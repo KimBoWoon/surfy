@@ -20,6 +20,7 @@ import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeason
 import com.cheeke.surfy.network.model.SurfyNetworkException
+import com.cheeke.surfy.network.model.toSurfyNetworkException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -114,7 +115,7 @@ class TvVM @AssistedInject constructor(
                     )
                 )
             }
-            is Result.Error -> TvState.Error(throwable = result.throwable as SurfyNetworkException)
+            is Result.Error -> TvState.Error(throwable = result.throwable.toSurfyNetworkException())
         }
     }.stateIn(
         scope = viewModelScope,
