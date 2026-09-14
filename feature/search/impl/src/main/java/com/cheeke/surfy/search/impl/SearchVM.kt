@@ -122,8 +122,8 @@ class SearchVM @AssistedInject constructor(
                                         searchRepository.getSearchPagingSource(
                                             type = request.searchType,
                                             query = request.query,
-                                            language = surfyAppData.value.language.find { it.isSelected }?.code.orEmpty(),
-                                            region = surfyAppData.value.region.find { it.isSelected }?.code.orEmpty(),
+                                            language = surfyAppData.value.selectedLanguage,
+                                            region = surfyAppData.value.selectedRegion,
                                             isAdult = surfyAppData.value.isAdult
                                         )
                                     }

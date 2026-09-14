@@ -8,6 +8,5 @@ import kotlinx.serialization.Serializable
 @Parcelize
 data class LocaleOption(
     val code: String = "",
-    val label: String = "",
-    val isSelected: Boolean = false
+    val label: String = ""
 ) : Parcelable

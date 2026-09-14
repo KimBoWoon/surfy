@@ -10,6 +10,7 @@ import androidx.paging.cachedIn
 import com.cheeke.surfy.common.Result
 import com.cheeke.surfy.common.asResult
 import com.cheeke.surfy.datamanager.api.DataManager
+import com.cheeke.surfy.datamanager.api.SurfyAppDataState
 import com.cheeke.surfy.detail.api.movie.MovieRepository
 import com.cheeke.surfy.model.Media
 import com.cheeke.surfy.model.Movie
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -56,8 +58,9 @@ class HomeVM @Inject constructor(
     private val onlineState = networkMonitor.isOnline
         .distinctUntilChanged()
         .filter { it }
-    private val localeState = dataManager.localeFlow
-        .map { locale -> "${locale.language}-${locale.region}" }
+    private val localeState = dataManager.surfyAppData
+        .filterIsInstance<SurfyAppDataState.Success>()
+        .map { surfyAppData -> surfyAppData.data.selectedLanguageAndRegion }
         .distinctUntilChanged()
     val nowPlayingMoviePaging = movieDataBaseRepository.getNowPlayingMovies().cachedIn(scope = viewModelScope)
     val upComingMoviePaging = movieDataBaseRepository.getUpComingMovies().cachedIn(scope = viewModelScope)

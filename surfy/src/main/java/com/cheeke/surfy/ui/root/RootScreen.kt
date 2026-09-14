@@ -65,6 +65,7 @@ import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.common.POSTER_IMAGE_RATIO
 import com.cheeke.surfy.common.ScrollTopEvent
 import com.cheeke.surfy.common.scrollToTop
+import com.cheeke.surfy.datamanager.api.SurfyAppDataState
 import com.cheeke.surfy.favorite.api.FavoriteNavKey
 import com.cheeke.surfy.favorite.impl.favoriteEntry
 import com.cheeke.surfy.firebase.api.LocalFirebaseLogHelper
@@ -135,15 +136,23 @@ fun RootScreen(
         val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
         val notConnectedMessage = stringResource(id = R.string.not_connected)
         val firebaseLog = LocalFirebaseLogHelper.current
+        val retryMessage = stringResource(id = R.string.network_retry)
+        val surfyAppDataState by viewModel.surfyDataManager.surfyAppData.collectAsStateWithLifecycle()
 
-        LaunchedEffect(key1 = isOffline) {
-            firebaseLog.sendLog("MovieMainScreen", "isOffline $isOffline")
+        LaunchedEffect(key1 = surfyAppDataState) {
+            val errorState = surfyAppDataState as? SurfyAppDataState.Error ?: return@LaunchedEffect
 
-            if (isOffline) {
-                snackbarHostState.showSnackbar(
-                    message = notConnectedMessage,
-                    duration = SnackbarDuration.Indefinite
-                )
+            firebaseLog.sendLog("MovieMainScreen", "error ${errorState.throwable}")
+
+            val result = snackbarHostState.showSnackbar(
+                message = notConnectedMessage,
+                actionLabel = retryMessage,
+                duration = SnackbarDuration.Indefinite
+            )
+
+            when (result) {
+                SnackbarResult.ActionPerformed -> viewModel.surfyDataManager.retry()
+                SnackbarResult.Dismissed -> {}
             }
         }
 
