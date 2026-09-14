@@ -24,3 +24,6 @@ enum class SurfyResponseErrorMessage(@param:StringRes val stringRes: Int) {
     SERVER_ERROR(stringRes = R.string.server_error),
     UNKNOWN(stringRes = R.string.response_error_unknown)
 }
+
+fun Throwable.toSurfyNetworkException(): SurfyNetworkException =
+    SurfyNetworkException(throwable = this)

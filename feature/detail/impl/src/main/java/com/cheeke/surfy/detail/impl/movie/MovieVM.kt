@@ -14,6 +14,7 @@ import com.cheeke.surfy.common.asResult
 import com.cheeke.surfy.detail.api.movie.MovieRepository
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.network.api.SurfyNetworkException
+import com.cheeke.surfy.network.api.toSurfyNetworkException
 import com.cheeke.surfy.userdata.api.UserDataRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -69,7 +70,7 @@ class MovieVM @AssistedInject constructor(
                 analyticsHelper.logSelectContent(contentType = "movie", id = id, title = result.data.title.orEmpty())
                 MovieState.Success(movie = result.data, isAutoPlayTrailer = internalData.isAutoPlayTrailer)
             }
-            is Result.Error -> MovieState.Error(throwable = result.throwable as SurfyNetworkException)
+            is Result.Error -> MovieState.Error(throwable = result.throwable.toSurfyNetworkException())
         }
     }.stateIn(
         scope = viewModelScope,

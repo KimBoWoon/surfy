@@ -1,7 +1,9 @@
 package com.cheeke.surfy.network.impl
 
 import com.cheeke.surfy.network.api.SurfyNetworkErrorMessage
+import com.cheeke.surfy.network.api.SurfyNetworkException
 import com.cheeke.surfy.network.api.SurfyResponseErrorMessage
+import com.cheeke.surfy.network.api.toSurfyNetworkException
 import okhttp3.Request
 import okio.Timeout
 import retrofit2.Call
@@ -31,7 +33,7 @@ internal class ApiResultCall<R>(
                     is SSLHandshakeException -> SurfyNetworkErrorMessage.SSL_HAND_SHAKE_EXCEPTION.stringRes
                     else -> SurfyNetworkErrorMessage.UNKNOWN.stringRes
                 }
-                callback.onResponse(this@ApiResultCall, Response.success(ApiResponse.Failure(throwable = throwable, stringRes = stringRes)))
+                callback.onResponse(this@ApiResultCall, Response.success(ApiResponse.Failure(throwable = throwable.toSurfyNetworkException(), stringRes = stringRes)))
             }
         })
     }
@@ -41,7 +43,7 @@ internal class ApiResultCall<R>(
             Response.success(response.toApiResponse())
         }
     } catch (e: Exception) {
-        Response.success(ApiResponse.Failure(throwable = e))
+        Response.success(ApiResponse.Failure(throwable = e.toSurfyNetworkException()))
     }
     override fun clone(): Call<ApiResponse<R>> = ApiResultCall(delegate, successType)
     override fun isExecuted(): Boolean = delegate.isExecuted
@@ -53,7 +55,7 @@ internal class ApiResultCall<R>(
     private fun Response<R>.toApiResponse(): ApiResponse<R> = when (code()) {
         in 200..299 -> body()
             ?.let { ApiResponse.Success(data = it) }
-            ?: ApiResponse.Failure(throwable = IllegalStateException(SurfyResponseErrorMessage.EMPTY_BODY.name))
+            ?: ApiResponse.Failure(throwable = SurfyNetworkException(stringRes = SurfyResponseErrorMessage.EMPTY_BODY.stringRes))
         in 400..499 -> ApiResponse.Failure(
             code = code(),
             stringRes = SurfyResponseErrorMessage.USER_ERROR.stringRes,

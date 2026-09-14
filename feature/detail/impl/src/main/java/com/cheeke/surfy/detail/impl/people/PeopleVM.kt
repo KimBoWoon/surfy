@@ -11,6 +11,7 @@ import com.cheeke.surfy.common.asResult
 import com.cheeke.surfy.detail.api.people.PeopleRepository
 import com.cheeke.surfy.model.People
 import com.cheeke.surfy.network.api.SurfyNetworkException
+import com.cheeke.surfy.network.api.toSurfyNetworkException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -60,7 +61,7 @@ class PeopleVM @AssistedInject constructor(
                     analyticsHelper.logSelectContent(contentType = "people", id = id, title = result.data.title.orEmpty())
                     PeopleState.Success(data = result.data)
                 }
-                is Result.Error -> PeopleState.Error(result.throwable as SurfyNetworkException)
+                is Result.Error -> PeopleState.Error(result.throwable.toSurfyNetworkException())
             }
         }.stateIn(
             scope = viewModelScope,
