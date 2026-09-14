@@ -13,7 +13,7 @@ import com.cheeke.surfy.common.asResult
 import com.cheeke.surfy.data.model.asExternalModel
 import com.cheeke.surfy.data.repository.MovieDataBaseRepository
 import com.cheeke.surfy.data.repository.PagingRepository
-import com.cheeke.surfy.data.util.DataManager
+import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.data.util.NetworkMonitor
 import com.cheeke.surfy.database.model.NowPlayingMovieEntity
 import com.cheeke.surfy.database.model.UpComingMovieEntity
@@ -38,10 +38,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeVM @Inject constructor(
-    dataManager: DataManager,
     movieDataBaseRepository: MovieDataBaseRepository,
     pagingRepository: PagingRepository,
-    networkMonitor: NetworkMonitor
+    networkMonitor: NetworkMonitor,
+    userDataRepository: UserDataRepository
 ) : ViewModel() {
     companion object {
         private const val TAG = "HomeVM"
@@ -62,8 +62,8 @@ class HomeVM @Inject constructor(
     private val onlineState = networkMonitor.isOnline
         .distinctUntilChanged()
         .filter { it }
-    private val localeState = dataManager.localeFlow
-        .map { locale -> "${locale.language}-${locale.region}" }
+    private val localeState = userDataRepository.internalData
+        .map { "${it.language}-${it.region}" }
         .distinctUntilChanged()
     val nowPlayingMoviePaging = Pager(
         config = PagingConfig(pageSize = 20, prefetchDistance = 5),

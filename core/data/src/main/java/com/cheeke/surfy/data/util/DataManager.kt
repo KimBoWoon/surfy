@@ -1,13 +1,12 @@
 package com.cheeke.surfy.data.util
 
 import com.cheeke.surfy.model.DarkThemeConfig
+import com.cheeke.surfy.model.Genre
 import com.cheeke.surfy.model.SurfyAppData
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface DataManager {
     val surfyAppData: StateFlow<SurfyAppDataState>
-    val localeFlow: Flow<Locale>
 }
 
 sealed interface SurfyAppDataState {
@@ -28,3 +27,6 @@ sealed interface SurfyAppDataState {
     fun shouldUseDarkTheme(isSystemDarkTheme: Boolean): Boolean = isSystemDarkTheme
     fun getMovieAppData(): SurfyAppData = SurfyAppData()
 }
+
+data class Locale(val language: String, val region: String)
+data class GenreData(val movie: List<Genre>, val tv: List<Genre>)

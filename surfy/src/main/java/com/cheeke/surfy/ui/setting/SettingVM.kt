@@ -34,8 +34,8 @@ class SettingVM @Inject constructor(
         flow3 = _uiState
     ) { internalData, movieAppDataState, settingsUiState ->
         val movieAppData = movieAppDataState.getMovieAppData()
-        val selectedLanguage = movieAppData.language.find { it.isSelected }
-        val selectedRegion = movieAppData.region.find { it.isSelected }
+        val selectedLanguage = movieAppData.selectedLanguage
+        val selectedRegion = movieAppData.selectedRegion
 
         SettingsUiState(
             sheet = settingsUiState.sheet,
@@ -111,14 +111,14 @@ class SettingVM @Inject constructor(
             is SettingsAction.PickRegion -> _uiState.update { it.copy(selectedRegion = action.option) }
             SettingsAction.ConfirmLanguageRegion -> {
                 viewModelScope.launch {
-                    _uiState.value.selectedLanguage?.let {
-                        if (it.code != _uiState.value.language?.code) {
-                            userDataRepository.updateLanguage(value = it.code)
+                    _uiState.value.selectedLanguage?.let { selectedLanguage ->
+                        if (selectedLanguage != _uiState.value.selectedLanguage) {
+                            userDataRepository.updateLanguage(value = selectedLanguage)
                         }
                     }
-                    _uiState.value.selectedRegion?.let {
-                        if (it.code != _uiState.value.region?.code) {
-                            userDataRepository.updateRegion(value = it.code)
+                    _uiState.value.selectedRegion?.let { selectedRegion ->
+                        if (selectedRegion != _uiState.value.selectedRegion) {
+                            userDataRepository.updateRegion(value = selectedRegion)
                         }
                     }
                 }
@@ -235,10 +235,10 @@ data class SettingsUiState(
     val themeList: List<DarkThemeConfig> = emptyList(),
     val isAdult: Boolean = true,
     val isTrailerAutoplay: Boolean = false,
-    val language: LocaleOption? = null,
-    val region: LocaleOption? = null,
-    val selectedLanguage: LocaleOption? = null,
-    val selectedRegion: LocaleOption? = null,
+    val language: String? = null,
+    val region: String? = null,
+    val selectedLanguage: String? = null,
+    val selectedRegion: String? = null,
     val imageQuality: String = "original",
     val imageQualityList: List<String> = emptyList(),
     val selectedImageQuality: String? = null,
@@ -261,8 +261,8 @@ sealed interface SettingsAction {
     data object OpenThemeSetting : SettingsAction
 
     // Language/Region sub sheet events
-    data class PickLanguage(val option: LocaleOption) : SettingsAction
-    data class PickRegion(val option: LocaleOption) : SettingsAction
+    data class PickLanguage(val option: String) : SettingsAction
+    data class PickRegion(val option: String) : SettingsAction
     data object ConfirmLanguageRegion : SettingsAction
     data object BackToMainFromLanguageRegion : SettingsAction
 

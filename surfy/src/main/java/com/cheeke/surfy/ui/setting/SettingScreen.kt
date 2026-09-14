@@ -180,7 +180,7 @@ fun SettingMainSheet(
             )
             SettingRowChevron(
                 title = stringResource(id = R.string.language_setting),
-                value = "${state.language?.code}-${state.region?.code}",
+                value = "${state.selectedLanguage}-${state.selectedRegion}",
                 onClick = { onAction(SettingsAction.OpenLanguageRegion) }
             )
             SettingRowChevron(
@@ -412,7 +412,7 @@ fun LanguageRegionSubSheet(
     val selectedLang = state.selectedLanguage ?: state.language
     val selectedRegion = state.selectedRegion ?: state.region
     val all = if (tab == LocaleTab.LANGUAGE) state.allLanguages else state.allRegions
-    val selectedCode = if (tab == LocaleTab.LANGUAGE) selectedLang?.code else selectedRegion?.code
+    val selectedCode = if (tab == LocaleTab.LANGUAGE) selectedLang else selectedRegion
     val filtered = remember(key1 = all, key2 = query.text) {
         if (query.text.isBlank()) {
             all
@@ -476,9 +476,9 @@ fun LanguageRegionSubSheet(
                         selected = opt.code == selectedCode
                     ) {
                         if (tab == LocaleTab.LANGUAGE) {
-                            onAction(SettingsAction.PickLanguage(option = opt))
+                            onAction(SettingsAction.PickLanguage(option = opt.code))
                         } else {
-                            onAction(SettingsAction.PickRegion(option = opt))
+                            onAction(SettingsAction.PickRegion(option = opt.code))
                         }
                     }
                 }
@@ -486,7 +486,7 @@ fun LanguageRegionSubSheet(
 
             // Confirm bar
             BottomConfirmBar(
-                enabled = (selectedLang?.code != state.language?.code) || (selectedRegion?.code != state.region?.code),
+                enabled = (selectedLang != state.language) || (selectedRegion != state.region),
                 text = "확인",
                 onClick = { onAction(SettingsAction.ConfirmLanguageRegion) },
                 modifier = Modifier.align(Alignment.BottomCenter)

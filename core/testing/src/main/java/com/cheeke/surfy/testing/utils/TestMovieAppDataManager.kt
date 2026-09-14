@@ -2,7 +2,6 @@ package com.cheeke.surfy.testing.utils
 
 import androidx.annotation.VisibleForTesting
 import com.cheeke.surfy.data.util.DataManager
-import com.cheeke.surfy.data.util.Locale
 import com.cheeke.surfy.data.util.SurfyAppDataState
 import com.cheeke.surfy.model.SurfyAppData
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 class TestMovieAppDataManager : DataManager {
     private val _movieAppData = MutableStateFlow<SurfyAppDataState>(value = SurfyAppDataState.Loading)
     override val surfyAppData: StateFlow<SurfyAppDataState> = _movieAppData.asStateFlow()
-    private val _localeFlow = MutableStateFlow<Locale>(value = Locale(language = "en", region = "US"))
-    override val localeFlow: StateFlow<Locale> = _localeFlow.asStateFlow()
 
     @VisibleForTesting
     fun setMovieAppData(surfyAppData: SurfyAppData) {
