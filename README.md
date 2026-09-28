@@ -18,7 +18,7 @@
 
 | 구조                      | 설명                                    | 브랜치                                                                                                |
 |-------------------------|---------------------------------------|----------------------------------------------------------------------------------------------------|
-| 🟢 **클린 아키텍처** (현재 브랜치) | 화면 · 비즈니스 로직 · 데이터로 나누는 계층 구조         | [`clean_architecture`](https://github.com/KimBoWoon/surfy/tree/clean_architecture)                 |
+| 🟢 **클린 아키텍처** (현재 브랜치) | 화면 · 비즈니스 로직 · 데이터로 나누는 계층 구조         | [`clean_architecture`](https://github.com/KimBoWoon/surfy/tree/feature/clean_architecture)         |
 | ⚪ api / impl 모듈 분리      | 모듈을 공개 계약(`api`)과 구현(`impl`)으로 나누는 구조 | [`feature/ryan_gradle_module`](https://github.com/KimBoWoon/surfy/tree/feature/ryan_gradle_module) |
 
 ## 스크린샷
