@@ -1,54 +1,30 @@
 package com.cheeke.surfy.home.impl
 
 import androidx.paging.PagingSource
-import com.cheeke.surfy.home.impl.paging.TrendingMoviePagingSource
-import com.cheeke.surfy.home.impl.paging.TrendingPeoplePagingSource
-import com.cheeke.surfy.home.impl.paging.TrendingTvPagingSource
+import com.cheeke.surfy.home.impl.paging.TrendingPagingSource
 import com.cheeke.surfy.model.TrendingMediaResult
 import com.cheeke.surfy.network.api.TrendingRemoteDataSource
 import javax.inject.Inject
 
 interface HomeRepository {
-    fun getTrendingMovie(
+    fun getTrending(
+        trending: Trending,
         timeWindow: String,
         language: String
     ): PagingSource<Int, TrendingMediaResult>
 
-    fun getTrendingPeople(
-        timeWindow: String,
-        language: String
-    ): PagingSource<Int, TrendingMediaResult>
-
-    fun getTrendingTv(timeWindow: String, language: String): PagingSource<Int, TrendingMediaResult>
+    enum class Trending {
+        MOVIE, PEOPLE, TV
+    }
 }
 
 class HomeRepositoryImpl @Inject constructor(
     private val trendingApis: TrendingRemoteDataSource
 ) : HomeRepository {
-    override fun getTrendingMovie(
+    override fun getTrending(
+        trending: HomeRepository.Trending,
         timeWindow: String,
         language: String
-    ): PagingSource<Int, TrendingMediaResult> = TrendingMoviePagingSource(
-        apis = trendingApis,
-        timeWindow = timeWindow,
-        language = language
-    )
-
-    override fun getTrendingPeople(
-        timeWindow: String,
-        language: String
-    ): PagingSource<Int, TrendingMediaResult> = TrendingPeoplePagingSource(
-        apis = trendingApis,
-        timeWindow = timeWindow,
-        language = language
-    )
-
-    override fun getTrendingTv(
-        timeWindow: String,
-        language: String
-    ): PagingSource<Int, TrendingMediaResult> = TrendingTvPagingSource(
-        apis = trendingApis,
-        timeWindow = timeWindow,
-        language = language
-    )
+    ): PagingSource<Int, TrendingMediaResult> =
+        TrendingPagingSource(apis = trendingApis, trending = trending, timeWindow = timeWindow, language = language)
 }

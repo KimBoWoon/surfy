@@ -26,4 +26,9 @@
     <string name="theme_setting">테마 설정</string>
     <string name="coming_soon_media">곧 개봉하는 미디어가 있습니다!</string>
     <string name="network_retry">연결</string>
+    <string name="setting_close">닫기</string>
+    <string name="setting_back">뒤로</string>
+    <string name="setting_confirm">확인</string>
+    <string name="language_and_region_remove_keyword">지우기</string>
+    <string name="language_and_region_search_hint">검색…</string>
 </resources>

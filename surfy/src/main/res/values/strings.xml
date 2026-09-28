@@ -26,4 +26,9 @@
     <string name="theme_setting">Theme Setting</string>
     <string name="coming_soon_media">Coming soon media!</string>
     <string name="network_retry">Connect</string>
+    <string name="setting_close">Close</string>
+    <string name="setting_back">Back</string>
+    <string name="setting_confirm">Confirm</string>
+    <string name="language_and_region_remove_keyword">Remove</string>
+    <string name="language_and_region_search_hint">Search…</string>
 </resources>

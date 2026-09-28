@@ -3,26 +3,34 @@ package com.cheeke.surfy.home.impl.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.cheeke.surfy.common.Log
+import com.cheeke.surfy.home.impl.HomeRepository
 import com.cheeke.surfy.model.TrendingMediaResult
 import com.cheeke.surfy.network.api.TrendingRemoteDataSource
 
-class TrendingTvPagingSource(
+class TrendingPagingSource(
+    private val trending: HomeRepository.Trending,
     private val apis: TrendingRemoteDataSource,
     private val timeWindow: String,
     private val language: String
 ) : PagingSource<Int, TrendingMediaResult>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TrendingMediaResult> =
         runCatching {
-            val response = apis.getTrendingTv(timeWindow = timeWindow, language = language, page = params.key ?: 1)
+            val page = params.key ?: 1
+            val response = when (trending) {
+                HomeRepository.Trending.MOVIE -> apis.getTrendingMovie(timeWindow = timeWindow, language = language, page = page)
+                HomeRepository.Trending.PEOPLE -> apis.getTrendingPeople(timeWindow = timeWindow, language = language, page = page)
+                HomeRepository.Trending.TV -> apis.getTrendingTv(timeWindow = timeWindow, language = language, page = page)
+            }
+            val totalPages = response.totalPages ?: 1
 
             LoadResult.Page(
                 data = response.results.orEmpty(),
                 prevKey = null,
-                nextKey = if ((response.totalPages ?: 1) > (params.key ?: 1)) (params.key ?: 1) + 1 else null
+                nextKey = if (totalPages > page) page + 1 else null
             )
         }.getOrElse { e ->
-            Log.printStackTrace(e)
-            LoadResult.Error(e)
+            Log.printStackTrace(tr = e)
+            LoadResult.Error(throwable = e)
         }
 
     override fun getRefreshKey(state: PagingState<Int, TrendingMediaResult>): Int? =

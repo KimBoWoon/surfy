@@ -153,7 +153,9 @@ fun SettingMainSheet(
         )
         HorizontalDivider()
         Card(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp10, vertical = dp5),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp10, vertical = dp5),
             shape = RoundedCornerShape(size = dp16),
             border = BorderStroke(width = dp1, color = MaterialTheme.colorScheme.inverseSurface)
         ) {
@@ -169,7 +171,9 @@ fun SettingMainSheet(
             )
         }
         Card(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp10, vertical = dp5),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp10, vertical = dp5),
             shape = RoundedCornerShape(size = dp16),
             border = BorderStroke(width = dp1, color = MaterialTheme.colorScheme.inverseSurface)
         ) {
@@ -190,7 +194,9 @@ fun SettingMainSheet(
             )
         }
         Card(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp10, vertical = dp5),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp10, vertical = dp5),
             shape = RoundedCornerShape(size = dp16),
             border = BorderStroke(width = dp1, color = MaterialTheme.colorScheme.inverseSurface)
         ) {
@@ -281,12 +287,16 @@ private fun SettingRowSwitch(title: String, checked: Boolean, onCheckedChange: (
 
 @Composable
 private fun BottomCloseButton(onClick: () -> Unit) {
-    Box(Modifier.fillMaxWidth().padding(horizontal = dp18, vertical = dp10)) {
+    Box(Modifier
+        .fillMaxWidth()
+        .padding(horizontal = dp18, vertical = dp10)) {
         Button(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth().height(height = dp48),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height = dp48),
             shape = RoundedCornerShape(size = dp999)
-        ) { Text("닫기") }
+        ) { Text(stringResource(id = R.string.setting_close)) }
     }
 }
 
@@ -303,23 +313,29 @@ fun ThemeSettingSubSheet(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp18, vertical = dp10),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp18, vertical = dp10),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { onAction(SettingsAction.BackToMainFromImageQuality) }) { Text(text = "뒤로") }
+            TextButton(onClick = { onAction(SettingsAction.BackToMainFromImageQuality) }) { Text(text = stringResource(id = R.string.setting_back)) }
             Spacer(modifier = Modifier.weight(weight = 1f))
             Text(text = stringResource(id = R.string.theme_setting), style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.weight(weight = 1f))
-            TextButton(onClick = { onAction(SettingsAction.CloseSheet) }) { Text(text = "닫기") }
+            TextButton(onClick = { onAction(SettingsAction.CloseSheet) }) { Text(text = stringResource(id = R.string.setting_close)) }
         }
 
         HorizontalDivider()
 
         Box(
-            modifier = Modifier.fillMaxWidth().heightIn(min = dp420, max = dp520)
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = dp420, max = dp520)
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(bottom = dp84),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = dp84),
                 contentPadding = PaddingValues(horizontal = dp16, vertical = dp12),
                 verticalArrangement = Arrangement.spacedBy(space = dp10)
             ) {
@@ -337,7 +353,7 @@ fun ThemeSettingSubSheet(
 
             BottomConfirmBar(
                 enabled = pending != current,
-                text = "확인",
+                text = stringResource(id = R.string.setting_confirm),
                 onClick = { onAction(SettingsAction.ConfirmTheme) },
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
@@ -358,23 +374,29 @@ fun ImageQualitySubSheet(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp18, vertical = dp10),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp18, vertical = dp10),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { onAction(SettingsAction.BackToMainFromImageQuality) }) { Text(text = "뒤로") }
+            TextButton(onClick = { onAction(SettingsAction.BackToMainFromImageQuality) }) { Text(text = stringResource(id = R.string.setting_back)) }
             Spacer(modifier = Modifier.weight(weight = 1f))
             Text(text = stringResource(id = R.string.image_quality_setting), style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.weight(weight = 1f))
-            TextButton(onClick = { onAction(SettingsAction.CloseSheet) }) { Text(text = "닫기") }
+            TextButton(onClick = { onAction(SettingsAction.CloseSheet) }) { Text(text = stringResource(id = R.string.setting_close)) }
         }
 
         HorizontalDivider()
 
         Box(
-            modifier = Modifier.fillMaxWidth().heightIn(min = dp420, max = dp520)
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = dp420, max = dp520)
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(bottom = dp84),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = dp84),
                 contentPadding = PaddingValues(horizontal = dp16, vertical = dp12),
                 verticalArrangement = Arrangement.spacedBy(space = dp10)
             ) {
@@ -392,7 +414,7 @@ fun ImageQualitySubSheet(
 
             BottomConfirmBar(
                 enabled = pending != current,
-                text = "확인",
+                text = stringResource(id = R.string.setting_confirm),
                 onClick = { onAction(SettingsAction.ConfirmImageQuality) },
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
@@ -425,7 +447,9 @@ fun LanguageRegionSubSheet(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp18, vertical = dp10),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp18, vertical = dp10),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(onClick = { onAction(SettingsAction.BackToMainFromLanguageRegion) }) { Text(text = "뒤로") }
@@ -436,8 +460,8 @@ fun LanguageRegionSubSheet(
         }
 
         PrimaryTabRow(selectedTabIndex = if (tab == LocaleTab.LANGUAGE) 0 else 1, divider = {}) {
-            Tab(selected = tab == LocaleTab.LANGUAGE, onClick = { tab = LocaleTab.LANGUAGE; query = TextFieldValue(text = "") }, text = { Text(text = "언어") })
-            Tab(selected = tab == LocaleTab.REGION, onClick = { tab = LocaleTab.REGION; query = TextFieldValue(text = "") }, text = { Text(text = "지역") })
+            Tab(selected = tab == LocaleTab.LANGUAGE, onClick = { tab = LocaleTab.LANGUAGE; query = TextFieldValue(text = "") }, text = { Text(text = stringResource(id = R.string.language_setting)) })
+            Tab(selected = tab == LocaleTab.REGION, onClick = { tab = LocaleTab.REGION; query = TextFieldValue(text = "") }, text = { Text(text = stringResource(id = R.string.region_setting)) })
         }
 
         Spacer(modifier = Modifier.height(height = dp12))
@@ -445,16 +469,20 @@ fun LanguageRegionSubSheet(
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp16),
-            placeholder = { Text(text = "검색...") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp16),
+            placeholder = { Text(text = stringResource(R.string.language_and_region_search_hint)) },
             singleLine = true,
             shape = RoundedCornerShape(size = dp16),
             trailingIcon = {
                 if (query.text.isNotBlank()) {
                     Text(
-                        text = "지우기",
+                        text = stringResource(R.string.language_and_region_remove_keyword),
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(end = dp12).clickable { query = TextFieldValue(text = "") }
+                        modifier = Modifier
+                            .padding(end = dp12)
+                            .clickable { query = TextFieldValue(text = "") }
                     )
                 }
             }
@@ -463,10 +491,14 @@ fun LanguageRegionSubSheet(
         Spacer(modifier = Modifier.height(height = dp12))
 
         Box(
-            modifier = Modifier.fillMaxWidth().heightIn(min = dp420, max = dp560)
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = dp420, max = dp560)
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(bottom = dp84),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = dp84),
                 contentPadding = PaddingValues(horizontal = dp16, vertical = dp8),
                 verticalArrangement = Arrangement.spacedBy(space = dp10)
             ) {
@@ -498,7 +530,9 @@ fun LanguageRegionSubSheet(
 @Composable
 private fun SelectRowSimple(label: String, selected: Boolean, onClick: () -> Unit) {
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(size = dp16),
         color = if (selected) {
             MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
@@ -507,7 +541,9 @@ private fun SelectRowSimple(label: String, selected: Boolean, onClick: () -> Uni
         }
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp14, vertical = dp12)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp14, vertical = dp12)
         ) {
             Text(text = label, modifier = Modifier.weight(weight = 1f))
             if (selected) Text(text = "✓", color = MaterialTheme.colorScheme.primary)
@@ -527,12 +563,16 @@ private fun BottomConfirmBar(
         shadowElevation = dp10, tonalElevation = dp2
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = dp16, vertical = dp14)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dp16, vertical = dp14)
         ) {
             Button(
                 enabled = enabled,
                 onClick = onClick,
-                modifier = Modifier.fillMaxWidth().height(height = dp48),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height = dp48),
                 shape = RoundedCornerShape(size = dp999)
             ) { Text(text) }
         }

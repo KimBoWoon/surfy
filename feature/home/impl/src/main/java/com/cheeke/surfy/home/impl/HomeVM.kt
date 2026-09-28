@@ -14,7 +14,6 @@ import com.cheeke.surfy.datamanager.api.SurfyAppDataState
 import com.cheeke.surfy.detail.api.movie.MovieRepository
 import com.cheeke.surfy.model.Media
 import com.cheeke.surfy.model.Movie
-import com.cheeke.surfy.model.TrendingMediaResult
 import com.cheeke.surfy.network.api.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,25 +63,25 @@ class HomeVM @Inject constructor(
         .distinctUntilChanged()
     val nowPlayingMoviePaging = movieDataBaseRepository.getNowPlayingMovies().cachedIn(scope = viewModelScope)
     val upComingMoviePaging = movieDataBaseRepository.getUpComingMovies().cachedIn(scope = viewModelScope)
-    val trendingMoviePaging: Flow<PagingData<TrendingMediaResult>> =
+    val trendingMoviePaging =
         createTrendingPaging(
             timeWindowFlow = trendingMovieTimeWindow,
             pagingSourceFactory = { timeWindow, language ->
-                homeRepository.getTrendingMovie(timeWindow = timeWindow, language = language)
+                homeRepository.getTrending(trending = HomeRepository.Trending.MOVIE, timeWindow = timeWindow, language = language)
             }
         )
-    val trendingPeoplePaging: Flow<PagingData<TrendingMediaResult>> =
+    val trendingPeoplePaging =
         createTrendingPaging(
             timeWindowFlow = trendingPeopleTimeWindow,
             pagingSourceFactory = { timeWindow, language ->
-                homeRepository.getTrendingPeople(timeWindow = timeWindow, language = language)
+                homeRepository.getTrending(trending = HomeRepository.Trending.PEOPLE, timeWindow = timeWindow, language = language)
             }
         )
-    val trendingTvPaging: Flow<PagingData<TrendingMediaResult>> =
+    val trendingTvPaging =
         createTrendingPaging(
             timeWindowFlow = trendingTvTimeWindow,
             pagingSourceFactory = { timeWindow, language ->
-                homeRepository.getTrendingTv(timeWindow = timeWindow, language = language)
+                homeRepository.getTrending(trending = HomeRepository.Trending.TV, timeWindow = timeWindow, language = language)
             }
         )
     val homeUiState = movieDataBaseRepository.getPopularMovies()
