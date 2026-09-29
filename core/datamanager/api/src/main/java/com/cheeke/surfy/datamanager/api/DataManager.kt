@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface DataManager {
     val surfyAppData: StateFlow<SurfyAppDataState>
+    fun retry()
 }
 
 sealed interface SurfyAppDataState {

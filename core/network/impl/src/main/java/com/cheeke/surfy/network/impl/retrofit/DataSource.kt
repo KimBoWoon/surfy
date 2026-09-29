@@ -405,21 +405,13 @@ class SyncRemoteDataSourceImpl @Inject constructor(
 class TrendingRemoteDataSourceImpl @Inject constructor(
     private val apis: TrendingApis
 ) : TrendingRemoteDataSource {
-    override suspend fun getTrendingMovie(timeWindow: String, language: String, page: Int): TrendingMedia =
-        when (val response = apis.getTrendingMovie(timeWindow = timeWindow, language = language, page = page)) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.MOVIE)
-        }
-
-    override suspend fun getTrendingPeople(timeWindow: String, language: String, page: Int): TrendingMedia =
-        when (val response = apis.getTrendingPeople(timeWindow = timeWindow, language = language, page = page)) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.PEOPLE)
-        }
-
-    override suspend fun getTrendingTv(timeWindow: String, language: String, page: Int): TrendingMedia =
-        when (val response = apis.getTrendingTv(timeWindow = timeWindow, language = language, page = page)) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.TV)
-        }
+    override suspend fun getTrending(
+        mediaType: MediaType,
+        timeWindow: String,
+        language: String,
+        page: Int
+    ): TrendingMedia = when (val response = apis.getTrending(mediaType = mediaType.label, timeWindow = timeWindow, language = language, page = page)) {
+        is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
+        is ApiResponse.Success -> response.data.asExternalModel(mediaType = mediaType)
+    }
 }

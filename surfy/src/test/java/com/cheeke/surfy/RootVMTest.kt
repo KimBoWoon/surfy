@@ -3,6 +3,7 @@ package com.cheeke.surfy
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
+import com.cheeke.surfy.datamanager.api.TestSurfyAppData
 import com.cheeke.surfy.deeplink.DeepLinkManager
 import com.cheeke.surfy.deeplink.parseDeeplink
 import com.cheeke.surfy.detail.api.TestMovieDatabaseRepository
@@ -36,6 +37,7 @@ class RootVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var deepLinkManager: TestDeepLinkManager
+    private lateinit var testMovieAppDataManager: TestSurfyAppData
     private lateinit var movieRepository: TestMovieDatabaseRepository
     private lateinit var tvRepository: TestTvDatabaseRepository
     private lateinit var networkMonitor: TestNetworkMonitor
@@ -56,6 +58,7 @@ class RootVMTest {
     @Before
     fun setUp() {
         deepLinkManager = TestDeepLinkManager()
+        testMovieAppDataManager = TestSurfyAppData()
         movieRepository = TestMovieDatabaseRepository()
         tvRepository = TestTvDatabaseRepository()
         networkMonitor = TestNetworkMonitor()
@@ -67,7 +70,8 @@ class RootVMTest {
             deepLinkManager = deepLinkManager,
             movieDataBaseRepository = movieRepository,
             tvDataBaseRepository = tvRepository,
-            networkMonitor = networkMonitor
+            networkMonitor = networkMonitor,
+            surfyDataManager = testMovieAppDataManager
         )
     }
 

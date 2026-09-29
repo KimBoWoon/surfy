@@ -13,7 +13,9 @@ import com.cheeke.surfy.datamanager.api.DataManager
 import com.cheeke.surfy.datamanager.api.SurfyAppDataState
 import com.cheeke.surfy.detail.api.movie.MovieRepository
 import com.cheeke.surfy.model.Media
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Movie
+import com.cheeke.surfy.model.defaultLanguageRegion
 import com.cheeke.surfy.network.api.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,33 +59,20 @@ class HomeVM @Inject constructor(
     private val onlineState = networkMonitor.isOnline
         .distinctUntilChanged()
         .filter { it }
-    private val localeState = dataManager.surfyAppData
+    private val selectedLanguage = dataManager.surfyAppData
         .filterIsInstance<SurfyAppDataState.Success>()
         .map { surfyAppData -> surfyAppData.data.selectedLanguageAndRegion }
         .distinctUntilChanged()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = defaultLanguageRegion
+        )
     val nowPlayingMoviePaging = movieDataBaseRepository.getNowPlayingMovies().cachedIn(scope = viewModelScope)
     val upComingMoviePaging = movieDataBaseRepository.getUpComingMovies().cachedIn(scope = viewModelScope)
-    val trendingMoviePaging =
-        createTrendingPaging(
-            timeWindowFlow = trendingMovieTimeWindow,
-            pagingSourceFactory = { timeWindow, language ->
-                homeRepository.getTrending(trending = HomeRepository.Trending.MOVIE, timeWindow = timeWindow, language = language)
-            }
-        )
-    val trendingPeoplePaging =
-        createTrendingPaging(
-            timeWindowFlow = trendingPeopleTimeWindow,
-            pagingSourceFactory = { timeWindow, language ->
-                homeRepository.getTrending(trending = HomeRepository.Trending.PEOPLE, timeWindow = timeWindow, language = language)
-            }
-        )
-    val trendingTvPaging =
-        createTrendingPaging(
-            timeWindowFlow = trendingTvTimeWindow,
-            pagingSourceFactory = { timeWindow, language ->
-                homeRepository.getTrending(trending = HomeRepository.Trending.TV, timeWindow = timeWindow, language = language)
-            }
-        )
+    val trendingMoviePaging = homeRepository.getTrending(trending = MediaType.MOVIE, timeWindow = trendingMovieTimeWindow.value, language = selectedLanguage.value)
+    val trendingPeoplePaging = homeRepository.getTrending(trending = MediaType.PEOPLE, timeWindow = trendingMovieTimeWindow.value, language = selectedLanguage.value)
+    val trendingTvPaging = homeRepository.getTrending(trending = MediaType.TV, timeWindow = trendingMovieTimeWindow.value, language = selectedLanguage.value)
     val homeUiState = movieDataBaseRepository.getPopularMovies()
         .map { popularMovies -> HomeUiState(popularMovies = popularMovies) }
         .asResult()
@@ -127,7 +116,7 @@ class HomeVM @Inject constructor(
     ): Flow<PagingData<T>> {
         return combine(
             timeWindowFlow,
-            localeState,
+            selectedLanguage,
             onlineState
         ) { timeWindow, language, _ ->
             TrendingRequest(timeWindow = timeWindow.label, language = language)

@@ -50,10 +50,10 @@ class GetMovieDetailUseCaseTest {
                 SurfyAppData(
                     secureBaseUrl = configurationTestData.images?.secureBaseUrl.orEmpty(),
                     movieGenres = genreListTestData.genres.orEmpty(),
-                    region = regionTestData.results?.map { LocaleOption(code = it.iso31661.orEmpty(), label = it.englishName.orEmpty(), isSelected = it.isSelected) }.orEmpty(),
-                    language = languageListTestData.map { LocaleOption(code = it.iso6391.orEmpty(), label = it.englishName.orEmpty(), isSelected = it.isSelected) },
+                    region = regionTestData.results?.map { LocaleOption(code = it.iso31661.orEmpty(), label = it.englishName.orEmpty()) }.orEmpty(),
+                    language = languageListTestData.map { LocaleOption(code = it.iso6391.orEmpty(), label = it.englishName.orEmpty()) },
                     posterSize = configurationTestData.images?.posterSizes?.map {
-                        PosterSize(size = it, isSelected = it == "original")
+                        PosterSize(size = it)
                     }.orEmpty()
                 )
             )

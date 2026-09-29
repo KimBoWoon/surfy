@@ -1,30 +1,44 @@
 package com.cheeke.surfy.home.impl
 
-import androidx.paging.PagingSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.cheeke.surfy.home.impl.paging.TrendingPagingSource
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.TrendingMediaResult
 import com.cheeke.surfy.network.api.TrendingRemoteDataSource
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface HomeRepository {
     fun getTrending(
-        trending: Trending,
-        timeWindow: String,
+        trending: MediaType,
+        timeWindow: TimeWindow,
         language: String
-    ): PagingSource<Int, TrendingMediaResult>
-
-    enum class Trending {
-        MOVIE, PEOPLE, TV
-    }
+    ): Flow<PagingData<TrendingMediaResult>>
 }
 
 class HomeRepositoryImpl @Inject constructor(
     private val trendingApis: TrendingRemoteDataSource
 ) : HomeRepository {
     override fun getTrending(
-        trending: HomeRepository.Trending,
-        timeWindow: String,
+        trending: MediaType,
+        timeWindow: TimeWindow,
         language: String
-    ): PagingSource<Int, TrendingMediaResult> =
-        TrendingPagingSource(apis = trendingApis, trending = trending, timeWindow = timeWindow, language = language)
+    ): Flow<PagingData<TrendingMediaResult>> =
+        Pager(
+            config = PagingConfig(pageSize = 20, initialLoadSize = 20, enablePlaceholders = false),
+            pagingSourceFactory = {
+                TrendingPagingSource(
+                    fetchPage = { page ->
+                        trendingApis.getTrending(
+                            mediaType = trending,
+                            timeWindow = timeWindow.label,
+                            language = language,
+                            page = page
+                        )
+                    }
+                )
+            }
+        ).flow
 }

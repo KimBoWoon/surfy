@@ -118,7 +118,7 @@ class SurfyDataManager @Inject constructor(
             initialValue = SurfyAppDataState.Loading
         )
 
-    fun retry() {
+    override fun retry() {
         retryTrigger.tryEmit(value = Unit)
     }
 

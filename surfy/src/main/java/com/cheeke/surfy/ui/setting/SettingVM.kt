@@ -45,8 +45,8 @@ class SettingVM @Inject constructor(
             isTrailerAutoplay = settingsUiState.isTrailerAutoplay,
             language = selectedLanguage,
             region = selectedRegion,
-            selectedLanguage = settingsUiState.selectedLanguage ?: selectedLanguage,
-            selectedRegion = settingsUiState.selectedRegion ?: selectedRegion,
+            selectedLanguage = settingsUiState.selectedLanguage,
+            selectedRegion = settingsUiState.selectedRegion,
             imageQuality = internalData.imageQuality,
             imageQualityList = movieAppData.posterSize.map { it.size.orEmpty() },
             allLanguages = movieAppData.language.sortedBy { it.label },
@@ -111,15 +111,11 @@ class SettingVM @Inject constructor(
             is SettingsAction.PickRegion -> _uiState.update { it.copy(selectedRegion = action.option) }
             SettingsAction.ConfirmLanguageRegion -> {
                 viewModelScope.launch {
-                    _uiState.value.selectedLanguage?.let {
-                        if (it != _uiState.value.language) {
-                            userDataRepository.updateLanguage(value = it)
-                        }
+                    if (_uiState.value.selectedLanguage != _uiState.value.language) {
+                        userDataRepository.updateLanguage(value = _uiState.value.selectedLanguage)
                     }
-                    _uiState.value.selectedRegion?.let {
-                        if (it != _uiState.value.region) {
-                            userDataRepository.updateRegion(value = it)
-                        }
+                    if (_uiState.value.selectedRegion != _uiState.value.region) {
+                        userDataRepository.updateRegion(value = _uiState.value.selectedRegion)
                     }
                 }
                 _uiState.update {
@@ -136,8 +132,8 @@ class SettingVM @Inject constructor(
                         sheet = SettingsSheet.Main,
                         language = it.language,
                         region = it.region,
-                        selectedLanguage = null,
-                        selectedRegion = null
+                        selectedLanguage = it.selectedLanguage,
+                        selectedRegion = it.selectedRegion
                     )
                 }
             }
@@ -235,10 +231,10 @@ data class SettingsUiState(
     val themeList: List<DarkThemeConfig> = emptyList(),
     val isAdult: Boolean = true,
     val isTrailerAutoplay: Boolean = false,
-    val language: String? = null,
-    val region: String? = null,
-    val selectedLanguage: String? = null,
-    val selectedRegion: String? = null,
+    val language: String = "",
+    val region: String = "",
+    val selectedLanguage: String = "",
+    val selectedRegion: String = "",
     val imageQuality: String = "original",
     val imageQualityList: List<String> = emptyList(),
     val selectedImageQuality: String? = null,

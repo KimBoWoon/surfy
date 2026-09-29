@@ -229,24 +229,11 @@ interface SyncApis {
 }
 
 interface TrendingApis {
-    @GET(value = "/3/trending/movie/{time_window}")
-    suspend fun getTrendingMovie(
-        @Path(value = "time_window") timeWindow: String,
-        @Query(value = "language") language: String,
-        @Query(value = "page") page: Int = 1
-    ): ApiResponse<NetworkTMDBTrendingMedia>
-
-    @GET(value = "/3/trending/person/{time_window}")
-    suspend fun getTrendingPeople(
-        @Path(value = "time_window") timeWindow: String,
-        @Query(value = "language") language: String,
-        @Query(value = "page") page: Int = 1
-    ): ApiResponse<NetworkTMDBTrendingMedia>
-
-    @GET(value = "/3/trending/tv/{time_window}")
-    suspend fun getTrendingTv(
-        @Path(value = "time_window") timeWindow: String,
-        @Query(value = "language") language: String,
-        @Query(value = "page") page: Int = 1
+    @GET("/3/trending/{mediaType}/{timeWindow}")
+    suspend fun getTrending(
+        @Path("mediaType") mediaType: String,
+        @Path("timeWindow") timeWindow: String,
+        @Query("language") language: String,
+        @Query("page") page: Int = 1
     ): ApiResponse<NetworkTMDBTrendingMedia>
 }
