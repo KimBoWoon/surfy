@@ -2,10 +2,8 @@ package com.cheeke.surfy.home.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.cheeke.surfy.common.Result
 import com.cheeke.surfy.common.asResult
@@ -15,6 +13,7 @@ import com.cheeke.surfy.detail.api.movie.MovieRepository
 import com.cheeke.surfy.model.Media
 import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Movie
+import com.cheeke.surfy.model.TrendingMediaResult
 import com.cheeke.surfy.model.defaultLanguageRegion
 import com.cheeke.surfy.network.api.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -70,9 +69,9 @@ class HomeVM @Inject constructor(
         )
     val nowPlayingMoviePaging = movieDataBaseRepository.getNowPlayingMovies().cachedIn(scope = viewModelScope)
     val upComingMoviePaging = movieDataBaseRepository.getUpComingMovies().cachedIn(scope = viewModelScope)
-    val trendingMoviePaging = homeRepository.getTrending(trending = MediaType.MOVIE, timeWindow = trendingMovieTimeWindow.value, language = selectedLanguage.value)
-    val trendingPeoplePaging = homeRepository.getTrending(trending = MediaType.PEOPLE, timeWindow = trendingMovieTimeWindow.value, language = selectedLanguage.value)
-    val trendingTvPaging = homeRepository.getTrending(trending = MediaType.TV, timeWindow = trendingMovieTimeWindow.value, language = selectedLanguage.value)
+    val trendingMoviePaging = createTrendingPaging(mediaType = MediaType.MOVIE, timeWindowFlow = trendingMovieTimeWindow)
+    val trendingPeoplePaging = createTrendingPaging(mediaType = MediaType.PEOPLE, timeWindowFlow = trendingPeopleTimeWindow)
+    val trendingTvPaging = createTrendingPaging(mediaType = MediaType.TV, timeWindowFlow = trendingTvTimeWindow)
     val homeUiState = movieDataBaseRepository.getPopularMovies()
         .map { popularMovies -> HomeUiState(popularMovies = popularMovies) }
         .asResult()
@@ -110,26 +109,24 @@ class HomeVM @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun <T : Any> createTrendingPaging(
-        timeWindowFlow: StateFlow<TimeWindow>,
-        pagingSourceFactory: (timeWindow: String, language: String) -> PagingSource<Int, T>
-    ): Flow<PagingData<T>> {
-        return combine(
+    private fun createTrendingPaging(
+        mediaType: MediaType,
+        timeWindowFlow: StateFlow<TimeWindow>
+    ): Flow<PagingData<TrendingMediaResult>> =
+        combine(
             timeWindowFlow,
             selectedLanguage,
             onlineState
         ) { timeWindow, language, _ ->
-            TrendingRequest(timeWindow = timeWindow.label, language = language)
+            TrendingRequest(timeWindow = timeWindow, language = language)
         }.distinctUntilChanged()
             .flatMapLatest { request ->
-                Pager(
-                    config = pagingConfig,
-                    pagingSourceFactory = {
-                        pagingSourceFactory(request.timeWindow, request.language)
-                    }
-                ).flow
-            }.cachedIn(viewModelScope)
-    }
+                homeRepository.getTrending(
+                    trending = mediaType,
+                    timeWindow = request.timeWindow,
+                    language = request.language
+                )
+            }.cachedIn(scope = viewModelScope)
 }
 
 sealed interface HomeState {
@@ -149,6 +146,6 @@ enum class TimeWindow(val label: String) {
 }
 
 private data class TrendingRequest(
-    val timeWindow: String,
+    val timeWindow: TimeWindow,
     val language: String
 )
