@@ -7,6 +7,7 @@ import com.cheeke.surfy.model.ExternalIds
 import com.cheeke.surfy.model.Genres
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Language
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.MovieWatchProvider
 import com.cheeke.surfy.model.People
@@ -167,23 +168,17 @@ class TestSyncRemoteDataSource : SyncRemoteDataSource {
 }
 
 class TestTrendingRemoteDataSource : TrendingRemoteDataSource {
-    override suspend fun getTrendingMovie(
+    override suspend fun getTrending(
+        mediaType: MediaType,
         timeWindow: String,
         language: String,
         page: Int
-    ): TrendingMedia = testTrendingMovie
-
-    override suspend fun getTrendingPeople(
-        timeWindow: String,
-        language: String,
-        page: Int
-    ): TrendingMedia = testTrendingPeople
-
-    override suspend fun getTrendingTv(
-        timeWindow: String,
-        language: String,
-        page: Int
-    ): TrendingMedia = testTrendingTv
+    ): TrendingMedia = when (mediaType) {
+        MediaType.MOVIE -> testTrendingMovie
+        MediaType.TV -> testTrendingTv
+        MediaType.PEOPLE -> testTrendingPeople
+        else -> testTrendingMovie
+    }
 }
 
 class TestSearchRemoteDataSource : SearchRemoteDataSource {

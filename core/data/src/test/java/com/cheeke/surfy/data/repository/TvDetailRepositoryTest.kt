@@ -7,6 +7,7 @@ import com.cheeke.surfy.testing.TestTvRemoteDataSource
 import com.cheeke.surfy.testing.model.tvEpisodeTestData
 import com.cheeke.surfy.testing.model.tvSeasonTestData
 import com.cheeke.surfy.testing.model.tvTestData
+import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -21,6 +22,7 @@ class TvDetailRepositoryTest {
     private lateinit var tvApis: TestTvRemoteDataSource
     private lateinit var datastore: InternalDataSource
     private lateinit var repository: TvDetailRepositoryImpl
+    private lateinit var userDataRepository: UserDataRepository
 
     @Before
     fun setup() {
@@ -28,9 +30,10 @@ class TvDetailRepositoryTest {
         datastore = InternalDataSource(
             datastore = InMemoryDataStore(initialValue = InternalDataPreferences.getDefaultInstance())
         )
+        userDataRepository = TestUserDataRepository()
         repository = TvDetailRepositoryImpl(
             apis = tvApis,
-            requestOptionsProvider = DetailRequestOptionsProvider(datastore = datastore),
+            requestOptionsProvider = DetailRequestOptionsProvider(userdata = userDataRepository),
         )
     }
 

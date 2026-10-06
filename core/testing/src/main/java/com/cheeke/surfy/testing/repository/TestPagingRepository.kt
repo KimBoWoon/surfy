@@ -1,10 +1,12 @@
 package com.cheeke.surfy.testing.repository
 
 import android.annotation.SuppressLint
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.testing.asPagingSourceFactory
 import com.cheeke.surfy.data.repository.PagingRepository
 import com.cheeke.surfy.model.Media
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.SearchKeyword
 import com.cheeke.surfy.model.SearchType
@@ -20,6 +22,8 @@ import com.cheeke.surfy.testing.model.testTrendingPeople
 import com.cheeke.surfy.testing.model.testTrendingTv
 import com.cheeke.surfy.testing.model.testTvReviews
 import com.cheeke.surfy.testing.model.tvSearchTestData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class TestPagingRepository : PagingRepository {
     @SuppressLint("VisibleForTests")
@@ -90,20 +94,19 @@ class TestPagingRepository : PagingRepository {
     ): PagingSource<Int, Review> = testTvReviews.asPagingSourceFactory().invoke()
 
     @SuppressLint("VisibleForTests")
-    override fun getTrendingMovie(
+    override fun getTrending(
+        mediaType: MediaType,
         timeWindow: String,
         language: String
-    ): PagingSource<Int, TrendingMediaResult> = testTrendingMovie.results?.asPagingSourceFactory()?.invoke()!!
+    ): Flow<PagingData<TrendingMediaResult>> {
+        val results: List<TrendingMediaResult> = when (mediaType) {
+            MediaType.MOVIE -> testTrendingMovie.results.orEmpty()
+            MediaType.TV -> testTrendingTv.results.orEmpty()
+            MediaType.PEOPLE -> testTrendingPeople.results.orEmpty()
+            MediaType.SERIES,
+            MediaType.NONE -> throw IllegalArgumentException("잘못된 타입입니다.")
+        }
 
-    @SuppressLint("VisibleForTests")
-    override fun getTrendingPeople(
-        timeWindow: String,
-        language: String
-    ): PagingSource<Int, TrendingMediaResult> = testTrendingPeople.results?.asPagingSourceFactory()?.invoke()!!
-
-    @SuppressLint("VisibleForTests")
-    override fun getTrendingTv(
-        timeWindow: String,
-        language: String
-    ): PagingSource<Int, TrendingMediaResult> = testTrendingTv.results?.asPagingSourceFactory()?.invoke()!!
+        return flowOf(value = PagingData.from(data = results))
+    }
 }

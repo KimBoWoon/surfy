@@ -1,16 +1,18 @@
 package com.cheeke.surfy.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import com.cheeke.surfy.data.paging.MovieReviewPagingSource
 import com.cheeke.surfy.data.paging.RecommendKeywordPagingSource
 import com.cheeke.surfy.data.paging.SearchPagingSource
 import com.cheeke.surfy.data.paging.SimilarMoviePagingSource
 import com.cheeke.surfy.data.paging.SimilarTvPagingSource
-import com.cheeke.surfy.data.paging.TrendingMoviePagingSource
-import com.cheeke.surfy.data.paging.TrendingPeoplePagingSource
-import com.cheeke.surfy.data.paging.TrendingTvPagingSource
+import com.cheeke.surfy.data.paging.TrendingPagingSource
 import com.cheeke.surfy.data.paging.TvReviewPagingSource
 import com.cheeke.surfy.model.Media
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.SearchKeyword
 import com.cheeke.surfy.model.SearchType
@@ -20,6 +22,7 @@ import com.cheeke.surfy.network.MovieRemoteDataSource
 import com.cheeke.surfy.network.SearchRemoteDataSource
 import com.cheeke.surfy.network.TrendingRemoteDataSource
 import com.cheeke.surfy.network.TvRemoteDataSource
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PagingRepositoryImpl @Inject constructor(
@@ -94,30 +97,24 @@ class PagingRepositoryImpl @Inject constructor(
         region = region
     )
 
-    override fun getTrendingMovie(
+    override fun getTrending(
+        mediaType: MediaType,
         timeWindow: String,
         language: String
-    ): PagingSource<Int, TrendingMediaResult> = TrendingMoviePagingSource(
-        apis = trendingApis,
-        timeWindow = timeWindow,
-        language = language
-    )
-
-    override fun getTrendingPeople(
-        timeWindow: String,
-        language: String
-    ): PagingSource<Int, TrendingMediaResult> = TrendingPeoplePagingSource(
-        apis = trendingApis,
-        timeWindow = timeWindow,
-        language = language
-    )
-
-    override fun getTrendingTv(
-        timeWindow: String,
-        language: String
-    ): PagingSource<Int, TrendingMediaResult> = TrendingTvPagingSource(
-        apis = trendingApis,
-        timeWindow = timeWindow,
-        language = language
-    )
+    ): Flow<PagingData<TrendingMediaResult>> =
+        Pager(
+            config = PagingConfig(pageSize = 20, initialLoadSize = 20, enablePlaceholders = false),
+            pagingSourceFactory = {
+                TrendingPagingSource(
+                    fetchPage = { page ->
+                        trendingApis.getTrending(
+                            mediaType = mediaType,
+                            timeWindow = timeWindow,
+                            language = language,
+                            page = page
+                        )
+                    }
+                )
+            }
+        ).flow
 }

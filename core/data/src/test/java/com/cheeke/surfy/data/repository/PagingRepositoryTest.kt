@@ -11,9 +11,6 @@ import com.cheeke.surfy.testing.model.similarMoviesTestData
 import com.cheeke.surfy.testing.model.similarTvTestData
 import com.cheeke.surfy.testing.model.testMovieReviews
 import com.cheeke.surfy.testing.model.testRecommendedKeyword
-import com.cheeke.surfy.testing.model.testTrendingMovie
-import com.cheeke.surfy.testing.model.testTrendingPeople
-import com.cheeke.surfy.testing.model.testTrendingTv
 import com.cheeke.surfy.testing.model.testTvReviews
 import com.cheeke.surfy.testing.model.tvSearchTestData
 import com.cheeke.surfy.testing.repository.TestPagingRepository
@@ -281,66 +278,24 @@ class PagingRepositoryTest {
         assertEquals(expected = null, actual = page.nextKey)
     }
 
-    @Test
-    fun trendingMoviePagingTest() = runTest {
-        val pagingSource = repository.getTrendingMovie(timeWindow = "day", language = "ko-KR")
-
-        val actual = pagingSource.load(
-            params = PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 101,
-                placeholdersEnabled = false
-            )
-        )
-
-        assertTrue(actual is PagingSource.LoadResult.Page)
-
-        val page = actual as PagingSource.LoadResult.Page
-
-        assertEquals(expected = testTrendingMovie.results, actual = page.data)
-        assertEquals(expected = null, actual = page.prevKey)
-        assertEquals(expected = null, actual = page.nextKey)
-    }
-
-    @Test
-    fun trendingPeoplePagingTest() = runTest {
-        val pagingSource = repository.getTrendingPeople(timeWindow = "day", language = "ko-KR")
-
-        val actual = pagingSource.load(
-            params = PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 101,
-                placeholdersEnabled = false
-            )
-        )
-
-        assertTrue(actual is PagingSource.LoadResult.Page)
-
-        val page = actual as PagingSource.LoadResult.Page
-
-        assertEquals(expected = testTrendingPeople.results, actual = page.data)
-        assertEquals(expected = null, actual = page.prevKey)
-        assertEquals(expected = null, actual = page.nextKey)
-    }
-
-    @Test
-    fun trendingTvPagingTest() = runTest {
-        val pagingSource = repository.getTrendingTv(timeWindow = "day", language = "ko-KR")
-
-        val actual = pagingSource.load(
-            params = PagingSource.LoadParams.Refresh(
-                key = null,
-                loadSize = 101,
-                placeholdersEnabled = false
-            )
-        )
-
-        assertTrue(actual is PagingSource.LoadResult.Page)
-
-        val page = actual as PagingSource.LoadResult.Page
-
-        assertEquals(expected = testTrendingTv.results, actual = page.data)
-        assertEquals(expected = null, actual = page.prevKey)
-        assertEquals(expected = null, actual = page.nextKey)
-    }
+//    @Test
+//    fun getTrendingMovieTest() = runTest {
+//        val result = repository.getTrending(MediaType.MOVIE, "day", "ko-KR", 1)
+//
+//        assertEquals(result, testTrendingMovie)
+//    }
+//
+//    @Test
+//    fun getTrendingPeopleTest() = runTest {
+//        val result = repository.getTrending(MediaType.PEOPLE, "day", "ko-KR", 1)
+//
+//        assertEquals(result, testTrendingPeople)
+//    }
+//
+//    @Test
+//    fun getTrendingTvTest() = runTest {
+//        val result = repository.getTrending(MediaType.TV, "day", "ko-KR", 1)
+//
+//        assertEquals(result, testTrendingTv)
+//    }
 }

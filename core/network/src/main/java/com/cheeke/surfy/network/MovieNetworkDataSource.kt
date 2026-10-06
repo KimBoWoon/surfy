@@ -7,6 +7,7 @@ import com.cheeke.surfy.model.ExternalIds
 import com.cheeke.surfy.model.Genres
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Language
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.MovieWatchProvider
 import com.cheeke.surfy.model.People
@@ -141,15 +142,7 @@ interface SyncRemoteDataSource {
 }
 
 interface TrendingRemoteDataSource {
-    suspend fun getTrendingMovie(timeWindow: String, language: String, page: Int): TrendingMedia
-
-    suspend fun getTrendingPeople(
-        timeWindow: String,
-        language: String,
-        page: Int = 1
-    ): TrendingMedia
-
-    suspend fun getTrendingTv(timeWindow: String, language: String, page: Int): TrendingMedia
+    suspend fun getTrending(mediaType: MediaType, timeWindow: String, language: String, page: Int): TrendingMedia
 }
 
 interface SearchRemoteDataSource {

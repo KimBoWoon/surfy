@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.cheeke.surfy.common.Result
@@ -13,13 +12,16 @@ import com.cheeke.surfy.common.asResult
 import com.cheeke.surfy.data.model.asExternalModel
 import com.cheeke.surfy.data.repository.MovieDataBaseRepository
 import com.cheeke.surfy.data.repository.PagingRepository
-import com.cheeke.surfy.data.repository.UserDataRepository
+import com.cheeke.surfy.data.util.DataManager
 import com.cheeke.surfy.data.util.NetworkMonitor
+import com.cheeke.surfy.data.util.SurfyAppDataState
 import com.cheeke.surfy.database.model.NowPlayingMovieEntity
 import com.cheeke.surfy.database.model.UpComingMovieEntity
 import com.cheeke.surfy.model.Media
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.TrendingMediaResult
+import com.cheeke.surfy.model.defaultLanguageRegion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +32,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -38,21 +41,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeVM @Inject constructor(
+    private val pagingRepository: PagingRepository,
     movieDataBaseRepository: MovieDataBaseRepository,
-    pagingRepository: PagingRepository,
     networkMonitor: NetworkMonitor,
-    userDataRepository: UserDataRepository
+    dataManager: DataManager
 ) : ViewModel() {
     companion object {
         private const val TAG = "HomeVM"
-        private const val PAGE_SIZE = 20
-        private const val PREFETCH_DISTANCE = 5
     }
 
-    private val pagingConfig = PagingConfig(
-        pageSize = PAGE_SIZE,
-        prefetchDistance = PREFETCH_DISTANCE
-    )
     private val _trendingMovieTimeWindow = MutableStateFlow(value = TimeWindow.DAY)
     val trendingMovieTimeWindow = _trendingMovieTimeWindow.asStateFlow()
     private val _trendingPeopleTimeWindow = MutableStateFlow(value = TimeWindow.DAY)
@@ -62,9 +59,15 @@ class HomeVM @Inject constructor(
     private val onlineState = networkMonitor.isOnline
         .distinctUntilChanged()
         .filter { it }
-    private val localeState = userDataRepository.internalData
-        .map { "${it.language}-${it.region}" }
+    private val selectedLanguage = dataManager.surfyAppData
+        .filterIsInstance<SurfyAppDataState.Success>()
+        .map { surfyAppData -> surfyAppData.data.selectedLanguageAndRegion }
         .distinctUntilChanged()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = defaultLanguageRegion
+        )
     val nowPlayingMoviePaging = Pager(
         config = PagingConfig(pageSize = 20, prefetchDistance = 5),
         pagingSourceFactory = { movieDataBaseRepository.getNowPlayingMovies() }
@@ -77,21 +80,9 @@ class HomeVM @Inject constructor(
     ).flow.map { pagingData ->
         pagingData.map(transform = UpComingMovieEntity::asExternalModel)
     }.cachedIn(scope = viewModelScope)
-    val trendingMoviePaging: Flow<PagingData<TrendingMediaResult>> =
-        createTrendingPaging(
-            timeWindowFlow = trendingMovieTimeWindow,
-            pagingSourceFactory = pagingRepository::getTrendingMovie
-        )
-    val trendingPeoplePaging: Flow<PagingData<TrendingMediaResult>> =
-        createTrendingPaging(
-            timeWindowFlow = trendingPeopleTimeWindow,
-            pagingSourceFactory = pagingRepository::getTrendingPeople
-        )
-    val trendingTvPaging: Flow<PagingData<TrendingMediaResult>> =
-        createTrendingPaging(
-            timeWindowFlow = trendingTvTimeWindow,
-            pagingSourceFactory = pagingRepository::getTrendingTv
-        )
+    val trendingMoviePaging = createTrendingPaging(mediaType = MediaType.MOVIE, timeWindowFlow = trendingMovieTimeWindow)
+    val trendingPeoplePaging = createTrendingPaging(mediaType = MediaType.PEOPLE, timeWindowFlow = trendingPeopleTimeWindow)
+    val trendingTvPaging = createTrendingPaging(mediaType = MediaType.TV, timeWindowFlow = trendingTvTimeWindow)
     val homeUiState: StateFlow<HomeState> = flow {
         emit(value = movieDataBaseRepository.getPopularMovies())
     }.map { popularMovies ->
@@ -131,26 +122,24 @@ class HomeVM @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun <T : Any> createTrendingPaging(
-        timeWindowFlow: StateFlow<TimeWindow>,
-        pagingSourceFactory: (timeWindow: String, language: String) -> PagingSource<Int, T>
-    ): Flow<PagingData<T>> {
-        return combine(
+    private fun createTrendingPaging(
+        mediaType: MediaType,
+        timeWindowFlow: StateFlow<TimeWindow>
+    ): Flow<PagingData<TrendingMediaResult>> =
+        combine(
             timeWindowFlow,
-            localeState,
+            selectedLanguage,
             onlineState
         ) { timeWindow, language, _ ->
             TrendingRequest(timeWindow = timeWindow.label, language = language)
         }.distinctUntilChanged()
             .flatMapLatest { request ->
-                Pager(
-                    config = pagingConfig,
-                    pagingSourceFactory = {
-                        pagingSourceFactory(request.timeWindow, request.language)
-                    }
-                ).flow
-            }.cachedIn(viewModelScope)
-    }
+                pagingRepository.getTrending(
+                    mediaType = mediaType,
+                    timeWindow = request.timeWindow,
+                    language = request.language
+                )
+            }.cachedIn(scope = viewModelScope)
 }
 
 sealed interface HomeState {

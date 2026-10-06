@@ -1,5 +1,6 @@
 package com.cheeke.surfy.network
 
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.testing.TestMovieRemoteDataSource
 import com.cheeke.surfy.testing.TestPeopleRemoteDataSource
 import com.cheeke.surfy.testing.TestSearchRemoteDataSource
@@ -240,21 +241,21 @@ class TrendingRemoteDataTest {
 
     @Test
     fun getTrendingMovieTest() = runTest {
-        val result = datasource.getTrendingMovie("day", "ko-KR", 1)
+        val result = datasource.getTrending(mediaType = MediaType.MOVIE, timeWindow = "day", language = "ko-KR", page = 1)
 
         assertEquals(result, testTrendingMovie)
     }
 
     @Test
     fun getTrendingPeopleTest() = runTest {
-        val result = datasource.getTrendingPeople("day", "ko-KR", 1)
+        val result = datasource.getTrending(mediaType = MediaType.PEOPLE, timeWindow = "day", language = "ko-KR", page = 1)
 
         assertEquals(result, testTrendingPeople)
     }
 
     @Test
     fun getTrendingTvTest() = runTest {
-        val result = datasource.getTrendingTv("day", "ko-KR", 1)
+        val result = datasource.getTrending(mediaType = MediaType.TV, timeWindow = "day", language = "ko-KR", page = 1)
 
         assertEquals(result, testTrendingTv)
     }
