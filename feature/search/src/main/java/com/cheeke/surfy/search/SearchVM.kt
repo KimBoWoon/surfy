@@ -11,8 +11,7 @@ import androidx.paging.cachedIn
 import androidx.paging.filter
 import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.analytics.logSearch
-import com.cheeke.surfy.data.repository.KeywordDataBaseRepository
-import com.cheeke.surfy.data.repository.PagingRepository
+import com.cheeke.surfy.data.repository.SearchRepository
 import com.cheeke.surfy.data.util.DataManager
 import com.cheeke.surfy.database.model.KeywordEntity
 import com.cheeke.surfy.model.Genre
@@ -51,8 +50,7 @@ class SearchVM @AssistedInject constructor(
     @Assisted initialSearchType: SearchType,
     dataManager: DataManager,
     private val savedStateHandle: SavedStateHandle,
-    private val pagingRepository: PagingRepository,
-    private val keywordDataBaseRepository: KeywordDataBaseRepository,
+    private val searchRepository: SearchRepository,
     private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
     companion object {
@@ -84,7 +82,7 @@ class SearchVM @AssistedInject constructor(
     val recentlyKeywordPaging = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
         initialKey = 1,
-        pagingSourceFactory = { keywordDataBaseRepository.getKeywords() }
+        pagingSourceFactory = { searchRepository.getKeywords() }
     ).flow.cachedIn(scope = viewModelScope)
     val recommendKeywordPaging = query
         .map { textFieldValue: TextFieldValue -> textFieldValue.text }
@@ -94,11 +92,7 @@ class SearchVM @AssistedInject constructor(
             if (keyword.trim().isEmpty()) {
                 flowOf(value = PagingData.empty())
             } else {
-                Pager(
-                    config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
-                    initialKey = 1,
-                    pagingSourceFactory = { pagingRepository.getRecommendKeywordPagingSource(query = keyword) }
-                ).flow
+                searchRepository.getRecommendKeywordPagingSource(query = keyword)
             }
         }.cachedIn(scope = viewModelScope)
     private val searchRequest = MutableStateFlow<SearchRequest?>(
@@ -117,19 +111,13 @@ class SearchVM @AssistedInject constructor(
                     emit(
                         value = SearchUiState.Success(
                             pagingData = combine(
-                                Pager(
-                                    config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
-                                    initialKey = 1,
-                                    pagingSourceFactory = {
-                                        pagingRepository.getSearchPagingSource(
-                                            type = request.searchType,
-                                            query = request.query,
-                                            language = surfyAppData.value.language.find { it.isSelected }?.code.orEmpty(),
-                                            region = surfyAppData.value.region.find { it.isSelected }?.code.orEmpty(),
-                                            isAdult = surfyAppData.value.isAdult
-                                        )
-                                    }
-                                ).flow.cachedIn(scope = viewModelScope),
+                                searchRepository.getSearchPagingSource(
+                                    type = request.searchType,
+                                    query = request.query,
+                                    language = surfyAppData.value.language.find { it.isSelected }?.code.orEmpty(),
+                                    region = surfyAppData.value.region.find { it.isSelected }?.code.orEmpty(),
+                                    isAdult = surfyAppData.value.isAdult
+                                ).cachedIn(scope = viewModelScope),
                                 selectedGenre
                             ) { pagingData: PagingData<Media>, genre: Genre? ->
                                 if (genre != null) {
@@ -180,19 +168,19 @@ class SearchVM @AssistedInject constructor(
 
     fun saveKeyword(keyword: String) {
         viewModelScope.launch {
-            keywordDataBaseRepository.insert(keyword = keyword)
+            searchRepository.insert(keyword = keyword)
         }
     }
 
     fun deleteAllRecentlyKeyword() {
         viewModelScope.launch {
-            keywordDataBaseRepository.deleteAll()
+            searchRepository.deleteAll()
         }
     }
 
     fun deleteRecentlyKeyword(entity: KeywordEntity) {
         viewModelScope.launch {
-            keywordDataBaseRepository.delete(entity = entity)
+            searchRepository.delete(entity = entity)
         }
     }
 }

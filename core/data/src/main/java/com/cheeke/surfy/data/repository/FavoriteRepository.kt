@@ -26,7 +26,7 @@ sealed interface FavoriteRepository {
 }
 
 class FavoriteMovieRepository @Inject constructor(
-    private val repository: MovieDataBaseRepository
+    private val repository: MovieRepository
 ) : FavoriteRepository {
     override val key: FavoriteKeys = FavoriteKeys.MOVIE
     override val pagingSource: Flow<PagingData<Media>> =
@@ -47,7 +47,7 @@ class FavoriteMovieRepository @Inject constructor(
 }
 
 class FavoritePeopleRepository @Inject constructor(
-    private val repository: PeopleDataBaseRepository
+    private val repository: PeopleRepository
 ) : FavoriteRepository {
     override val key: FavoriteKeys = FavoriteKeys.PEOPLE
     override val pagingSource: Flow<PagingData<Media>> =
@@ -68,7 +68,7 @@ class FavoritePeopleRepository @Inject constructor(
 }
 
 class FavoriteTvRepository @Inject constructor(
-    private val repository: TvDataBaseRepository
+    private val repository: TvRepository
 ) : FavoriteRepository {
     override val key: FavoriteKeys = FavoriteKeys.TV
     override val pagingSource: Flow<PagingData<Media>> =

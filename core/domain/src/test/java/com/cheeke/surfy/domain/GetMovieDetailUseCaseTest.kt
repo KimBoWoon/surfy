@@ -11,9 +11,7 @@ import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.regionTestData
 import com.cheeke.surfy.testing.model.unFavoriteMovieDetailTestData
-import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestMovieDetailRepository
-import com.cheeke.surfy.testing.repository.TestPagingRepository
+import com.cheeke.surfy.testing.repository.TestMovieRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
@@ -28,27 +26,22 @@ import kotlin.test.assertEquals
 class GetMovieDetailUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var detailRepository: TestMovieDetailRepository
-    private lateinit var movieDataBaseRepository: TestMovieDatabaseRepository
+    private lateinit var testMovieRepository: TestMovieRepository
     private lateinit var userDataRepository: TestUserDataRepository
     private lateinit var getMovieDetailUseCase: GetMovieDetailUseCase
     private lateinit var movieAppDataRepository: TestMovieAppDataManager
-    private lateinit var testPagingRepository: TestPagingRepository
 
     @Before
     fun setup() {
-        detailRepository = TestMovieDetailRepository()
-        movieDataBaseRepository = TestMovieDatabaseRepository()
+        testMovieRepository = TestMovieRepository()
         userDataRepository = TestUserDataRepository()
         movieAppDataRepository = TestMovieAppDataManager()
-        testPagingRepository = TestPagingRepository()
         getMovieDetailUseCase = GetMovieDetailUseCase(
             userDataRepository = userDataRepository,
-            detailRepository = detailRepository,
-            movieDataBaseRepository = movieDataBaseRepository
+            movieRepository = testMovieRepository
         )
         runBlocking {
-            movieDataBaseRepository.insert(media = Movie(id = 23))
+            testMovieRepository.insert(media = Movie(id = 23))
             movieAppDataRepository.setMovieAppData(
                 SurfyAppData(
                     secureBaseUrl = configurationTestData.images?.secureBaseUrl.orEmpty(),
@@ -65,8 +58,8 @@ class GetMovieDetailUseCaseTest {
 
     @Test
     fun getMovieDetailTest() = runTest {
-        detailRepository.setMovie(favoriteMovieDetailTestData)
-        detailRepository.setMovieSeries(movieSeriesTestData)
+        testMovieRepository.setMovie(favoriteMovieDetailTestData)
+        testMovieRepository.setMovieSeries(movieSeriesTestData)
 
         val result = getMovieDetailUseCase(id = 0).first()
 
@@ -82,15 +75,15 @@ class GetMovieDetailUseCaseTest {
 
         assertEquals(
             expected = result.isFavorite,
-            actual = movieDataBaseRepository.isFavorite(id = 0).first()
+            actual = testMovieRepository.isFavorite(id = 0).first()
         )
     }
 
     @Test
     fun getFavoriteMovieDetailTest() = runTest {
-        detailRepository.setMovie(unFavoriteMovieDetailTestData)
-        detailRepository.setMovieSeries(movieSeriesTestData)
-        movieDataBaseRepository.insert(
+        testMovieRepository.setMovie(unFavoriteMovieDetailTestData)
+        testMovieRepository.setMovieSeries(movieSeriesTestData)
+        testMovieRepository.insert(
             media = Movie(
                 id = unFavoriteMovieDetailTestData.id,
                 title = unFavoriteMovieDetailTestData.title,
@@ -112,7 +105,7 @@ class GetMovieDetailUseCaseTest {
 
         assertEquals(
             expected = result.isFavorite,
-            actual = movieDataBaseRepository.isFavorite(id = 324).first()
+            actual = testMovieRepository.isFavorite(id = 324).first()
         )
     }
 }

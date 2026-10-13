@@ -3,16 +3,13 @@ package com.cheeke.surfy.detail.movie
 import androidx.compose.ui.util.trace
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.analytics.logSelectContent
 import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.common.Result
 import com.cheeke.surfy.common.asResult
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.PagingRepository
+import com.cheeke.surfy.data.repository.MovieRepository
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.domain.GetMovieDetailUseCase
 import com.cheeke.surfy.model.Movie
@@ -34,10 +31,9 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = MovieVM.Factory::class)
 class MovieVM @AssistedInject constructor(
     @Assisted(value = "id") val id: Int,
+    userDataRepository: UserDataRepository,
     private val getMovieDetail: GetMovieDetailUseCase,
-    private val movieDataBaseRepository: MovieDataBaseRepository,
-    private val pagingRepository: PagingRepository,
-    private val userDataRepository: UserDataRepository,
+    private val movieRepository: MovieRepository,
     private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
     companion object {
@@ -84,17 +80,11 @@ class MovieVM @AssistedInject constructor(
     val similarMovies = userDataRepository.internalData
         .map { it.language to it.region }
         .flatMapLatest {
-            Pager(
-                config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
-                initialKey = 1,
-                pagingSourceFactory = {
-                    pagingRepository.getSimilarMoviePagingSource(
-                        id = id,
-                        language = it.first,
-                        region = it.second
-                    )
-                }
-            ).flow
+            movieRepository.getSimilarMoviePagingSource(
+                id = id,
+                language = it.first,
+                region = it.second
+            )
         }.cachedIn(scope = viewModelScope)
     val isCheatActive = userDataRepository.internalData
         .map { it.isCheatActive }
@@ -107,17 +97,11 @@ class MovieVM @AssistedInject constructor(
     val movieReviews = userDataRepository.internalData
         .map { it.language to it.region }
         .flatMapLatest {
-            Pager(
-                config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
-                initialKey = 1,
-                pagingSourceFactory = {
-                    pagingRepository.getMovieReviews(
-                        movieId = id,
-                        language = it.first,
-                        region = it.second
-                    )
-                }
-            ).flow
+            movieRepository.getMovieReviews(
+                movieId = id,
+                language = it.first,
+                region = it.second
+            )
         }.cachedIn(scope = viewModelScope)
 
     init {
@@ -134,13 +118,13 @@ class MovieVM @AssistedInject constructor(
 
     fun insertMovie(movie: Movie) {
         viewModelScope.launch {
-            movieDataBaseRepository.insert(media = movie)
+            movieRepository.insert(media = movie)
         }
     }
 
     fun deleteMovie(movie: Movie) {
         viewModelScope.launch {
-            movieDataBaseRepository.delete(media = movie)
+            movieRepository.delete(media = movie)
         }
     }
 }

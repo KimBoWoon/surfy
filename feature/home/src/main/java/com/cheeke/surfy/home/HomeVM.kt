@@ -10,8 +10,8 @@ import androidx.paging.map
 import com.cheeke.surfy.common.Result
 import com.cheeke.surfy.common.asResult
 import com.cheeke.surfy.data.model.asExternalModel
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.PagingRepository
+import com.cheeke.surfy.data.repository.HomeRepository
+import com.cheeke.surfy.data.repository.MovieRepository
 import com.cheeke.surfy.data.util.DataManager
 import com.cheeke.surfy.data.util.NetworkMonitor
 import com.cheeke.surfy.data.util.SurfyAppDataState
@@ -41,8 +41,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeVM @Inject constructor(
-    private val pagingRepository: PagingRepository,
-    movieDataBaseRepository: MovieDataBaseRepository,
+    private val homeRepository: HomeRepository,
+    movieRepository: MovieRepository,
     networkMonitor: NetworkMonitor,
     dataManager: DataManager
 ) : ViewModel() {
@@ -70,13 +70,13 @@ class HomeVM @Inject constructor(
         )
     val nowPlayingMoviePaging = Pager(
         config = PagingConfig(pageSize = 20, prefetchDistance = 5),
-        pagingSourceFactory = { movieDataBaseRepository.getNowPlayingMovies() }
+        pagingSourceFactory = { movieRepository.getNowPlayingMovies() }
     ).flow.map { pagingData ->
         pagingData.map(transform = NowPlayingMovieEntity::asExternalModel)
     }.cachedIn(scope = viewModelScope)
     val upComingMoviePaging = Pager(
         config = PagingConfig(pageSize = 20, prefetchDistance = 5),
-        pagingSourceFactory = { movieDataBaseRepository.getUpComingMovies() }
+        pagingSourceFactory = { movieRepository.getUpComingMovies() }
     ).flow.map { pagingData ->
         pagingData.map(transform = UpComingMovieEntity::asExternalModel)
     }.cachedIn(scope = viewModelScope)
@@ -84,7 +84,7 @@ class HomeVM @Inject constructor(
     val trendingPeoplePaging = createTrendingPaging(mediaType = MediaType.PEOPLE, timeWindowFlow = trendingPeopleTimeWindow)
     val trendingTvPaging = createTrendingPaging(mediaType = MediaType.TV, timeWindowFlow = trendingTvTimeWindow)
     val homeUiState: StateFlow<HomeState> = flow {
-        emit(value = movieDataBaseRepository.getPopularMovies())
+        emit(value = movieRepository.getPopularMovies())
     }.map { popularMovies ->
         HomeUiState(popularMovies = popularMovies)
     }.asResult()
@@ -134,7 +134,7 @@ class HomeVM @Inject constructor(
             TrendingRequest(timeWindow = timeWindow.label, language = language)
         }.distinctUntilChanged()
             .flatMapLatest { request ->
-                pagingRepository.getTrending(
+                homeRepository.getTrending(
                     mediaType = mediaType,
                     timeWindow = request.timeWindow,
                     language = request.language

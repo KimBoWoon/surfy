@@ -409,8 +409,8 @@ fun LanguageRegionSubSheet(
 ) {
     var tab by remember { mutableStateOf(value = LocaleTab.LANGUAGE) }
     var query by remember { mutableStateOf(value = TextFieldValue(text = "")) }
-    val selectedLang = state.selectedLanguage ?: state.language
-    val selectedRegion = state.selectedRegion ?: state.region
+    val selectedLang = state.selectedLanguage
+    val selectedRegion = state.selectedRegion
     val all = if (tab == LocaleTab.LANGUAGE) state.allLanguages else state.allRegions
     val selectedCode = if (tab == LocaleTab.LANGUAGE) selectedLang else selectedRegion
     val filtered = remember(key1 = all, key2 = query.text) {

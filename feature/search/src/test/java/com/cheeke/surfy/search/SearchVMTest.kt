@@ -11,8 +11,7 @@ import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.testing.TestSearchRemoteDataSource
 import com.cheeke.surfy.testing.model.movieSearchTestData
 import com.cheeke.surfy.testing.model.testRecommendedKeyword
-import com.cheeke.surfy.testing.repository.TestKeywordDataBaseRepository
-import com.cheeke.surfy.testing.repository.TestPagingRepository
+import com.cheeke.surfy.testing.repository.TestSearchRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
@@ -32,20 +31,18 @@ class SearchVMTest {
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var viewModel: SearchVM
     private lateinit var savedStateHandle: SavedStateHandle
-    private lateinit var testPagingRepository: TestPagingRepository
+    private lateinit var searchRepository: TestSearchRepository
     private lateinit var testUserDataRepository: TestUserDataRepository
     private lateinit var testMovieAppDataManager: TestMovieAppDataManager
-    private lateinit var testKeywordDataBaseRepository: TestKeywordDataBaseRepository
     private lateinit var testAnalyticsHelper: TestAnalyticsHelper
     private lateinit var apis: TestSearchRemoteDataSource
 
     @Before
     fun setup() {
         savedStateHandle = SavedStateHandle()
-        testPagingRepository = TestPagingRepository()
+        searchRepository = TestSearchRepository()
         testUserDataRepository = TestUserDataRepository()
         testMovieAppDataManager = TestMovieAppDataManager()
-        testKeywordDataBaseRepository = TestKeywordDataBaseRepository()
         testAnalyticsHelper = TestAnalyticsHelper()
         apis = TestSearchRemoteDataSource()
         viewModel = SearchVM(
@@ -53,8 +50,7 @@ class SearchVMTest {
             initialSearchType = SearchType.MOVIE,
             savedStateHandle = savedStateHandle,
             dataManager = testMovieAppDataManager,
-            pagingRepository = testPagingRepository,
-            keywordDataBaseRepository = testKeywordDataBaseRepository,
+            searchRepository = searchRepository,
             analyticsHelper = testAnalyticsHelper
         )
     }

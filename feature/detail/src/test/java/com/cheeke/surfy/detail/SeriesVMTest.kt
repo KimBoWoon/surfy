@@ -5,7 +5,7 @@ import com.cheeke.surfy.detail.series.SeriesVM
 import com.cheeke.surfy.domain.GetSeriesDetailUseCase
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.testImageList
-import com.cheeke.surfy.testing.repository.TestSeriesDetailRepository
+import com.cheeke.surfy.testing.repository.TestSeriesRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
@@ -24,7 +24,7 @@ import org.robolectric.RobolectricTestRunner
 class SeriesVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var testDetailRepository: TestSeriesDetailRepository
+    private lateinit var testSeriesRepository: TestSeriesRepository
     private lateinit var testMovieAppDataManager: TestMovieAppDataManager
     private lateinit var testAnalyticsHelper: TestAnalyticsHelper
     private lateinit var getSeriesDetailUseCase: GetSeriesDetailUseCase
@@ -32,10 +32,10 @@ class SeriesVMTest {
 
     @Before
     fun setup() {
-        testDetailRepository = TestSeriesDetailRepository()
+        testSeriesRepository = TestSeriesRepository()
         testMovieAppDataManager = TestMovieAppDataManager()
         testAnalyticsHelper = TestAnalyticsHelper()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = testDetailRepository)
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(seriesRepository = testSeriesRepository)
 
         seriesVM = SeriesVM(
             id = 0,
@@ -50,8 +50,8 @@ class SeriesVMTest {
 
         assertEquals(SeriesState.Loading, seriesVM.series.value)
 
-        testDetailRepository.setMovieSeries(movieSeriesTestData)
-        testDetailRepository.setImageList(imageList = testImageList)
+        testSeriesRepository.setMovieSeries(movieSeriesTestData)
+        testSeriesRepository.setImageList(imageList = testImageList)
 
         assertEquals(
             SeriesState.Success(series = movieSeriesTestData, imageList = testImageList),

@@ -34,9 +34,6 @@ import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.regionTestData
 import com.cheeke.surfy.testing.model.unFavoriteMovieDetailTestData
-import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestMovieDetailRepository
-import com.cheeke.surfy.testing.repository.TestPagingRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -86,7 +83,7 @@ class MovieScreenTest {
         movieDetailUseCase = GetMovieDetailUseCase(
             userDataRepository = testUserDataRepository,
             movieDataBaseRepository = testDatabaseRepository,
-            detailRepository = testDetailRepository
+            movieRepository = testDetailRepository
         )
         viewModel = MovieVM(
             id = 0,

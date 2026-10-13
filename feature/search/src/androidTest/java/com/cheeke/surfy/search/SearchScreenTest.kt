@@ -24,7 +24,6 @@ import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.keywordList
 import com.cheeke.surfy.testing.model.testRecommendedKeyword
 import com.cheeke.surfy.testing.repository.TestKeywordDataBaseRepository
-import com.cheeke.surfy.testing.repository.TestPagingRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
 import kotlinx.coroutines.flow.flowOf
@@ -59,7 +58,7 @@ class SearchScreenTest {
             initialSearchType = SearchType.MOVIE,
             savedStateHandle = savedStateHandle,
             dataManager = movieAppDataRepository,
-            pagingRepository = testPagingRepository,
+            searchRepository = testPagingRepository,
             keywordDataBaseRepository = testKeywordDataBaseRepository,
             analyticsHelper = object : AnalyticsHelper {
                 override fun logEvent(event: AnalyticsEvent) {

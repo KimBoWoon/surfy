@@ -3,8 +3,7 @@ package com.cheeke.surfy.domain
 import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeasons
-import com.cheeke.surfy.testing.repository.TestTvDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestTvDetailRepository
+import com.cheeke.surfy.testing.repository.TestTvRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import kotlinx.coroutines.flow.first
@@ -17,8 +16,7 @@ import kotlin.test.assertEquals
 class GetTvDataUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var detailRepository: TestTvDetailRepository
-    private lateinit var tvDataBaseRepository: TestTvDatabaseRepository
+    private lateinit var testTvRepository: TestTvRepository
     private lateinit var getTvDetailUseCase: GetTvDetailUseCase
     private lateinit var userDataRepository: TestUserDataRepository
     private val tv = Tv(id = 0)
@@ -34,21 +32,19 @@ class GetTvDataUseCaseTest {
 
     @Before
     fun setup() {
-        detailRepository = TestTvDetailRepository()
-        tvDataBaseRepository = TestTvDatabaseRepository()
+        testTvRepository = TestTvRepository()
         userDataRepository = TestUserDataRepository()
         getTvDetailUseCase = GetTvDetailUseCase(
-            tvDataBaseRepository = tvDataBaseRepository,
-            detailRepository = detailRepository
+            tvRepository = testTvRepository
         )
     }
 
     @Test
     fun getTvDetailTest() = runTest {
-        detailRepository.setTv(tv)
-        detailRepository.setTvSeason(tvSeasons)
-        detailRepository.setTvEpisode(tvEpisode)
-        tvDataBaseRepository.insert(media = tv)
+        testTvRepository.setTv(tv)
+        testTvRepository.setTvSeason(tvSeasons)
+        testTvRepository.setTvEpisode(tvEpisode)
+        testTvRepository.insert(media = tv)
 
         val result = getTvDetailUseCase(id = 0).first()
 
@@ -60,16 +56,16 @@ class GetTvDataUseCaseTest {
 
     @Test
     fun getFavoriteTvTest() = runTest {
-        detailRepository.setTv(tv)
-        detailRepository.setTvSeason(tvSeasons)
-        detailRepository.setTvEpisode(tvEpisode)
-        tvDataBaseRepository.insert(media = Tv(id = 123))
+        testTvRepository.setTv(tv)
+        testTvRepository.setTvSeason(tvSeasons)
+        testTvRepository.setTvEpisode(tvEpisode)
+        testTvRepository.insert(media = Tv(id = 123))
 
         assertEquals(
             expected = getTvDetailUseCase(id = 0).first().tv.isFavorite,
             actual = false
         )
-        tvDataBaseRepository.insert(media = tv)
+        testTvRepository.insert(media = tv)
         assertEquals(
             expected = getTvDetailUseCase(id = 0).first().tv.isFavorite,
             actual = true

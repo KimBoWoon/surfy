@@ -14,7 +14,6 @@ import com.cheeke.surfy.notifications.SystemTrayNotifier
 import com.cheeke.surfy.sync.workers.MidnightSyncWorker
 import com.cheeke.surfy.sync.workers.delegatedData
 import com.cheeke.surfy.testing.TestSyncRemoteDataSource
-import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
 import com.cheeke.surfy.testing.repository.TestSyncRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import kotlinx.coroutines.Dispatchers

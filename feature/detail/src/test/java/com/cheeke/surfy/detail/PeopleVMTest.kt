@@ -7,8 +7,7 @@ import com.cheeke.surfy.model.People
 import com.cheeke.surfy.testing.model.combineCreditsTestData
 import com.cheeke.surfy.testing.model.externalIdsTestData
 import com.cheeke.surfy.testing.model.peopleDetailTestData
-import com.cheeke.surfy.testing.repository.TestPeopleDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestPeopleDetailRepository
+import com.cheeke.surfy.testing.repository.TestPeopleRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
@@ -30,30 +29,27 @@ class PeopleVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var viewModel: PeopleVM
-    private lateinit var testDatabaseRepository: TestPeopleDatabaseRepository
-    private lateinit var testDetailRepository: TestPeopleDetailRepository
+    private lateinit var testPeopleRepository: TestPeopleRepository
     private lateinit var getPeopleDetailUseCase: GetPeopleDetailUseCase
     private lateinit var testMovieAppDataManager: TestMovieAppDataManager
     private lateinit var testAnalyticsHelper: TestAnalyticsHelper
 
     @Before
     fun setup() {
-        testDatabaseRepository = TestPeopleDatabaseRepository()
-        testDetailRepository = TestPeopleDetailRepository()
+        testPeopleRepository = TestPeopleRepository()
         testMovieAppDataManager = TestMovieAppDataManager()
         testAnalyticsHelper = TestAnalyticsHelper()
         getPeopleDetailUseCase = GetPeopleDetailUseCase(
-            detailRepository = testDetailRepository,
-            peopleDataBaseRepository = testDatabaseRepository
+            peopleRepository = testPeopleRepository,
         )
         viewModel = PeopleVM(
             id = 0,
             getPeopleDetail = getPeopleDetailUseCase,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testPeopleRepository,
             analyticsHelper = testAnalyticsHelper
         )
         runBlocking {
-            testDatabaseRepository.insert(media = People(id = 0, title = "people_1", posterPath = "/peopleImagePath.png"))
+            testPeopleRepository.insert(media = People(id = 0, title = "people_1", posterPath = "/peopleImagePath.png"))
         }
     }
 
@@ -70,14 +66,14 @@ class PeopleVMTest {
 
         assertEquals(expected = viewModel.people.value, actual = PeopleState.Loading)
 
-        testDetailRepository.setPeopleDetail(peopleDetailTestData)
-        testDetailRepository.setCombineCredits(combineCreditsTestData)
-        testDetailRepository.setExternalIds(externalIdsTestData)
+        testPeopleRepository.setPeopleDetail(peopleDetailTestData)
+        testPeopleRepository.setCombineCredits(combineCreditsTestData)
+        testPeopleRepository.setExternalIds(externalIdsTestData)
 
         assertEquals(
             expected = viewModel.people.value,
             actual = PeopleState.Success(
-                data = peopleDetailTestData.copy(isFavorite = testDatabaseRepository.isFavorite(id = 0).first())
+                data = peopleDetailTestData.copy(isFavorite = testPeopleRepository.isFavorite(id = 0).first())
             )
         )
     }
@@ -87,22 +83,22 @@ class PeopleVMTest {
         viewModel = PeopleVM(
             id = 124,
             getPeopleDetail = getPeopleDetailUseCase,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testPeopleRepository,
             analyticsHelper = testAnalyticsHelper
         )
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.people.collect() }
 
         val people = People(id = 124, combineCredits = combineCreditsTestData, externalIds = externalIdsTestData)
 
-        testDetailRepository.setPeopleDetail(people)
-        testDetailRepository.setCombineCredits(combineCreditsTestData)
-        testDetailRepository.setExternalIds(externalIdsTestData)
-        testDatabaseRepository.insert(media = People(id = 124, title = "people_124", posterPath = "/peopleImagePath.png"))
+        testPeopleRepository.setPeopleDetail(people)
+        testPeopleRepository.setCombineCredits(combineCreditsTestData)
+        testPeopleRepository.setExternalIds(externalIdsTestData)
+        testPeopleRepository.insert(media = People(id = 124, title = "people_124", posterPath = "/peopleImagePath.png"))
 
         assertEquals(
             expected = viewModel.people.value,
             actual = PeopleState.Success(
-                data = people.copy(isFavorite = testDatabaseRepository.isFavorite(id = 124).first())
+                data = people.copy(isFavorite = testPeopleRepository.isFavorite(id = 124).first())
             )
         )
     }
@@ -112,20 +108,20 @@ class PeopleVMTest {
         viewModel = PeopleVM(
             id = 124,
             getPeopleDetail = getPeopleDetailUseCase,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testPeopleRepository,
             analyticsHelper = testAnalyticsHelper
         )
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.people.collect() }
 
-        testDetailRepository.setPeopleDetail(peopleDetailTestData)
-        testDetailRepository.setCombineCredits(combineCreditsTestData)
-        testDetailRepository.setExternalIds(externalIdsTestData)
-        testDatabaseRepository.delete(media = People(id = 124, title = "people_124", posterPath = "/peopleImagePath.png"))
+        testPeopleRepository.setPeopleDetail(peopleDetailTestData)
+        testPeopleRepository.setCombineCredits(combineCreditsTestData)
+        testPeopleRepository.setExternalIds(externalIdsTestData)
+        testPeopleRepository.delete(media = People(id = 124, title = "people_124", posterPath = "/peopleImagePath.png"))
 
         assertEquals(
             expected = viewModel.people.value,
             actual = PeopleState.Success(
-                data = peopleDetailTestData.copy(isFavorite = testDatabaseRepository.isFavorite(id = 124).first())
+                data = peopleDetailTestData.copy(isFavorite = testPeopleRepository.isFavorite(id = 124).first())
             )
         )
     }

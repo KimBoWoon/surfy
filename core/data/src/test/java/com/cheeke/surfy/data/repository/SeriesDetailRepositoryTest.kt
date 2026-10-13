@@ -20,7 +20,7 @@ class SeriesDetailRepositoryTest {
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var movieApis: TestSeriesRemoteDataSource
     private lateinit var datastore: InternalDataSource
-    private lateinit var repository: SeriesDetailRepositoryImpl
+    private lateinit var repository: SeriesRepositoryImpl
     private lateinit var userDataRepository: UserDataRepository
 
     @Before
@@ -30,7 +30,7 @@ class SeriesDetailRepositoryTest {
             datastore = InMemoryDataStore(initialValue = InternalDataPreferences.getDefaultInstance())
         )
         userDataRepository = TestUserDataRepository()
-        repository = SeriesDetailRepositoryImpl(
+        repository = SeriesRepositoryImpl(
             apis = movieApis,
             requestOptionsProvider = DetailRequestOptionsProvider(userdata = userDataRepository),
         )

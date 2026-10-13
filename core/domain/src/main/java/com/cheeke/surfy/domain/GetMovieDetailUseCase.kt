@@ -2,8 +2,7 @@ package com.cheeke.surfy.domain
 
 import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.common.toEpochDayOrMax
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.MovieDetailRepository
+import com.cheeke.surfy.data.repository.MovieRepository
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.Series
@@ -20,15 +19,14 @@ import javax.inject.Inject
 
 class GetMovieDetailUseCase @Inject constructor(
     private val userDataRepository: UserDataRepository,
-    private val movieDataBaseRepository: MovieDataBaseRepository,
-    private val detailRepository: MovieDetailRepository
+    private val movieRepository: MovieRepository
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(id: Int): Flow<Movie> =
         combine(
-            detailRepository.getData(id = id),
+            movieRepository.getData(id = id),
             userDataRepository.internalData,
-            movieDataBaseRepository.isFavorite(id = id)
+            movieRepository.isFavorite(id = id)
         ) { movie, internalData, isFavorite ->
             val country = movie.releases?.countries?.filter { country ->
                 country.iso31661.equals(other = internalData.region, ignoreCase = true)
@@ -46,7 +44,7 @@ class GetMovieDetailUseCase @Inject constructor(
         }
 
     private fun getCollection(collectionId: Int): Flow<Series> =
-        detailRepository.getMovieSeries(collectionId = collectionId)
+        movieRepository.getMovieSeries(collectionId = collectionId)
             .map { series ->
                 series.copy(
                     parts = series.parts?.sortedWith(

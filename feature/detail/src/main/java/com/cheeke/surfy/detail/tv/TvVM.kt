@@ -3,16 +3,13 @@ package com.cheeke.surfy.detail.tv
 import androidx.compose.ui.util.trace
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.analytics.logSelectContent
 import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.common.Result
 import com.cheeke.surfy.common.asResult
-import com.cheeke.surfy.data.repository.PagingRepository
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
+import com.cheeke.surfy.data.repository.TvRepository
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.domain.GetTvDetailUseCase
 import com.cheeke.surfy.domain.TvSeasonLoadState
@@ -39,11 +36,10 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = TvVM.Factory::class)
 class TvVM @AssistedInject constructor(
     @Assisted(value = "id") val id: Int,
+    userDataRepository: UserDataRepository,
     private val getTvDetailUseCase: GetTvDetailUseCase,
-    private val tvDataBaseRepository: TvDataBaseRepository,
-    private val pagingRepository: PagingRepository,
-    private val analyticsHelper: AnalyticsHelper,
-    private val userDataRepository: UserDataRepository
+    private val tvRepository: TvRepository,
+    private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
     companion object {
         private const val TAG = "TvVM"
@@ -61,17 +57,11 @@ class TvVM @AssistedInject constructor(
     val similarTvs = userDataRepository.internalData
         .map { it.language to it.region }
         .flatMapLatest {
-            Pager(
-                config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
-                initialKey = 1,
-                pagingSourceFactory = {
-                    pagingRepository.getSimilarTvPagingSource(
-                        id = id,
-                        language = it.first,
-                        region = it.second
-                    )
-                }
-            ).flow
+            tvRepository.getSimilarTvPagingSource(
+                id = id,
+                language = it.first,
+                region = it.second
+            )
         }.cachedIn(scope = viewModelScope)
     private val _selectedEpisode = MutableStateFlow<TvEpisode?>(value = null)
     val selectedEpisode = _selectedEpisode.asStateFlow()
@@ -126,17 +116,11 @@ class TvVM @AssistedInject constructor(
     val tvReviews = userDataRepository.internalData
         .map { it.language to it.region }
         .flatMapLatest {
-            Pager(
-                config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
-                initialKey = 1,
-                pagingSourceFactory = {
-                    pagingRepository.getTvReviews(
-                        seriesId = id,
-                        language = it.first,
-                        region = it.second
-                    )
-                }
-            ).flow
+            tvRepository.getTvReviews(
+                seriesId = id,
+                language = it.first,
+                region = it.second
+            )
         }.cachedIn(scope = viewModelScope)
 
     init {
@@ -159,13 +143,13 @@ class TvVM @AssistedInject constructor(
 
     fun insertTv(tv: Tv) {
         viewModelScope.launch {
-            tvDataBaseRepository.insert(media = tv)
+            tvRepository.insert(media = tv)
         }
     }
 
     fun deleteTv(tv: Tv) {
         viewModelScope.launch {
-            tvDataBaseRepository.delete(media = tv)
+            tvRepository.delete(media = tv)
         }
     }
 

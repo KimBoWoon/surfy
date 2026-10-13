@@ -2,8 +2,7 @@ package com.cheeke.surfy.domain
 
 import com.cheeke.surfy.common.Result
 import com.cheeke.surfy.common.asResult
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
-import com.cheeke.surfy.data.repository.TvDetailRepository
+import com.cheeke.surfy.data.repository.TvRepository
 import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeason
@@ -18,8 +17,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class GetTvDetailUseCase @Inject constructor(
-    private val tvDataBaseRepository: TvDataBaseRepository,
-    private val detailRepository: TvDetailRepository
+    private val tvRepository: TvRepository
 ) {
     private val episodesCache = MutableStateFlow<Map<String, List<TvEpisode>>>(value = emptyMap())
 
@@ -43,8 +41,8 @@ class GetTvDetailUseCase @Inject constructor(
             }
 
         return combine(
-            detailRepository.getData(id = id),
-            tvDataBaseRepository.isFavorite(id = id),
+            tvRepository.getData(id = id),
+            tvRepository.isFavorite(id = id),
             episodesCache,
             seasonState
         ) { tv, isFavorite, episodesBySeason, currentSeasonState ->
@@ -57,7 +55,7 @@ class GetTvDetailUseCase @Inject constructor(
     }
 
     private fun getTvSeason(id: Int, season: TvSeason): Flow<TvSeasonLoadState> =
-        detailRepository.getTvSeasons(seriesId = id, seasonNumber = season.seasonNumber ?: -1)
+        tvRepository.getTvSeasons(seriesId = id, seasonNumber = season.seasonNumber ?: -1)
             .asResult()
             .map { result ->
                 when (result) {

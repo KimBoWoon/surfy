@@ -9,9 +9,7 @@ import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeason
 import com.cheeke.surfy.model.TvSeasons
-import com.cheeke.surfy.testing.repository.TestPagingRepository
-import com.cheeke.surfy.testing.repository.TestTvDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestTvDetailRepository
+import com.cheeke.surfy.testing.repository.TestTvRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
@@ -30,14 +28,11 @@ import kotlin.test.assertEquals
 class TvVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private val testDataBaseRepository = TestTvDatabaseRepository()
-    private val testPagingRepository = TestPagingRepository()
-    private val testDetailRepository = TestTvDetailRepository()
+    private val testTvRepository = TestTvRepository()
     private val testUserDataRepository = TestUserDataRepository()
     private val testAnalyticsHelper = TestAnalyticsHelper()
     private val getTvDetailUseCase = GetTvDetailUseCase(
-        detailRepository = testDetailRepository,
-        tvDataBaseRepository = testDataBaseRepository
+        tvRepository = testTvRepository
     )
     private lateinit var viewModel: TvVM
     private val tv = Tv(id = 0)
@@ -62,8 +57,7 @@ class TvVMTest {
     fun setup() {
         viewModel = TvVM(
             id = 0,
-            tvDataBaseRepository = testDataBaseRepository,
-            pagingRepository = testPagingRepository,
+            tvRepository = testTvRepository,
             getTvDetailUseCase = getTvDetailUseCase,
             analyticsHelper = testAnalyticsHelper,
             userDataRepository = testUserDataRepository
@@ -88,10 +82,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = Tv(id = 124))
+        testTvRepository.setTv(tv)
+        testTvRepository.setTvSeason(tvSeasons)
+        testTvRepository.setTvEpisode(tvEpisode)
+        testTvRepository.insert(media = Tv(id = 124))
         assertEquals(
             expected = viewModel.uiState.value,
             actual = TvState.Success(
@@ -114,10 +108,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = Tv(id = 124))
+        testTvRepository.setTv(tv)
+        testTvRepository.setTvSeason(tvSeasons)
+        testTvRepository.setTvEpisode(tvEpisode)
+        testTvRepository.insert(media = Tv(id = 124))
         assertEquals(
             expected = viewModel.uiState.value,
             actual = TvState.Success(
@@ -153,10 +147,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = tv)
+        testTvRepository.setTv(tv)
+        testTvRepository.setTvSeason(tvSeasons)
+        testTvRepository.setTvEpisode(tvEpisode)
+        testTvRepository.insert(media = tv)
         assertEquals(
             expected = viewModel.uiState.value,
             actual = TvState.Success(
@@ -227,10 +221,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = Tv(id = 124))
+        testTvRepository.setTv(tv)
+        testTvRepository.setTvSeason(tvSeasons)
+        testTvRepository.setTvEpisode(tvEpisode)
+        testTvRepository.insert(media = Tv(id = 124))
         viewModel.onSelectSeason(season = tvSeason)
         assertEquals(
             expected = viewModel.uiState.value,

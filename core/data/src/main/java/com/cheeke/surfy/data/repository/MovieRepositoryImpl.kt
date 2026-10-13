@@ -1,24 +1,47 @@
 package com.cheeke.surfy.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import com.cheeke.surfy.core.data.BuildConfig
+import com.cheeke.surfy.data.paging.MovieReviewPagingSource
+import com.cheeke.surfy.data.paging.SimilarMoviePagingSource
 import com.cheeke.surfy.database.dao.MovieDao
 import com.cheeke.surfy.database.model.MovieEntity
 import com.cheeke.surfy.database.model.NowPlayingMovieEntity
 import com.cheeke.surfy.database.model.UpComingMovieEntity
 import com.cheeke.surfy.database.model.asExternalModel
+import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Media
 import com.cheeke.surfy.model.Movie
+import com.cheeke.surfy.model.MovieWatchProvider
+import com.cheeke.surfy.model.Review
+import com.cheeke.surfy.model.Series
+import com.cheeke.surfy.model.SimilarMedia
+import com.cheeke.surfy.network.MovieRemoteDataSource
+import com.cheeke.surfy.network.SeriesRemoteDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
 
-class MovieDataBaseRepositoryImpl @Inject constructor(
-    private val movieDao: MovieDao
-) : MovieDataBaseRepository {
+class MovieRepositoryImpl @Inject constructor(
+    private val movieDao: MovieDao,
+    private val movieApis: MovieRemoteDataSource,
+    private val seriesApis: SeriesRemoteDataSource,
+    private val requestOptionsProvider: DetailRequestOptionsProvider
+) : MovieRepository {
+    private companion object {
+        const val PAGE_SIZE = 20
+        const val INITIAL_LOAD_SIZE = 20
+        const val ENABLE_PLACE_HOLDER = false
+        val config = PagingConfig(pageSize = PAGE_SIZE, initialLoadSize = INITIAL_LOAD_SIZE, enablePlaceholders = ENABLE_PLACE_HOLDER)
+    }
+
     init {
         if (BuildConfig.BENCHMARK) {
             CoroutineScope(context = Dispatchers.IO).launch {
@@ -87,4 +110,58 @@ class MovieDataBaseRepositoryImpl @Inject constructor(
 
     override fun getFavorite(): PagingSource<Int, MovieEntity> =
         movieDao.getFavoriteMovie()
+
+    override fun getData(id: Int): Flow<Movie> = flow {
+        val internalData = requestOptionsProvider.current()
+
+        emit(value = movieApis.getMovie(id = id, language = internalData.languageTag, region = internalData.region, includeImageLanguage = internalData.includeImageLanguage))
+    }
+
+    override fun getMovieSeries(collectionId: Int): Flow<Series> = flow {
+        val internalData = requestOptionsProvider.current()
+
+        emit(value = seriesApis.getMovieSeries(collectionId = collectionId, language = internalData.languageTag))
+    }
+
+    override fun getMovieSeriesImageList(collectionId: Int): Flow<ImageList> = flow {
+        val internalData = requestOptionsProvider.current()
+
+        emit(value = seriesApis.getSeriesImages(collectionId = collectionId, includeImageLanguage = "${internalData.languageTag},null", language = internalData.languageTag))
+    }
+
+    override fun getMovieWatchProviders(movieId: Int): Flow<MovieWatchProvider> = flow {
+        emit(value = movieApis.getMovieWatchProvider(movieId = movieId))
+    }
+
+    override fun getSimilarMoviePagingSource(
+        id: Int,
+        language: String,
+        region: String
+    ): Flow<PagingData<SimilarMedia>> = Pager(
+        config = config,
+        pagingSourceFactory = {
+            SimilarMoviePagingSource(
+                apis = movieApis,
+                id = id,
+                language = language,
+                region = region
+            )
+        }
+    ).flow
+
+    override fun getMovieReviews(
+        movieId: Int,
+        language: String,
+        region: String
+    ): Flow<PagingData<Review>> = Pager(
+        config = config,
+        pagingSourceFactory = {
+            MovieReviewPagingSource(
+                apis = movieApis,
+                id = movieId,
+                language = language,
+                region = region
+            )
+        }
+    ).flow
 }

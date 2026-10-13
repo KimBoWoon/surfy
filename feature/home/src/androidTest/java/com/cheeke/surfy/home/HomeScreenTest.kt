@@ -17,8 +17,6 @@ import com.cheeke.surfy.testing.model.testTrendingMovie
 import com.cheeke.surfy.testing.model.testTrendingPeople
 import com.cheeke.surfy.testing.model.testTrendingTv
 import com.cheeke.surfy.testing.model.upComingMovieTest
-import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestPagingRepository
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
 import com.cheeke.surfy.testing.utils.TestNetworkMonitor
 import org.junit.Before
@@ -43,8 +41,8 @@ class HomeScreenTest {
         testNetworkMonitor = TestNetworkMonitor()
         viewModel = HomeVM(
             dataManager = dataManager,
-            movieDataBaseRepository = testDatabaseRepository,
-            pagingRepository = testPagingRepository,
+            movieRepository = testDatabaseRepository,
+            homeRepository = testPagingRepository,
             networkMonitor = testNetworkMonitor
         )
     }

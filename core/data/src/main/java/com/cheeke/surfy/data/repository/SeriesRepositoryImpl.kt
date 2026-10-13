@@ -7,15 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-interface SeriesDetailRepository : DetailRepository<Series> {
-    override fun getData(id: Int): Flow<Series>
-    fun getMovieSeriesImageList(collectionId: Int): Flow<ImageList>
-}
-
-class SeriesDetailRepositoryImpl @Inject constructor(
+class SeriesRepositoryImpl @Inject constructor(
     private val apis: SeriesRemoteDataSource,
     private val requestOptionsProvider: DetailRequestOptionsProvider
-) : SeriesDetailRepository {
+) : SeriesRepository {
     override fun getData(id: Int): Flow<Series> = flow {
         val internalData = requestOptionsProvider.current()
 

@@ -28,7 +28,6 @@ import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.regionTestData
-import com.cheeke.surfy.testing.repository.TestSeriesDetailRepository
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -65,7 +64,7 @@ class SeriesScreenTest {
     fun setup() {
         savedStateHandle = SavedStateHandle(initialState = mapOf("id" to 0))
         testDetailRepository = TestSeriesDetailRepository()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = testDetailRepository)
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(seriesRepository = testDetailRepository)
         viewModel = SeriesVM(
             id = 0,
             getSeriesDetailUseCase = getSeriesDetailUseCase,

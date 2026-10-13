@@ -9,8 +9,8 @@ import com.cheeke.surfy.favorite.navigation.FavoriteNavKey
 import com.cheeke.surfy.home.navigation.HomeNavKey
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.Tv
-import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestTvDatabaseRepository
+import com.cheeke.surfy.testing.repository.TestMovieRepository
+import com.cheeke.surfy.testing.repository.TestTvRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestNetworkMonitor
 import com.cheeke.surfy.ui.root.RootVM
@@ -36,8 +36,8 @@ class RootVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var deepLinkManager: TestDeepLinkManager
-    private lateinit var movieRepository: TestMovieDatabaseRepository
-    private lateinit var tvRepository: TestTvDatabaseRepository
+    private lateinit var movieRepository: TestMovieRepository
+    private lateinit var tvRepository: TestTvRepository
     private lateinit var networkMonitor: TestNetworkMonitor
     private lateinit var viewModel: RootVM
     private val media1 = Movie(
@@ -56,8 +56,8 @@ class RootVMTest {
     @Before
     fun setUp() {
         deepLinkManager = TestDeepLinkManager()
-        movieRepository = TestMovieDatabaseRepository()
-        tvRepository = TestTvDatabaseRepository()
+        movieRepository = TestMovieRepository()
+        tvRepository = TestTvRepository()
         networkMonitor = TestNetworkMonitor()
         tvRepository.setTvs(listOf(media3))
         runBlocking {
@@ -65,8 +65,8 @@ class RootVMTest {
         }
         viewModel = RootVM(
             deepLinkManager = deepLinkManager,
-            movieDataBaseRepository = movieRepository,
-            tvDataBaseRepository = tvRepository,
+            movieRepository = movieRepository,
+            tvRepository = tvRepository,
             networkMonitor = networkMonitor
         )
     }

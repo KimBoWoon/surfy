@@ -3,7 +3,7 @@ package com.cheeke.surfy.domain
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SeriesPart
-import com.cheeke.surfy.testing.repository.TestSeriesDetailRepository
+import com.cheeke.surfy.testing.repository.TestSeriesRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -16,13 +16,13 @@ class GetSeriesDetailUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var detailRepository: TestSeriesDetailRepository
+    private lateinit var testSeriesRepository: TestSeriesRepository
     private lateinit var getSeriesDetailUseCase: GetSeriesDetailUseCase
 
     @Before
     fun setup() {
-        detailRepository = TestSeriesDetailRepository()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = detailRepository)
+        testSeriesRepository = TestSeriesRepository()
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(seriesRepository = testSeriesRepository)
     }
 
     @Test
@@ -38,8 +38,8 @@ class GetSeriesDetailUseCaseTest {
         )
         val imageList = ImageList(id = 100)
 
-        detailRepository.setMovieSeries(movieSeries = series)
-        detailRepository.setImageList(imageList = imageList)
+        testSeriesRepository.setMovieSeries(movieSeries = series)
+        testSeriesRepository.setImageList(imageList = imageList)
 
         val result = getSeriesDetailUseCase(id = 1).first()
 
@@ -54,8 +54,8 @@ class GetSeriesDetailUseCaseTest {
         val series = Series(id = 10)
         val imageList = ImageList(id = 20)
 
-        detailRepository.setMovieSeries(movieSeries = series)
-        detailRepository.setImageList(imageList = imageList)
+        testSeriesRepository.setMovieSeries(movieSeries = series)
+        testSeriesRepository.setImageList(imageList = imageList)
 
         val result = getSeriesDetailUseCase(id = 10).first()
 

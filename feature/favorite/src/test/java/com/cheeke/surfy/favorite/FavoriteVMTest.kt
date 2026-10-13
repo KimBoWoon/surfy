@@ -7,9 +7,9 @@ import com.cheeke.surfy.data.repository.FavoriteKeys
 import com.cheeke.surfy.data.repository.FavoriteMovieRepository
 import com.cheeke.surfy.data.repository.FavoritePeopleRepository
 import com.cheeke.surfy.data.repository.FavoriteTvRepository
-import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestPeopleDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestTvDatabaseRepository
+import com.cheeke.surfy.testing.repository.TestMovieRepository
+import com.cheeke.surfy.testing.repository.TestPeopleRepository
+import com.cheeke.surfy.testing.repository.TestTvRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -23,12 +23,12 @@ import kotlin.test.assertEquals
 class FavoriteVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private val testMovieDatabaseRepository = TestMovieDatabaseRepository()
-    private val testPeopleDatabaseRepository = TestPeopleDatabaseRepository()
-    private val testTvDatabaseRepository = TestTvDatabaseRepository()
-    private val movieTab = FavoriteMovieRepository(repository = testMovieDatabaseRepository)
-    private val peopleTab = FavoritePeopleRepository(repository = testPeopleDatabaseRepository)
-    private val tvTab = FavoriteTvRepository(repository = testTvDatabaseRepository)
+    private val movieRepository = TestMovieRepository()
+    private val peopleRepository = TestPeopleRepository()
+    private val tvRepository = TestTvRepository()
+    private val movieTab = FavoriteMovieRepository(repository = movieRepository)
+    private val peopleTab = FavoritePeopleRepository(repository = peopleRepository)
+    private val tvTab = FavoriteTvRepository(repository = tvRepository)
     private lateinit var viewModel: FavoriteVM
 
     @Before
@@ -69,10 +69,10 @@ class FavoriteVMTest {
 
     @Test
     fun favoriteMoviePagingTest() = runTest {
-        val favoriteMovieSource = testMovieDatabaseRepository.getFavorite()
+        val favoriteMovieSource = movieRepository.getFavorite()
         val favoriteMoviePager = TestPager(
             config = PagingConfig(pageSize = 0, initialLoadSize = 20, prefetchDistance = 5),
-            pagingSource = testMovieDatabaseRepository.getFavorite()
+            pagingSource = movieRepository.getFavorite()
         )
 
         assertEquals(
@@ -89,10 +89,10 @@ class FavoriteVMTest {
 
     @Test
     fun favoritePeoplePagingTest() = runTest {
-        val favoritePeopleSource = testMovieDatabaseRepository.getFavorite()
+        val favoritePeopleSource = movieRepository.getFavorite()
         val favoritePeoplePager = TestPager(
             config = PagingConfig(pageSize = 0, initialLoadSize = 20, prefetchDistance = 5),
-            pagingSource = testMovieDatabaseRepository.getFavorite()
+            pagingSource = movieRepository.getFavorite()
         )
 
         assertEquals(
@@ -109,10 +109,10 @@ class FavoriteVMTest {
 
     @Test
     fun favoriteTvPagingTest() = runTest {
-        val favoriteTvSource = testMovieDatabaseRepository.getFavorite()
+        val favoriteTvSource = movieRepository.getFavorite()
         val favoriteTvPager = TestPager(
             config = PagingConfig(pageSize = 0, initialLoadSize = 20, prefetchDistance = 5),
-            pagingSource = testMovieDatabaseRepository.getFavorite()
+            pagingSource = movieRepository.getFavorite()
         )
 
         assertEquals(

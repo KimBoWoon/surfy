@@ -3,22 +3,50 @@ package com.cheeke.surfy.data.repository
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
+import com.cheeke.surfy.core.datastore.InternalDataPreferences
 import com.cheeke.surfy.data.testdouble.TestTvDao
 import com.cheeke.surfy.database.model.TvEntity
+import com.cheeke.surfy.datastore.InternalDataSource
+import com.cheeke.surfy.datastore_test.InMemoryDataStore
+import com.cheeke.surfy.testing.TestTvRemoteDataSource
+import com.cheeke.surfy.testing.model.tvEpisodeTestData
+import com.cheeke.surfy.testing.model.tvSeasonTestData
+import com.cheeke.surfy.testing.model.tvTestData
+import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
 import kotlin.test.assertEquals
 
-class TvDataBaseRepositoryTest {
+class TvRepositoryTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private val tvDao = TestTvDao()
-    private val repository = TvDataBaseRepositoryImpl(tvDao = tvDao)
+    private lateinit var tvApis: TestTvRemoteDataSource
+    private lateinit var datastore: InternalDataSource
+    private lateinit var userDataRepository: UserDataRepository
+    private lateinit var tvDao: TestTvDao
+    private lateinit var repository: TvRepositoryImpl
     private val tv = TvEntity(id = 0, posterPath = "posterPath_0", timestamp = 0L, name = "tv_0", firstAirDate = LocalDate.now().plusDays(1).toString(), lastAirDate = "lastAirDate_0")
+
+    @Before
+    fun setup() {
+        tvDao = TestTvDao()
+        tvApis = TestTvRemoteDataSource()
+        datastore = InternalDataSource(
+            datastore = InMemoryDataStore(initialValue = InternalDataPreferences.getDefaultInstance())
+        )
+        userDataRepository = TestUserDataRepository()
+        repository = TvRepositoryImpl(
+            apis = tvApis,
+            requestOptionsProvider = DetailRequestOptionsProvider(userdata = userDataRepository),
+            tvDao = tvDao,
+            tvApis = tvApis
+        )
+    }
 
     @Test
     fun getFavoriteTest() = runTest {
@@ -153,4 +181,79 @@ class TvDataBaseRepositoryTest {
             actual = listOf(tv1, tv3)
         )
     }
+
+    @Test
+    fun getTvDetailTest() = runTest {
+        val result = repository.getData(id = 0)
+
+        assertEquals(expected = result.first(), actual = tvTestData)
+    }
+
+    @Test
+    fun getTvSeasonTest() = runTest {
+        val result = repository.getTvSeasons(seriesId = 0, seasonNumber = 1)
+
+        assertEquals(expected = result.first(), actual = tvSeasonTestData)
+    }
+
+    @Test
+    fun getTvEpisodeTest() = runTest {
+        val result = repository.getTvEpisode(seriesId = 0, seasonNumber = 1, episodeNumber = 1)
+
+        assertEquals(expected = result.first(), actual = tvEpisodeTestData)
+    }
+
+//    @Test
+//    fun similarTvPagingTest() = runTest {
+//        val pagingSource = repository.getSimilarTvPagingSource(id = 0, language = "ko", region = "KR")
+//
+//        val actual = pagingSource.load(
+//            params = PagingSource.LoadParams.Refresh(
+//                key = null,
+//                loadSize = 101,
+//                placeholdersEnabled = false
+//            )
+//        )
+//
+//        assertTrue(actual is PagingSource.LoadResult.Page)
+//
+//        val page = actual as PagingSource.LoadResult.Page
+//
+//        assertEquals(
+//            expected = similarTvTestData.results?.mapIndexed { index, tv ->
+//                SimilarMedia(
+////                    genres = listOf(Genre(id = index)),
+//                    title = tv.name,
+//                    id = tv.id,
+//                    posterPath = tv.posterPath,
+//                    firstAirDate = "firstAirDate_$index",
+//                    adult = true
+//                )
+//            }?.firstOrNull() ?: emptyList<Tv>(),
+//            actual = page.data.firstOrNull() ?: emptyList<Tv>()
+//        )
+//        assertEquals(expected = null, actual = page.prevKey)
+//        assertEquals(expected = null, actual = page.nextKey)
+//    }
+//
+//    @Test
+//    fun tvReviewPagingTest() = runTest {
+//        val pagingSource = repository.getTvReviews(seriesId = 0, language = "ko", region = "KR")
+//
+//        val actual = pagingSource.load(
+//            params = PagingSource.LoadParams.Refresh(
+//                key = null,
+//                loadSize = 101,
+//                placeholdersEnabled = false
+//            )
+//        )
+//
+//        assertTrue(actual is PagingSource.LoadResult.Page)
+//
+//        val page = actual as PagingSource.LoadResult.Page
+//
+//        assertEquals(expected = testTvReviews, actual = page.data)
+//        assertEquals(expected = null, actual = page.prevKey)
+//        assertEquals(expected = null, actual = page.nextKey)
+//    }
 }

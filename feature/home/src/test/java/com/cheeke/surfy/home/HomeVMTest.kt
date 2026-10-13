@@ -4,8 +4,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
 import com.cheeke.surfy.model.Movie
-import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestPagingRepository
+import com.cheeke.surfy.testing.repository.TestHomeRepository
+import com.cheeke.surfy.testing.repository.TestMovieRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
@@ -23,22 +23,22 @@ class HomeVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var viewModel: HomeVM
-    private lateinit var testDatabaseRepository: TestMovieDatabaseRepository
-    private lateinit var testPagingRepository: TestPagingRepository
+    private lateinit var movieRepository: TestMovieRepository
+    private lateinit var homeRepository: TestHomeRepository
     private lateinit var testNetworkMonitor: TestNetworkMonitor
     private lateinit var testUserRepository: TestUserDataRepository
     private lateinit var testMovieAppDataManager: TestMovieAppDataManager
 
     @Before
     fun setup() {
-        testDatabaseRepository = TestMovieDatabaseRepository()
-        testPagingRepository = TestPagingRepository()
+        movieRepository = TestMovieRepository()
+        homeRepository = TestHomeRepository()
         testNetworkMonitor = TestNetworkMonitor()
         testUserRepository = TestUserDataRepository()
         testMovieAppDataManager = TestMovieAppDataManager()
         viewModel = HomeVM(
-            movieDataBaseRepository = testDatabaseRepository,
-            pagingRepository = testPagingRepository,
+            movieRepository = movieRepository,
+            homeRepository = homeRepository,
             networkMonitor = testNetworkMonitor,
             dataManager = testMovieAppDataManager
         )
@@ -55,10 +55,10 @@ class HomeVMTest {
         assertEquals(expected = viewModel.homeUiState.value, actual = HomeState.Loading)
         backgroundScope.launch(context = UnconfinedTestDispatcher()) { viewModel.homeUiState.collect() }
 
-        val nowPlayingMovieResult = testDatabaseRepository.getNowPlayingMovies()
+        val nowPlayingMovieResult = movieRepository.getNowPlayingMovies()
         val nowPlayingTestPager = TestPager(
             config = PagingConfig(pageSize = 0, initialLoadSize = 20, prefetchDistance = 5),
-            pagingSource = testDatabaseRepository.getNowPlayingMovies()
+            pagingSource = movieRepository.getNowPlayingMovies()
         )
 
         assertEquals(
@@ -72,10 +72,10 @@ class HomeVMTest {
             )
         )
 
-        val upComingMovieResult = testDatabaseRepository.getUpComingMovies()
+        val upComingMovieResult = movieRepository.getUpComingMovies()
         val upComingMovieTestPager = TestPager(
             config = PagingConfig(pageSize = 0, initialLoadSize = 20, prefetchDistance = 5),
-            pagingSource = testDatabaseRepository.getUpComingMovies()
+            pagingSource = movieRepository.getUpComingMovies()
         )
 
         assertEquals(
@@ -98,7 +98,7 @@ class HomeVMTest {
 
 //        assertEquals(expected = viewModel.homeUiState.value, actual = HomeState.Loading)
 
-        testDatabaseRepository.setMovies(listOf(movie))
+        movieRepository.setMovies(listOf(movie))
 
         assertEquals(
             expected = viewModel.homeUiState.value,

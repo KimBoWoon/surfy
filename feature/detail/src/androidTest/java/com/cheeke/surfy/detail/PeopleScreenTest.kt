@@ -30,8 +30,6 @@ import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.peopleDetailTestData
 import com.cheeke.surfy.testing.model.regionTestData
-import com.cheeke.surfy.testing.repository.TestPeopleDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestPeopleDetailRepository
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -71,13 +69,13 @@ class PeopleScreenTest {
         testDatabaseRepository = TestPeopleDatabaseRepository()
         testDetailRepository = TestPeopleDetailRepository()
         getPeopleDetail = GetPeopleDetailUseCase(
-            detailRepository = testDetailRepository,
+            peopleRepository = testDetailRepository,
             peopleDataBaseRepository = testDatabaseRepository
         )
         viewModel = PeopleVM(
             id = 0,
             getPeopleDetail = getPeopleDetail,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testDatabaseRepository,
             analyticsHelper = object : AnalyticsHelper {
                 override fun logEvent(event: AnalyticsEvent) {
                     println("event: $event")

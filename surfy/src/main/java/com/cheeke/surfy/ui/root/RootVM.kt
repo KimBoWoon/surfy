@@ -2,8 +2,8 @@ package com.cheeke.surfy.ui.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
+import com.cheeke.surfy.data.repository.MovieRepository
+import com.cheeke.surfy.data.repository.TvRepository
 import com.cheeke.surfy.data.util.NetworkMonitor
 import com.cheeke.surfy.deeplink.DeepLinkManager
 import com.cheeke.surfy.model.Media
@@ -19,10 +19,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RootVM @Inject constructor(
+    networkMonitor: NetworkMonitor,
     private val deepLinkManager: DeepLinkManager,
-    private val movieDataBaseRepository: MovieDataBaseRepository,
-    private val tvDataBaseRepository: TvDataBaseRepository,
-    private val networkMonitor: NetworkMonitor
+    private val movieRepository: MovieRepository,
+    private val tvRepository: TvRepository
 ) : ViewModel() {
     private val _nextWeekReleaseMedias: MutableStateFlow<List<Media>> = MutableStateFlow(value = emptyList())
     val nextWeekReleaseMedias = _nextWeekReleaseMedias.asStateFlow()
@@ -39,7 +39,7 @@ class RootVM @Inject constructor(
         viewModelScope.launch {
             supervisorScope {
                 _nextWeekReleaseMedias.emit(
-                    value = (movieDataBaseRepository.getNextWeekReleaseMovies() + tvDataBaseRepository.getNextWeekReleaseTvs())
+                    value = (movieRepository.getNextWeekReleaseMovies() + tvRepository.getNextWeekReleaseTvs())
                         .sortedBy { it.releaseDate }
                 )
             }

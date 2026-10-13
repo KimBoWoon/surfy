@@ -2,8 +2,8 @@ package com.cheeke.surfy.ui.activities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
+import com.cheeke.surfy.data.repository.MovieRepository
+import com.cheeke.surfy.data.repository.TvRepository
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.data.util.DataManager
 import com.cheeke.surfy.data.util.SurfyAppDataState
@@ -30,8 +30,8 @@ class MainVM @Inject constructor(
     dataManager: DataManager,
     syncManager: SyncManager,
     private val userDataRepository: UserDataRepository,
-    private val movieDataBaseRepository: MovieDataBaseRepository,
-    private val tvDataBaseRepository: TvDataBaseRepository
+    private val movieRepository: MovieRepository,
+    private val tvRepository: TvRepository
 ) : ViewModel() {
     init {
         viewModelScope.launch {
@@ -59,7 +59,7 @@ class MainVM @Inject constructor(
 
             supervisorScope {
                 _nextWeekReleaseMedias.emit(
-                    value = (movieDataBaseRepository.getNextWeekReleaseMovies() + tvDataBaseRepository.getNextWeekReleaseTvs())
+                    value = (movieRepository.getNextWeekReleaseMovies() + tvRepository.getNextWeekReleaseTvs())
                         .sortedBy { it.releaseDate }
                 )
             }
