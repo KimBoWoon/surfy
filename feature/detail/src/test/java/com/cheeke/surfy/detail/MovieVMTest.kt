@@ -13,7 +13,7 @@ import com.cheeke.surfy.testing.TestMovieRemoteDataSource
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.similarMoviesTestData
-import com.cheeke.surfy.testing.model.testMovieReviews
+import com.cheeke.surfy.testing.model.testMovieReviewList
 import com.cheeke.surfy.testing.repository.TestMovieRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
@@ -173,7 +173,7 @@ class MovieVMTest {
 
         assertEquals(
             expected = PagingSource.LoadResult.Page<Int, Review>(
-                data = testMovieReviews,
+                data = testMovieReviewList,
                 prevKey = null,
                 nextKey = null
             ),

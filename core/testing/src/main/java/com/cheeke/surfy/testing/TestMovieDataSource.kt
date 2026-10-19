@@ -15,9 +15,11 @@ import com.cheeke.surfy.model.Regions
 import com.cheeke.surfy.model.Reviews
 import com.cheeke.surfy.model.SearchData
 import com.cheeke.surfy.model.SearchKeywordData
+import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedias
 import com.cheeke.surfy.model.TrendingMedia
+import com.cheeke.surfy.model.TrendingMediaResult
 import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeasons
@@ -36,28 +38,22 @@ import com.cheeke.surfy.testing.model.externalIdsTestData
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
 import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
-import com.cheeke.surfy.testing.model.movieSearchTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.nowPlayingMoviesTestData
 import com.cheeke.surfy.testing.model.peopleDetailTestData
-import com.cheeke.surfy.testing.model.peopleSearchTestData
 import com.cheeke.surfy.testing.model.regionTestData
 import com.cheeke.surfy.testing.model.searchKeywordTest
-import com.cheeke.surfy.testing.model.seriesSearchTestData
 import com.cheeke.surfy.testing.model.similarMoviesTestData
 import com.cheeke.surfy.testing.model.similarTvTestData
 import com.cheeke.surfy.testing.model.testImageList
 import com.cheeke.surfy.testing.model.testMovieReview
-import com.cheeke.surfy.testing.model.testMovieReviews
-import com.cheeke.surfy.testing.model.testTrendingMovie
-import com.cheeke.surfy.testing.model.testTrendingPeople
-import com.cheeke.surfy.testing.model.testTrendingTv
+import com.cheeke.surfy.testing.model.testTvReviews
 import com.cheeke.surfy.testing.model.tvEpisodeTestData
-import com.cheeke.surfy.testing.model.tvSearchTestData
 import com.cheeke.surfy.testing.model.tvSeasonTestData
 import com.cheeke.surfy.testing.model.tvTestData
 import com.cheeke.surfy.testing.model.upcomingMoviesTestData
 import com.cheeke.surfy.testing.model.watchProvidersTestData
+import java.util.concurrent.CopyOnWriteArrayList
 
 class TestSettingRemoteDataSource : SettingRemoteDataSource {
     override suspend fun getConfiguration(): Configuration = configurationTestData
@@ -69,6 +65,33 @@ class TestSettingRemoteDataSource : SettingRemoteDataSource {
 }
 
 class TestMovieRemoteDataSource : MovieRemoteDataSource {
+    data class Request(
+        val movieId: Int,
+        val language: String,
+        val page: Int
+    )
+
+    val similarMovieRequests: MutableList<Request> = CopyOnWriteArrayList()
+    val reviewRequests: MutableList<Request> = CopyOnWriteArrayList()
+    var similarMoviesResponse: SimilarMedias = similarMoviesTestData
+    var reviewsResponse: Reviews = testMovieReview
+
+    override suspend fun getSimilarMovies(
+        movieId: Int, language: String, page: Int
+    ): SimilarMedias {
+        similarMovieRequests += Request(movieId = movieId, language = language, page = page)
+        return similarMoviesResponse
+    }
+
+    override suspend fun getMovieReviews(
+        movieId: Int,
+        language: String,
+        page: Int
+    ): Reviews {
+        reviewRequests += Request(movieId = movieId, language = language, page = page)
+        return reviewsResponse
+    }
+
     override suspend fun getMovie(
         id: Int,
         appendToResponse: String,
@@ -76,21 +99,6 @@ class TestMovieRemoteDataSource : MovieRemoteDataSource {
         includeImageLanguage: String,
         region: String
     ): Movie = favoriteMovieDetailTestData
-
-    override suspend fun getSimilarMovies(id: Int, language: String, page: Int): SimilarMedias =
-        similarMoviesTestData
-
-    override suspend fun getMovieReviews(
-        movieId: Int,
-        language: String,
-        page: Int
-    ): Reviews = Reviews(
-        id = 0,
-        page = 1,
-        results = testMovieReviews,
-        totalPages = 1,
-        totalResults = 0
-    )
 
     override suspend fun getMovieWatchProvider(movieId: Int): MovieWatchProvider = watchProvidersTestData
 }
@@ -110,6 +118,35 @@ class TestPeopleRemoteDataSource : PeopleRemoteDataSource {
 }
 
 class TestTvRemoteDataSource : TvRemoteDataSource {
+    data class Request(
+        val seriesId: Int,
+        val language: String,
+        val page: Int
+    )
+
+    val similarTvRequests: MutableList<Request> = CopyOnWriteArrayList()
+    val reviewRequests: MutableList<Request> = CopyOnWriteArrayList()
+    var similarTvResponse: SimilarMedias = similarTvTestData
+    var reviewsResponse: Reviews = testTvReviews
+
+    override suspend fun getSimilarTv(
+        id: Int,
+        language: String,
+        page: Int
+    ): SimilarMedias {
+        similarTvRequests += Request(seriesId = id, language = language, page = page)
+        return similarTvResponse
+    }
+
+    override suspend fun getTvReviews(
+        seriesId: Int,
+        language: String,
+        page: Int
+    ): Reviews {
+        reviewRequests += Request(seriesId = seriesId, language = language, page = page)
+        return reviewsResponse
+    }
+
     override suspend fun getTv(
         id: Int,
         language: String,
@@ -132,17 +169,17 @@ class TestTvRemoteDataSource : TvRemoteDataSource {
         language: String
     ): TvEpisode = tvEpisodeTestData
 
-    override suspend fun getSimilarTv(
-        id: Int,
-        language: String,
-        page: Int
-    ): SimilarMedias = similarTvTestData
-
-    override suspend fun getTvReviews(
-        seriesId: Int,
-        language: String,
-        page: Int
-    ): Reviews = testMovieReview
+//    override suspend fun getSimilarTv(
+//        id: Int,
+//        language: String,
+//        page: Int
+//    ): SimilarMedias = similarTvTestData
+//
+//    override suspend fun getTvReviews(
+//        seriesId: Int,
+//        language: String,
+//        page: Int
+//    ): Reviews = testMovieReview
 }
 
 class TestSeriesRemoteDataSource : SeriesRemoteDataSource {
@@ -168,58 +205,144 @@ class TestSyncRemoteDataSource : SyncRemoteDataSource {
 }
 
 class TestTrendingRemoteDataSource : TrendingRemoteDataSource {
+    data class Request(
+        val mediaType: MediaType,
+        val timeWindow: String,
+        val language: String,
+        val page: Int
+    )
+
+    val requests = mutableListOf<Request>()
+    var totalPages: Int = 3
+
     override suspend fun getTrending(
         mediaType: MediaType,
         timeWindow: String,
         language: String,
         page: Int
-    ): TrendingMedia = when (mediaType) {
-        MediaType.MOVIE -> testTrendingMovie
-        MediaType.TV -> testTrendingTv
-        MediaType.PEOPLE -> testTrendingPeople
-        else -> testTrendingMovie
+    ): TrendingMedia {
+        requests += Request(
+            mediaType = mediaType,
+            timeWindow = timeWindow,
+            language = language,
+            page = page
+        )
+        return createTrendingResponse(mediaType = mediaType, page = page, totalPages = totalPages)
+    }
+
+    private fun createTrendingResponse(mediaType: MediaType, page: Int, totalPages: Int): TrendingMedia =
+        TrendingMedia(
+            page = page,
+            results = List(size = PAGE_SIZE) { index ->
+                when (mediaType) {
+                    MediaType.NONE -> {
+                        TrendingMediaResult(
+                            id = (page - 1) * PAGE_SIZE + index,
+                            adult = true,
+                            backdropPath = "backdropPath_$index",
+                            genreIds = emptyList(),
+                            originalLanguage = "originalLanguage_$index",
+                            originalTitle = "originalTitle_$index",
+                            title = "trendingMovieTitle_$index"
+                        )
+                    }
+                    MediaType.MOVIE -> {
+                        TrendingMediaResult(
+                            id = (page - 1) * PAGE_SIZE + index,
+                            adult = true,
+                            backdropPath = "backdropPath_$index",
+                            genreIds = emptyList(),
+                            originalLanguage = "originalLanguage_$index",
+                            originalTitle = "originalTitle_$index",
+                            title = "trendingMovieTitle_$index"
+                        )
+                    }
+                    MediaType.TV -> {
+                        TrendingMediaResult(
+                            id = (page - 1) * PAGE_SIZE + index,
+                            adult = true,
+                            backdropPath = "backdropPath_$index",
+                            genreIds = emptyList(),
+                            originalLanguage = "originalLanguage_$index",
+                            originalTitle = "originalTitle_$index",
+                            title = "trendingTvTitle_$index"
+                        )
+                    }
+                    MediaType.PEOPLE -> {
+                        TrendingMediaResult(
+                            id = (page - 1) * PAGE_SIZE + index,
+                            adult = true,
+                            posterPath = "posterPath_$index",
+                            originalTitle = "originalTitle_$index",
+                            title = "trendingPeopleTitle_$index"
+                        )
+                    }
+                    MediaType.SERIES -> {
+                        TrendingMediaResult(
+                            id = (page - 1) * PAGE_SIZE + index,
+                            adult = true,
+                            backdropPath = "backdropPath_$index",
+                            genreIds = emptyList(),
+                            originalLanguage = "originalLanguage_$index",
+                            originalTitle = "originalTitle_$index",
+                            title = "trendingMovieTitle_$index"
+                        )
+                    }
+                }
+            },
+            totalPages = totalPages,
+            totalResults = 0
+        )
+
+    private companion object {
+        const val PAGE_SIZE = 21
     }
 }
 
 class TestSearchRemoteDataSource : SearchRemoteDataSource {
-    override suspend fun searchMulti(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        page: Int
-    ): SearchData = movieSearchTestData
+    data class SearchRequest(
+        val type: SearchType,
+        val query: String,
+        val language: String,
+        val region: String,
+        val isAdult: Boolean,
+        val page: Int
+    )
 
-    override suspend fun searchMovies(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = movieSearchTestData
+    data class KeywordRequest(
+        val query: String,
+        val page: Int
+    )
 
-    override suspend fun searchPeople(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = peopleSearchTestData
+    val searchRequests: MutableList<SearchRequest> = CopyOnWriteArrayList()
+    val keywordRequests: MutableList<KeywordRequest> = CopyOnWriteArrayList()
+    var searchResponses: Map<SearchType, SearchData> = emptyMap()
+    var keywordResponse: SearchKeywordData = searchKeywordTest
 
-    override suspend fun searchTv(
+    override suspend fun search(
+        type: SearchType,
         query: String,
-        includeAdult: Boolean,
         language: String,
         region: String,
+        isAdult: Boolean,
         page: Int
-    ): SearchData = tvSearchTestData
+    ): SearchData {
+        searchRequests += SearchRequest(
+            type = type,
+            query = query,
+            language = language,
+            region = region,
+            isAdult = isAdult,
+            page = page
+        )
+        return searchResponses.getValue(type)
+    }
 
-    override suspend fun searchSeries(
+    override suspend fun getSearchKeyword(
         query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
         page: Int
-    ): SearchData = seriesSearchTestData
-
-    override suspend fun getSearchKeyword(query: String, page: Int): SearchKeywordData = searchKeywordTest
+    ): SearchKeywordData {
+        keywordRequests += KeywordRequest(query = query, page = page)
+        return keywordResponse
+    }
 }

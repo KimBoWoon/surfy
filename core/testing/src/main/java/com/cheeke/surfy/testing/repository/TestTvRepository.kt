@@ -13,7 +13,7 @@ import com.cheeke.surfy.model.SimilarMedia
 import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeasons
-import com.cheeke.surfy.testing.model.testTvReviews
+import com.cheeke.surfy.testing.model.testTvReviewList
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -128,5 +128,5 @@ class TestTvRepository : TvRepository {
         seriesId: Int,
         language: String,
         region: String
-    ): Flow<PagingData<Review>> = flowOf(value = PagingData.from(data = testTvReviews))
+    ): Flow<PagingData<Review>> = flowOf(value = PagingData.from(data = testTvReviewList))
 }

@@ -17,7 +17,7 @@ import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedia
 import com.cheeke.surfy.testing.model.nowPlayingMovieTest
-import com.cheeke.surfy.testing.model.testMovieReviews
+import com.cheeke.surfy.testing.model.testMovieReviewList
 import com.cheeke.surfy.testing.model.upComingMovieTest
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -140,5 +140,5 @@ class TestMovieRepository : MovieRepository {
     @SuppressLint("VisibleForTests")
     override fun getMovieReviews(
         movieId: Int, language: String, region: String
-    ): Flow<PagingData<Review>> = flowOf(value = PagingData.from(data = testMovieReviews))
+    ): Flow<PagingData<Review>> = flowOf(value = PagingData.from(data = testMovieReviewList))
 }

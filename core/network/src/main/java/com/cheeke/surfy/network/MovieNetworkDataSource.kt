@@ -15,6 +15,7 @@ import com.cheeke.surfy.model.Regions
 import com.cheeke.surfy.model.Reviews
 import com.cheeke.surfy.model.SearchData
 import com.cheeke.surfy.model.SearchKeywordData
+import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedias
 import com.cheeke.surfy.model.TrendingMedia
@@ -146,42 +147,12 @@ interface TrendingRemoteDataSource {
 }
 
 interface SearchRemoteDataSource {
-    suspend fun searchMulti(
+    suspend fun search(
+        type: SearchType,
         query: String,
-        includeAdult: Boolean = true,
-        language: String = defaultLanguageRegion,
-        page: Int = 1
-    ): SearchData
-
-    suspend fun searchMovies(
-        query: String,
-        includeAdult: Boolean = true,
         language: String = defaultLanguageRegion,
         region: String = defaultRegion,
-        page: Int = 1
-    ): SearchData
-
-    suspend fun searchTv(
-        query: String,
-        includeAdult: Boolean = true,
-        language: String = defaultLanguageRegion,
-        region: String = defaultRegion,
-        page: Int = 1
-    ): SearchData
-
-    suspend fun searchPeople(
-        query: String,
-        includeAdult: Boolean = true,
-        language: String = defaultLanguageRegion,
-        region: String = defaultRegion,
-        page: Int = 1
-    ): SearchData
-
-    suspend fun searchSeries(
-        query: String,
-        includeAdult: Boolean = true,
-        language: String = defaultLanguageRegion,
-        region: String = defaultRegion,
+        isAdult: Boolean = false,
         page: Int = 1
     ): SearchData
 

@@ -3,6 +3,7 @@ package com.cheeke.surfy.data.repository
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
+import androidx.paging.testing.asSnapshot
 import com.cheeke.surfy.core.datastore.InternalDataPreferences
 import com.cheeke.surfy.data.testdouble.TestMovieDao
 import com.cheeke.surfy.database.model.MovieEntity
@@ -10,14 +11,18 @@ import com.cheeke.surfy.database.model.NowPlayingMovieEntity
 import com.cheeke.surfy.database.model.asExternalModel
 import com.cheeke.surfy.datastore.InternalDataSource
 import com.cheeke.surfy.datastore_test.InMemoryDataStore
+import com.cheeke.surfy.model.Reviews
 import com.cheeke.surfy.testing.TestMovieRemoteDataSource
 import com.cheeke.surfy.testing.TestSeriesRemoteDataSource
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
+import com.cheeke.surfy.testing.model.similarMoviesTestData
 import com.cheeke.surfy.testing.model.testImageList
+import com.cheeke.surfy.testing.model.testMovieReviewList
 import com.cheeke.surfy.testing.model.watchProvidersTestData
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -280,45 +285,59 @@ class MovieRepositoryTest {
         assertEquals(expected = result.first(), actual = watchProvidersTestData)
     }
 
-//    @Test
-//    fun similarMoviePagingTest() = runTest {
-//        val pagingSource = repository.getSimilarMoviePagingSource(id = 0, language = "ko", region = "KR")
-//
-//        val actual = pagingSource.load(
-//            params = PagingSource.LoadParams.Refresh(
-//                key = 1,
-//                loadSize = 100,
-//                placeholdersEnabled = false
-//            )
-//        )
-//
-//        assertTrue(actual is PagingSource.LoadResult.Page)
-//
-//        val page = actual as PagingSource.LoadResult.Page
-//
-//        assertEquals(expected = similarMoviesTestData.results.orEmpty(), actual = page.data)
-//        assertEquals(expected = 0, actual = page.prevKey)
-//        assertEquals(expected = null, actual = page.nextKey)
-//    }
-//
-//    @Test
-//    fun movieReviewPagingTest() = runTest {
-//        val pagingSource = repository.getMovieReviews(movieId = 0, language = "ko", region = "KR")
-//
-//        val actual = pagingSource.load(
-//            params = PagingSource.LoadParams.Refresh(
-//                key = null,
-//                loadSize = 6,
-//                placeholdersEnabled = false
-//            )
-//        )
-//
-//        assertTrue(actual is PagingSource.LoadResult.Page)
-//
-//        val page = actual as PagingSource.LoadResult.Page
-//
-//        assertEquals(expected = testMovieReviews, actual = page.data)
-//        assertEquals(expected = null, actual = page.prevKey)
-//        assertEquals(expected = null, actual = page.nextKey)
-//    }
+    @Test
+    fun `유사 영화는 remote 결과를 그대로 반환한다`() = runTest {
+        val loadedItems = repository.getSimilarMoviePagingSource(
+            id = 0,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertEquals(
+            expected = similarMoviesTestData.results.orEmpty(),
+            actual = loadedItems
+        )
+    }
+
+    @Test
+    fun `유사 영화는 전달한 파라미터와 page 1로 요청한다`() = runTest {
+        repository.getSimilarMoviePagingSource(
+            id = 7,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertEquals(
+            expected = TestMovieRemoteDataSource.Request(
+                movieId = 7,
+                language = "ko-KR",
+                page = 1
+            ),
+            actual = movieApis.similarMovieRequests.first()
+        )
+    }
+
+    @Test
+    fun `영화 리뷰는 remote 결과를 그대로 반환한다`() = runTest {
+        val loadedItems = repository.getMovieReviews(
+            movieId = 0,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertEquals(expected = testMovieReviewList, actual = loadedItems)
+    }
+
+    @Test
+    fun `영화 리뷰가 없으면 빈 리스트를 반환한다`() = runTest {
+        movieApis.reviewsResponse = Reviews()
+
+        val loadedItems = repository.getMovieReviews(
+            movieId = 0,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertTrue(loadedItems.isEmpty())
+    }
 }

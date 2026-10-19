@@ -24,7 +24,6 @@ import javax.inject.Inject
 class TvRepositoryImpl @Inject constructor(
     private val tvDao: TvDao,
     private val tvApis: TvRemoteDataSource,
-    private val apis: TvRemoteDataSource,
     private val requestOptionsProvider: DetailRequestOptionsProvider
 ) : TvRepository {
     private companion object {
@@ -79,7 +78,7 @@ class TvRepositoryImpl @Inject constructor(
 
     override fun getData(id: Int): Flow<Tv> = flow {
         val internalData = requestOptionsProvider.current()
-        val tv = apis.getTv(id = id, language = internalData.languageTag, includeImageLanguage = internalData.includeImageLanguage)
+        val tv = tvApis.getTv(id = id, language = internalData.languageTag, includeImageLanguage = internalData.includeImageLanguage)
         emit(value = tv)
     }
 
@@ -89,7 +88,7 @@ class TvRepositoryImpl @Inject constructor(
     ): Flow<TvSeasons> = flow {
         val internalData = requestOptionsProvider.current()
 
-        emit(value = apis.getTvSeasons(seriesId = seriesId, seasonNumber = seasonNumber, language = internalData.languageTag))
+        emit(value = tvApis.getTvSeasons(seriesId = seriesId, seasonNumber = seasonNumber, language = internalData.languageTag))
     }
 
     override fun getTvEpisode(
@@ -99,7 +98,7 @@ class TvRepositoryImpl @Inject constructor(
     ): Flow<TvEpisode> = flow {
         val internalData = requestOptionsProvider.current()
 
-        emit(value = apis.getTvEpisode(seriesId = seriesId, seasonNumber = seasonNumber, episodeNumber = episodeNumber, language = internalData.languageTag))
+        emit(value = tvApis.getTvEpisode(seriesId = seriesId, seasonNumber = seasonNumber, episodeNumber = episodeNumber, language = internalData.languageTag))
     }
 
     override fun getSimilarTvPagingSource(

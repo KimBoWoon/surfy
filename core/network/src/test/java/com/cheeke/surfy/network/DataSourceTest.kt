@@ -1,6 +1,7 @@
 package com.cheeke.surfy.network
 
 import com.cheeke.surfy.model.MediaType
+import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.testing.TestMovieRemoteDataSource
 import com.cheeke.surfy.testing.TestPeopleRemoteDataSource
 import com.cheeke.surfy.testing.TestSearchRemoteDataSource
@@ -27,11 +28,11 @@ import com.cheeke.surfy.testing.model.seriesSearchTestData
 import com.cheeke.surfy.testing.model.similarMoviesTestData
 import com.cheeke.surfy.testing.model.similarTvTestData
 import com.cheeke.surfy.testing.model.testImageList
-import com.cheeke.surfy.testing.model.testMovieReview
-import com.cheeke.surfy.testing.model.testMovieReviews
+import com.cheeke.surfy.testing.model.testMovieReviewList
 import com.cheeke.surfy.testing.model.testTrendingMovie
 import com.cheeke.surfy.testing.model.testTrendingPeople
 import com.cheeke.surfy.testing.model.testTrendingTv
+import com.cheeke.surfy.testing.model.testTvReviews
 import com.cheeke.surfy.testing.model.tvEpisodeTestData
 import com.cheeke.surfy.testing.model.tvSearchTestData
 import com.cheeke.surfy.testing.model.tvSeasonTestData
@@ -135,7 +136,7 @@ class MovieRemoteDataTest {
     fun getMovieReviewTest() = runTest {
         val result = datasource.getMovieReviews(0)
 
-        assertEquals(result.results, testMovieReviews)
+        assertEquals(result.results, testMovieReviewList)
     }
 
     @Test
@@ -207,10 +208,10 @@ class TvRemoteDataTest {
     }
 
     @Test
-    fun getExternalIdsTest() = runTest {
+    fun getTvReviewTest() = runTest {
         val result = datasource.getTvReviews(seriesId = 0, language = "ko-KR")
 
-        assertEquals(result, testMovieReview)
+        assertEquals(result, testTvReviews)
     }
 }
 
@@ -264,39 +265,47 @@ class TrendingRemoteDataTest {
 class SearchRemoteDataTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private val datasource = TestSearchRemoteDataSource()
+    private val datasource = TestSearchRemoteDataSource().apply {
+        searchResponses = mapOf(
+            SearchType.MOVIE to movieSearchTestData,
+            SearchType.PEOPLE to peopleSearchTestData,
+            SearchType.TV to tvSearchTestData,
+            SearchType.SERIES to seriesSearchTestData,
+            SearchType.MULTI to movieSearchTestData
+        )
+    }
 
     @Test
     fun searchMoviesTest() = runTest {
-        val result = datasource.searchMovies("미션")
+        val result = datasource.search(type = SearchType.MOVIE, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
 
         assertEquals(result, movieSearchTestData)
     }
 
     @Test
     fun searchPeopleTest() = runTest {
-        val result = datasource.searchPeople("톰 크루즈")
+        val result = datasource.search(type = SearchType.PEOPLE, query = "톰 크루즈", language = "ko", region = "KR", isAdult = false, page = 1)
 
         assertEquals(result, peopleSearchTestData)
     }
 
     @Test
     fun searchTvTest() = runTest {
-        val result = datasource.searchTv("톰 크루즈")
+        val result = datasource.search(type = SearchType.TV, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
 
         assertEquals(result, tvSearchTestData)
     }
 
     @Test
     fun searchSeriesTest() = runTest {
-        val result = datasource.searchSeries("톰 크루즈")
+        val result = datasource.search(type = SearchType.SERIES, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
 
         assertEquals(result, seriesSearchTestData)
     }
 
     @Test
     fun searchMultiTest() = runTest {
-        val result = datasource.searchMulti("톰 크루즈")
+        val result = datasource.search(type = SearchType.MULTI, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
 
         assertEquals(result, movieSearchTestData)
     }

@@ -187,7 +187,7 @@ val similarMoviesTestData = SimilarMedias(
 
 val similarTvTestData = SimilarMedias(
     page = 1,
-    results = (0..100).map {
+    results = (0..10).map {
         SimilarMedia(
 //            genres = listOf(Genre(id = it)),
             firstAirDate = "firstAirDate_$it",
@@ -235,7 +235,7 @@ val searchKeywordTest = SearchKeywordData(
     totalResults = 5
 )
 
-val testMovieReviews = (0..5).map {
+val testMovieReviewList = (0..5).map {
     Review(
         id = it.toString(),
         author = "author$it",
@@ -250,12 +250,12 @@ val testMovieReviews = (0..5).map {
 val testMovieReview = Reviews(
     id = 0,
     page = 1,
-    results = testMovieReviews,
+    results = testMovieReviewList,
     totalPages = 1,
     totalResults = 0
 )
 
-val testTvReviews = (0..100).map {
+val testTvReviewList = (0..10).map {
     Review(
         author = "author_$it",
         content = "content_$it",
@@ -272,9 +272,17 @@ val testTvReviews = (0..100).map {
     )
 }
 
+val testTvReviews = Reviews(
+    id = 0,
+    page = 1,
+    results = testTvReviewList,
+    totalPages = 1,
+    totalResults = 0
+)
+
 val testTrendingMovie = TrendingMedia(
     page = 1,
-    results = (0..10).map {
+    results = (0..20).map {
         TrendingMediaResult(
             adult = true,
             backdropPath = "backdropPath_$it",
@@ -285,13 +293,13 @@ val testTrendingMovie = TrendingMedia(
             title = "trendingMovieTitle_$it"
         )
     },
-    totalPages = 1,
+    totalPages = 3,
     totalResults = 0
 )
 
 val testTrendingPeople = TrendingMedia(
     page = 1,
-    results = (0..10).map {
+    results = (0..20).map {
         TrendingMediaResult(
             adult = true,
             posterPath = "posterPath_$it",
@@ -300,13 +308,13 @@ val testTrendingPeople = TrendingMedia(
             title = "trendingPeopleTitle_$it"
         )
     },
-    totalPages = 1,
+    totalPages = 3,
     totalResults = 0
 )
 
 val testTrendingTv = TrendingMedia(
     page = 1,
-    results = (0..10).map {
+    results = (0..20).map {
         TrendingMediaResult(
             adult = true,
             backdropPath = "backdropPath_$it",
@@ -317,7 +325,7 @@ val testTrendingTv = TrendingMedia(
             title = "trendingTvTitle_$it"
         )
     },
-    totalPages = 1,
+    totalPages = 3,
     totalResults = 0
 )
 

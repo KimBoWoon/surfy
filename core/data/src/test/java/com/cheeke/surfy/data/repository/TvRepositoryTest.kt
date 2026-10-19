@@ -3,17 +3,23 @@ package com.cheeke.surfy.data.repository
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
+import androidx.paging.testing.asSnapshot
 import com.cheeke.surfy.core.datastore.InternalDataPreferences
 import com.cheeke.surfy.data.testdouble.TestTvDao
 import com.cheeke.surfy.database.model.TvEntity
 import com.cheeke.surfy.datastore.InternalDataSource
 import com.cheeke.surfy.datastore_test.InMemoryDataStore
+import com.cheeke.surfy.model.Reviews
+import com.cheeke.surfy.model.SimilarMedia
 import com.cheeke.surfy.testing.TestTvRemoteDataSource
+import com.cheeke.surfy.testing.model.similarTvTestData
+import com.cheeke.surfy.testing.model.testTvReviewList
 import com.cheeke.surfy.testing.model.tvEpisodeTestData
 import com.cheeke.surfy.testing.model.tvSeasonTestData
 import com.cheeke.surfy.testing.model.tvTestData
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -41,7 +47,6 @@ class TvRepositoryTest {
         )
         userDataRepository = TestUserDataRepository()
         repository = TvRepositoryImpl(
-            apis = tvApis,
             requestOptionsProvider = DetailRequestOptionsProvider(userdata = userDataRepository),
             tvDao = tvDao,
             tvApis = tvApis
@@ -203,57 +208,84 @@ class TvRepositoryTest {
         assertEquals(expected = result.first(), actual = tvEpisodeTestData)
     }
 
-//    @Test
-//    fun similarTvPagingTest() = runTest {
-//        val pagingSource = repository.getSimilarTvPagingSource(id = 0, language = "ko", region = "KR")
-//
-//        val actual = pagingSource.load(
-//            params = PagingSource.LoadParams.Refresh(
-//                key = null,
-//                loadSize = 101,
-//                placeholdersEnabled = false
-//            )
-//        )
-//
-//        assertTrue(actual is PagingSource.LoadResult.Page)
-//
-//        val page = actual as PagingSource.LoadResult.Page
-//
-//        assertEquals(
-//            expected = similarTvTestData.results?.mapIndexed { index, tv ->
-//                SimilarMedia(
-////                    genres = listOf(Genre(id = index)),
-//                    title = tv.name,
-//                    id = tv.id,
-//                    posterPath = tv.posterPath,
-//                    firstAirDate = "firstAirDate_$index",
-//                    adult = true
-//                )
-//            }?.firstOrNull() ?: emptyList<Tv>(),
-//            actual = page.data.firstOrNull() ?: emptyList<Tv>()
-//        )
-//        assertEquals(expected = null, actual = page.prevKey)
-//        assertEquals(expected = null, actual = page.nextKey)
-//    }
-//
-//    @Test
-//    fun tvReviewPagingTest() = runTest {
-//        val pagingSource = repository.getTvReviews(seriesId = 0, language = "ko", region = "KR")
-//
-//        val actual = pagingSource.load(
-//            params = PagingSource.LoadParams.Refresh(
-//                key = null,
-//                loadSize = 101,
-//                placeholdersEnabled = false
-//            )
-//        )
-//
-//        assertTrue(actual is PagingSource.LoadResult.Page)
-//
-//        val page = actual as PagingSource.LoadResult.Page
-//
-//        assertEquals(expected = testTvReviews, actual = page.data)
-//        assertEquals(expected = null, actual = page.prevKey)
-//        assertEquals(expected = null, actual = page.nextKey)
-//    }
+    @Test
+    fun `유사 TV는 remote 결과를 SimilarMedia로 변환해 반환한다`() = runTest {
+        val loadedItems = repository.getSimilarTvPagingSource(
+            id = 0,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        val expectedItems = similarTvTestData.results.orEmpty().mapIndexed { index, tv ->
+            SimilarMedia(
+                name = tv.name,
+                id = tv.id,
+                posterPath = tv.posterPath,
+                firstAirDate = tv.firstAirDate,
+                adult = true
+            )
+        }
+
+        assertEquals(expected = expectedItems, actual = loadedItems)
+    }
+
+    @Test
+    fun `유사 TV는 전달한 파라미터와 page 1로 요청한다`() = runTest {
+        repository.getSimilarTvPagingSource(
+            id = 7,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertEquals(
+            expected = TestTvRemoteDataSource.Request(
+                seriesId = 7,
+                language = "ko-KR",
+                page = 1
+            ),
+            actual = tvApis.similarTvRequests.first()
+        )
+    }
+
+    @Test
+    fun `TV 리뷰는 remote 결과를 그대로 반환한다`() = runTest {
+        val loadedItems = repository.getTvReviews(
+            seriesId = 0,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertEquals(expected = testTvReviewList, actual = loadedItems)
+    }
+
+    @Test
+    fun `TV 리뷰는 전달한 파라미터와 page 1로 요청한다`() = runTest {
+        repository.getTvReviews(
+            seriesId = 7,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertEquals(
+            expected = TestTvRemoteDataSource.Request(
+                seriesId = 7,
+                language = "ko-KR",
+                page = 1
+            ),
+            actual = tvApis.reviewRequests.first()
+        )
+    }
+
+    @Test
+    fun `TV 리뷰가 없으면 빈 리스트를 반환한다`() = runTest {
+        tvApis.reviewsResponse = Reviews()
+
+        val loadedItems = repository.getTvReviews(
+            seriesId = 0,
+            language = "ko",
+            region = "KR"
+        ).asSnapshot()
+
+        assertTrue(loadedItems.isEmpty())
+    }
 }
