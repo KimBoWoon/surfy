@@ -170,50 +170,6 @@ interface SearchApis {
         @Query(value = "page") page: Int = 1
     ): ApiResponse<NetworkTMDBSearch>
 
-//    @GET(value = "/3/search/multi")
-//    suspend fun searchMulti(
-//        @Query(value = "query") query: String,
-//        @Query(value = "include_adult") includeAdult: Boolean = true,
-//        @Query(value = "language") language: String = defaultLanguageRegion,
-//        @Query(value = "page") page: Int = 1
-//    ): ApiResponse<NetworkTMDBSearch>
-//
-//    @GET(value = "/3/search/movie")
-//    suspend fun searchMovies(
-//        @Query(value = "query") query: String,
-//        @Query(value = "include_adult") includeAdult: Boolean = true,
-//        @Query(value = "language") language: String = defaultLanguageRegion,
-//        @Query(value = "region") region: String = defaultRegion,
-//        @Query(value = "page") page: Int = 1
-//    ): ApiResponse<NetworkTMDBSearch>
-//
-//    @GET(value = "/3/search/tv")
-//    suspend fun searchTv(
-//        @Query(value = "query") query: String,
-//        @Query(value = "include_adult") includeAdult: Boolean = true,
-//        @Query(value = "language") language: String = defaultLanguageRegion,
-//        @Query(value = "region") region: String = defaultRegion,
-//        @Query(value = "page") page: Int = 1
-//    ): ApiResponse<NetworkTMDBSearch>
-//
-//    @GET(value = "/3/search/person")
-//    suspend fun searchPeople(
-//        @Query(value = "query") query: String,
-//        @Query(value = "include_adult") includeAdult: Boolean = true,
-//        @Query(value = "language") language: String = defaultLanguageRegion,
-//        @Query(value = "region") region: String = defaultRegion,
-//        @Query(value = "page") page: Int = 1
-//    ): ApiResponse<NetworkTMDBSearch>
-//
-//    @GET(value = "/3/search/collection")
-//    suspend fun searchMovieSeries(
-//        @Query(value = "query") query: String,
-//        @Query(value = "include_adult") includeAdult: Boolean = true,
-//        @Query(value = "page") page: Int = 1,
-//        @Query(value = "language") language: String = defaultLanguageRegion,
-//        @Query(value = "region") region: String = defaultRegion
-//    ): ApiResponse<NetworkTMDBSearch>
-
     @GET(value = "/3/search/keyword")
     suspend fun getSearchKeyword(
         @Query(value = "query") query: String,

@@ -21,7 +21,6 @@ interface SearchRepository {
         type: SearchType,
         query: String,
         language: String,
-        region: String,
         isAdult: Boolean
     ): Flow<PagingData<Media>>
 
@@ -50,7 +49,6 @@ class SearchRepositoryImpl @Inject constructor(
         type: SearchType,
         query: String,
         language: String,
-        region: String,
         isAdult: Boolean
     ): Flow<PagingData<Media>> = Pager(
         config = config,
@@ -60,7 +58,6 @@ class SearchRepositoryImpl @Inject constructor(
                 type = type,
                 query = query,
                 language = language,
-                region = region,
                 isAdult = isAdult,
             )
         }

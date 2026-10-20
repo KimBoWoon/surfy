@@ -117,8 +117,7 @@ class SearchVM @AssistedInject constructor(
                             flow = searchRepository.search(
                                 type = request.searchType,
                                 query = request.query,
-                                language = option.selectedLanguage,
-                                region = option.selectedRegion,
+                                language = "${option.selectedLanguage}-${option.selectedRegion}",
                                 isAdult = option.isAdult
                             ).cachedIn(scope = viewModelScope),
                             flow2 = selectedGenre

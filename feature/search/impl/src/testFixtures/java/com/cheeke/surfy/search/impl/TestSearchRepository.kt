@@ -47,10 +47,9 @@ class TestSearchRepository : SearchRepository {
         type: SearchType,
         query: String,
         language: String,
-        region: String,
         isAdult: Boolean
     ): Flow<PagingData<Media>> {
-        val result = PagingData.Companion.from(
+        val result = PagingData.from(
             data = when (type) {
                 SearchType.MOVIE -> movieSearchTestData.results
                 SearchType.MULTI -> movieSearchTestData.results
@@ -65,5 +64,5 @@ class TestSearchRepository : SearchRepository {
 
     @SuppressLint("VisibleForTests")
     override fun getRecommendKeyword(query: String): Flow<PagingData<SearchKeyword>> =
-        flowOf(value = PagingData.Companion.from(data = testRecommendedKeyword))
+        flowOf(value = PagingData.from(data = testRecommendedKeyword))
 }
