@@ -5,18 +5,60 @@ import androidx.paging.PagingSource
 import androidx.paging.testing.TestPager
 import com.cheeke.surfy.database.impl.model.PeopleEntity
 import com.cheeke.surfy.detail.api.TestPeopleDao
+import com.cheeke.surfy.detail.impl.people.PeopleRepositoryImpl
+import com.cheeke.surfy.network.api.TestPeopleRemoteDataSource
+import com.cheeke.surfy.testing.model.combineCreditsTestData
+import com.cheeke.surfy.testing.model.externalIdsTestData
+import com.cheeke.surfy.testing.model.peopleDetailTestData
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
+import com.cheeke.surfy.userdata.api.TestUserDataRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class PeopleDataBaseRepositoryTest {
+class PeopleRepositoryTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private val peopleDao = TestPeopleDao()
     private val people = PeopleEntity(id = 0, timestamp = 0L, name = "people_0", profilePath = "profilePath_0")
+    private lateinit var movieApis: TestPeopleRemoteDataSource
+    private lateinit var userdata: TestUserDataRepository
+    private lateinit var repository: PeopleRepositoryImpl
+
+    @Before
+    fun setup() {
+        movieApis = TestPeopleRemoteDataSource()
+        userdata = TestUserDataRepository()
+        repository = PeopleRepositoryImpl(
+            apis = movieApis,
+            requestOptionsProvider = DetailRequestOptionsProvider(userdataRepository = userdata),
+            peopleDao = peopleDao
+        )
+    }
+
+    @Test
+    fun getPeopleDetailTest() = runTest {
+        val result = repository.getData(id = 0)
+
+        assertEquals(expected = result.first(), actual = peopleDetailTestData)
+    }
+
+    @Test
+    fun getCombineCreditsTest() = runTest {
+        val result = repository.getCombineCredits(0)
+
+        assertEquals(expected = result.first(), actual = combineCreditsTestData)
+    }
+
+    @Test
+    fun getExternalIdsTest() = runTest {
+        val result = repository.getExternalIds(0)
+
+        assertEquals(expected = result.first(), actual = externalIdsTestData)
+    }
 
     @Test
     fun getFavoriteTest() = runTest {

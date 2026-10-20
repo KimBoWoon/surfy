@@ -1,7 +1,7 @@
 package com.cheeke.surfy.detail.impl
 
 import com.cheeke.surfy.analytics.api.TestAnalyticsHelper
-import com.cheeke.surfy.detail.api.TestTvDatabaseRepository
+import com.cheeke.surfy.detail.api.TestTvRepository
 import com.cheeke.surfy.detail.impl.tv.GetTvDetailUseCase
 import com.cheeke.surfy.detail.impl.tv.TvSeasonLoadState
 import com.cheeke.surfy.detail.impl.tv.TvState
@@ -28,13 +28,11 @@ import kotlin.test.assertEquals
 class TvVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private val testDataBaseRepository = TestTvDatabaseRepository()
-    private val testDetailRepository = TestTvDetailRepository()
+    private val repository = TestTvRepository()
     private val testUserDataRepository = TestUserDataRepository()
     private val testAnalyticsHelper = TestAnalyticsHelper()
     private val getTvDetailUseCase = GetTvDetailUseCase(
-        detailRepository = testDetailRepository,
-        repository = testDataBaseRepository
+        repository = repository
     )
     private lateinit var viewModel: TvVM
     private val tv = Tv(id = 0)
@@ -59,7 +57,7 @@ class TvVMTest {
     fun setup() {
         viewModel = TvVM(
             id = 0,
-            tvRepository = testDataBaseRepository,
+            tvRepository = repository,
             getTvDetailUseCase = getTvDetailUseCase,
             analyticsHelper = testAnalyticsHelper,
             userDataRepository = testUserDataRepository
@@ -84,10 +82,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = Tv(id = 124))
+        repository.setTv(tv)
+        repository.setTvSeason(tvSeasons)
+        repository.setTvEpisode(tvEpisode)
+        repository.insert(media = Tv(id = 124))
         assertEquals(
             expected = viewModel.uiState.value,
             actual = TvState.Success(
@@ -110,10 +108,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = Tv(id = 124))
+        repository.setTv(tv)
+        repository.setTvSeason(tvSeasons)
+        repository.setTvEpisode(tvEpisode)
+        repository.insert(media = Tv(id = 124))
         assertEquals(
             expected = viewModel.uiState.value,
             actual = TvState.Success(
@@ -149,10 +147,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = tv)
+        repository.setTv(tv)
+        repository.setTvSeason(tvSeasons)
+        repository.setTvEpisode(tvEpisode)
+        repository.insert(media = tv)
         assertEquals(
             expected = viewModel.uiState.value,
             actual = TvState.Success(
@@ -223,10 +221,10 @@ class TvVMTest {
             expected = viewModel.uiState.value,
             actual = TvState.Loading
         )
-        testDetailRepository.setTv(tv)
-        testDetailRepository.setTvSeason(tvSeasons)
-        testDetailRepository.setTvEpisode(tvEpisode)
-        testDataBaseRepository.insert(media = Tv(id = 124))
+        repository.setTv(tv)
+        repository.setTvSeason(tvSeasons)
+        repository.setTvEpisode(tvEpisode)
+        repository.insert(media = Tv(id = 124))
         viewModel.onSelectSeason(season = tvSeason)
         assertEquals(
             expected = viewModel.uiState.value,

@@ -7,7 +7,7 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.cheeke.surfy.detail.api.TestMovieDatabaseRepository
+import com.cheeke.surfy.detail.api.TestMovieRepository
 import com.cheeke.surfy.network.api.TestSyncRemoteDataSource
 import com.cheeke.surfy.sync.api.SyncRepository
 import com.cheeke.surfy.sync.api.TestSyncRepository
@@ -29,7 +29,7 @@ class MidnightSyncWorkerTest {
     private lateinit var apis: TestSyncRemoteDataSource
     private lateinit var syncRepository: TestSyncRepository
     private lateinit var userDataRepository: TestUserDataRepository
-    private lateinit var databaseRepository: TestMovieDatabaseRepository
+    private lateinit var databaseRepository: TestMovieRepository
 
     @Before
     fun setup() {
@@ -37,7 +37,7 @@ class MidnightSyncWorkerTest {
         apis = TestSyncRemoteDataSource()
         syncRepository = TestSyncRepository()
         userDataRepository = TestUserDataRepository()
-        databaseRepository = TestMovieDatabaseRepository()
+        databaseRepository = TestMovieRepository()
     }
 
     @Test

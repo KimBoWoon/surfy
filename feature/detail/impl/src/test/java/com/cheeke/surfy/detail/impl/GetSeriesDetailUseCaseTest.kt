@@ -1,5 +1,6 @@
 package com.cheeke.surfy.detail.impl
 
+import com.cheeke.surfy.detail.api.TestSeriesRepository
 import com.cheeke.surfy.detail.impl.series.GetSeriesDetailUseCase
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Series
@@ -16,12 +17,12 @@ class GetSeriesDetailUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var detailRepository: TestSeriesDetailRepository
+    private lateinit var detailRepository: TestSeriesRepository
     private lateinit var getSeriesDetailUseCase: GetSeriesDetailUseCase
 
     @Before
     fun setup() {
-        detailRepository = TestSeriesDetailRepository()
+        detailRepository = TestSeriesRepository()
         getSeriesDetailUseCase = GetSeriesDetailUseCase(repository = detailRepository)
     }
 

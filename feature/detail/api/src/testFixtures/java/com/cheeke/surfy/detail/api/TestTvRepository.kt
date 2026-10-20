@@ -1,6 +1,5 @@
 package com.cheeke.surfy.detail.api
 
-import androidx.annotation.VisibleForTesting
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.testing.asPagingSourceFactory
@@ -8,6 +7,8 @@ import com.cheeke.surfy.detail.api.tv.TvRepository
 import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.SimilarMedia
 import com.cheeke.surfy.model.Tv
+import com.cheeke.surfy.model.TvEpisode
+import com.cheeke.surfy.model.TvSeasons
 import com.cheeke.surfy.testing.model.similarTvTestData
 import com.cheeke.surfy.testing.model.testTvReviews
 import kotlinx.coroutines.channels.BufferOverflow
@@ -17,11 +18,15 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import org.jetbrains.annotations.VisibleForTesting
 import java.time.LocalDate
 
-class TestTvDatabaseRepository : TvRepository {
+class TestTvRepository : TvRepository {
     val tvDatabase = MutableSharedFlow<List<Tv>>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val currentTvDatabase get() = tvDatabase.replayCache.firstOrNull().orEmpty()
+    private val tv = MutableSharedFlow<Tv>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val tvSeasons = MutableSharedFlow<TvSeasons>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val tvEpisode = MutableSharedFlow<TvEpisode>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     override fun getFavorite(): Flow<PagingData<Tv>> =
         flow { emit(value = PagingData.from(data = currentTvDatabase)) }
@@ -74,4 +79,32 @@ class TestTvDatabaseRepository : TvRepository {
         language: String,
         region: String
     ): PagingSource<Int, Review> = testTvReviews.asPagingSourceFactory().invoke()
+
+    override fun getData(id: Int): Flow<Tv> = tv
+
+    override fun getTvSeasons(
+        seriesId: Int,
+        seasonNumber: Int
+    ): Flow<TvSeasons> = tvSeasons
+
+    override fun getTvEpisode(
+        seriesId: Int,
+        seasonNumber: Int,
+        episodeNumber: Int
+    ): Flow<TvEpisode> = tvEpisode
+
+    @VisibleForTesting
+    fun setTv(tv: Tv) {
+        this@TestTvRepository.tv.tryEmit(value = tv)
+    }
+
+    @VisibleForTesting
+    fun setTvSeason(tvSeasons: TvSeasons) {
+        this@TestTvRepository.tvSeasons.tryEmit(value = tvSeasons)
+    }
+
+    @VisibleForTesting
+    fun setTvEpisode(tvEpisode: TvEpisode) {
+        this@TestTvRepository.tvEpisode.tryEmit(value = tvEpisode)
+    }
 }

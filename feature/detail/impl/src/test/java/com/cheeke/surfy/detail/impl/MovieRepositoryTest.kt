@@ -9,7 +9,13 @@ import com.cheeke.surfy.database.impl.model.asExternalModel
 import com.cheeke.surfy.detail.api.TestMovieDao
 import com.cheeke.surfy.detail.impl.movie.MovieRepositoryImpl
 import com.cheeke.surfy.network.api.TestMovieRemoteDataSource
+import com.cheeke.surfy.network.api.TestSeriesRemoteDataSource
+import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
+import com.cheeke.surfy.testing.model.movieSeriesTestData
+import com.cheeke.surfy.testing.model.testImageList
+import com.cheeke.surfy.testing.model.watchProvidersTestData
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
+import com.cheeke.surfy.userdata.api.TestUserDataRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -17,11 +23,15 @@ import org.junit.Test
 import java.time.LocalDate
 import kotlin.test.assertEquals
 
-class MovieDataBaseRepositoryTest {
+class MovieRepositoryTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private val movieDao = TestMovieDao()
-    private val repository = MovieRepositoryImpl(movieDao = movieDao, movieApis = TestMovieRemoteDataSource())
+    private val movieApis = TestMovieRemoteDataSource()
+    private val seriesApis = TestSeriesRemoteDataSource()
+    private val userdataRepository = TestUserDataRepository()
+    private val requestOptionsProvider = DetailRequestOptionsProvider(userdataRepository = userdataRepository)
+    private val repository = MovieRepositoryImpl(movieDao = movieDao, movieApis = movieApis, seriesApis = seriesApis, requestOptionsProvider = requestOptionsProvider)
     private val movie = MovieEntity(id = 0, title = "title_0", posterPath = "posterPath_0", releaseDate = "releaseDate", timestamp = 0)
 
     @Test
@@ -220,5 +230,33 @@ class MovieDataBaseRepositoryTest {
             expected = movieDao.getNextWeekReleaseMovies(),
             actual = listOf(movie1, movie3)
         )
+    }
+
+    @Test
+    fun getMovieDetailTest() = runTest {
+        val result = repository.getData(id = 0)
+
+        assertEquals(expected = result.first(), actual = favoriteMovieDetailTestData)
+    }
+
+    @Test
+    fun getMovieSeriesTest() = runTest {
+        val result = repository.getMovieSeries(collectionId = 0)
+
+        assertEquals(expected = result.first(), actual = movieSeriesTestData)
+    }
+
+    @Test
+    fun getMovieSeriesImageListTest() = runTest {
+        val result = repository.getMovieSeriesImageList(collectionId = 0)
+
+        assertEquals(expected = result.first(), actual = testImageList)
+    }
+
+    @Test
+    fun getMovieWatchProvidersTest() = runTest {
+        val result = repository.getMovieWatchProviders(movieId = 0)
+
+        assertEquals(expected = result.first(), actual = watchProvidersTestData)
     }
 }

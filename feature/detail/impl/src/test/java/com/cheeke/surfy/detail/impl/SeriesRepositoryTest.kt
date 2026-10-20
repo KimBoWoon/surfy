@@ -13,7 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class SeriesDetailRepositoryTest {
+class SeriesRepositoryTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var movieApis: TestSeriesRemoteDataSource

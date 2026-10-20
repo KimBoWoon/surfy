@@ -1,7 +1,7 @@
 package com.cheeke.surfy.detail.impl
 
 import com.cheeke.surfy.datamanager.api.TestSurfyAppData
-import com.cheeke.surfy.detail.api.TestMovieDatabaseRepository
+import com.cheeke.surfy.detail.api.TestMovieRepository
 import com.cheeke.surfy.detail.impl.movie.GetMovieDetailUseCase
 import com.cheeke.surfy.model.LocaleOption
 import com.cheeke.surfy.model.Movie
@@ -27,25 +27,22 @@ import kotlin.test.assertEquals
 class GetMovieDetailUseCaseTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var detailRepository: TestMovieDetailRepository
-    private lateinit var movieDataBaseRepository: TestMovieDatabaseRepository
+    private lateinit var repository: TestMovieRepository
     private lateinit var userDataRepository: TestUserDataRepository
     private lateinit var getMovieDetailUseCase: GetMovieDetailUseCase
     private lateinit var movieAppDataRepository: TestSurfyAppData
 
     @Before
     fun setup() {
-        detailRepository = TestMovieDetailRepository()
-        movieDataBaseRepository = TestMovieDatabaseRepository()
+        repository = TestMovieRepository()
         userDataRepository = TestUserDataRepository()
         movieAppDataRepository = TestSurfyAppData()
         getMovieDetailUseCase = GetMovieDetailUseCase(
             userDataRepository = userDataRepository,
-            detailRepository = detailRepository,
-            repository = movieDataBaseRepository
+            repository = repository
         )
         runBlocking {
-            movieDataBaseRepository.insert(media = Movie(id = 23))
+            repository.insert(media = Movie(id = 23))
             movieAppDataRepository.setMovieAppData(
                 SurfyAppData(
                     secureBaseUrl = configurationTestData.images?.secureBaseUrl.orEmpty(),
@@ -62,8 +59,8 @@ class GetMovieDetailUseCaseTest {
 
     @Test
     fun getMovieDetailTest() = runTest {
-        detailRepository.setMovie(favoriteMovieDetailTestData)
-        detailRepository.setMovieSeries(movieSeriesTestData)
+        repository.setMovie(favoriteMovieDetailTestData)
+        repository.setMovieSeries(movieSeriesTestData)
 
         val result = getMovieDetailUseCase(id = 0).first()
 
@@ -79,15 +76,15 @@ class GetMovieDetailUseCaseTest {
 
         assertEquals(
             expected = result.isFavorite,
-            actual = movieDataBaseRepository.isFavorite(id = 0).first()
+            actual = repository.isFavorite(id = 0).first()
         )
     }
 
     @Test
     fun getFavoriteMovieDetailTest() = runTest {
-        detailRepository.setMovie(unFavoriteMovieDetailTestData)
-        detailRepository.setMovieSeries(movieSeriesTestData)
-        movieDataBaseRepository.insert(
+        repository.setMovie(unFavoriteMovieDetailTestData)
+        repository.setMovieSeries(movieSeriesTestData)
+        repository.insert(
             media = Movie(
                 id = unFavoriteMovieDetailTestData.id,
                 title = unFavoriteMovieDetailTestData.title,
@@ -109,7 +106,7 @@ class GetMovieDetailUseCaseTest {
 
         assertEquals(
             expected = result.isFavorite,
-            actual = movieDataBaseRepository.isFavorite(id = 324).first()
+            actual = repository.isFavorite(id = 324).first()
         )
     }
 }

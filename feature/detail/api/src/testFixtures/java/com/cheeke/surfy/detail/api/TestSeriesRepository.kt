@@ -1,4 +1,4 @@
-package com.cheeke.surfy.detail.impl
+package com.cheeke.surfy.detail.api
 
 import com.cheeke.surfy.detail.api.series.SeriesRepository
 import com.cheeke.surfy.model.ImageList
@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.jetbrains.annotations.VisibleForTesting
 
-class TestSeriesDetailRepository : SeriesRepository {
-    private val movieSeries = MutableSharedFlow<Series>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val imageList = MutableSharedFlow<ImageList>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+class TestSeriesRepository : SeriesRepository {
+    private val movieSeries =
+        MutableSharedFlow<Series>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val imageList =
+        MutableSharedFlow<ImageList>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     override fun getData(id: Int): Flow<Series> = movieSeries
 
@@ -18,11 +20,11 @@ class TestSeriesDetailRepository : SeriesRepository {
 
     @VisibleForTesting
     fun setMovieSeries(movieSeries: Series) {
-        this@TestSeriesDetailRepository.movieSeries.tryEmit(value = movieSeries)
+        this@TestSeriesRepository.movieSeries.tryEmit(value = movieSeries)
     }
 
     @VisibleForTesting
     fun setImageList(imageList: ImageList) {
-        this@TestSeriesDetailRepository.imageList.tryEmit(value = imageList)
+        this@TestSeriesRepository.imageList.tryEmit(value = imageList)
     }
 }

@@ -2,6 +2,7 @@ package com.cheeke.surfy.detail.impl
 
 import com.cheeke.surfy.analytics.api.TestAnalyticsHelper
 import com.cheeke.surfy.datamanager.api.TestSurfyAppData
+import com.cheeke.surfy.detail.api.TestSeriesRepository
 import com.cheeke.surfy.detail.impl.series.GetSeriesDetailUseCase
 import com.cheeke.surfy.detail.impl.series.SeriesState
 import com.cheeke.surfy.detail.impl.series.SeriesVM
@@ -23,7 +24,7 @@ import org.robolectric.RobolectricTestRunner
 class SeriesVMTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var testDetailRepository: TestSeriesDetailRepository
+    private lateinit var testDetailRepository: TestSeriesRepository
     private lateinit var testMovieAppDataManager: TestSurfyAppData
     private lateinit var testAnalyticsHelper: TestAnalyticsHelper
     private lateinit var getSeriesDetailUseCase: GetSeriesDetailUseCase
@@ -31,7 +32,7 @@ class SeriesVMTest {
 
     @Before
     fun setup() {
-        testDetailRepository = TestSeriesDetailRepository()
+        testDetailRepository = TestSeriesRepository()
         testMovieAppDataManager = TestSurfyAppData()
         testAnalyticsHelper = TestAnalyticsHelper()
         getSeriesDetailUseCase = GetSeriesDetailUseCase(repository = testDetailRepository)
