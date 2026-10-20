@@ -15,6 +15,7 @@ import com.cheeke.surfy.model.Regions
 import com.cheeke.surfy.model.Reviews
 import com.cheeke.surfy.model.SearchData
 import com.cheeke.surfy.model.SearchKeywordData
+import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedias
 import com.cheeke.surfy.model.TrendingMedia
@@ -28,14 +29,11 @@ import com.cheeke.surfy.testing.model.externalIdsTestData
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
 import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
-import com.cheeke.surfy.testing.model.movieSearchTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.nowPlayingMoviesTestData
 import com.cheeke.surfy.testing.model.peopleDetailTestData
-import com.cheeke.surfy.testing.model.peopleSearchTestData
 import com.cheeke.surfy.testing.model.regionTestData
 import com.cheeke.surfy.testing.model.searchKeywordTest
-import com.cheeke.surfy.testing.model.seriesSearchTestData
 import com.cheeke.surfy.testing.model.similarMoviesTestData
 import com.cheeke.surfy.testing.model.similarTvTestData
 import com.cheeke.surfy.testing.model.testImageList
@@ -45,11 +43,11 @@ import com.cheeke.surfy.testing.model.testTrendingMovie
 import com.cheeke.surfy.testing.model.testTrendingPeople
 import com.cheeke.surfy.testing.model.testTrendingTv
 import com.cheeke.surfy.testing.model.tvEpisodeTestData
-import com.cheeke.surfy.testing.model.tvSearchTestData
 import com.cheeke.surfy.testing.model.tvSeasonTestData
 import com.cheeke.surfy.testing.model.tvTestData
 import com.cheeke.surfy.testing.model.upcomingMoviesTestData
 import com.cheeke.surfy.testing.model.watchProvidersTestData
+import java.util.concurrent.CopyOnWriteArrayList
 
 class TestSettingRemoteDataSource : SettingRemoteDataSource {
     override suspend fun getConfiguration(): Configuration = configurationTestData
@@ -175,44 +173,46 @@ class TestTrendingRemoteDataSource : TrendingRemoteDataSource {
 }
 
 class TestSearchRemoteDataSource : SearchRemoteDataSource {
-    override suspend fun searchMulti(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        page: Int
-    ): SearchData = movieSearchTestData
+    data class SearchRequest(
+        val type: SearchType,
+        val query: String,
+        val language: String,
+        val isAdult: Boolean,
+        val page: Int
+    )
 
-    override suspend fun searchMovies(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = movieSearchTestData
+    data class KeywordRequest(
+        val query: String,
+        val page: Int
+    )
 
-    override suspend fun searchPeople(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = peopleSearchTestData
+    val searchRequests: MutableList<SearchRequest> = CopyOnWriteArrayList()
+    val keywordRequests: MutableList<KeywordRequest> = CopyOnWriteArrayList()
+    var searchResponses: Map<SearchType, SearchData> = emptyMap()
+    var keywordResponse: SearchKeywordData = searchKeywordTest
 
-    override suspend fun searchTv(
+    override suspend fun search(
+        type: SearchType,
         query: String,
-        includeAdult: Boolean,
         language: String,
-        region: String,
+        isAdult: Boolean,
         page: Int
-    ): SearchData = tvSearchTestData
+    ): SearchData {
+        searchRequests += SearchRequest(
+            type = type,
+            query = query,
+            language = language,
+            isAdult = isAdult,
+            page = page
+        )
+        return searchResponses.getValue(key = type)
+    }
 
-    override suspend fun searchSeries(
+    override suspend fun getSearchKeyword(
         query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
         page: Int
-    ): SearchData = seriesSearchTestData
-
-    override suspend fun getSearchKeyword(query: String, page: Int): SearchKeywordData = searchKeywordTest
+    ): SearchKeywordData {
+        keywordRequests += KeywordRequest(query = query, page = page)
+        return keywordResponse
+    }
 }

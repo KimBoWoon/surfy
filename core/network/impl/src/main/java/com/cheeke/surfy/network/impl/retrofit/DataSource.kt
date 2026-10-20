@@ -16,6 +16,7 @@ import com.cheeke.surfy.model.Regions
 import com.cheeke.surfy.model.Reviews
 import com.cheeke.surfy.model.SearchData
 import com.cheeke.surfy.model.SearchKeywordData
+import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedias
 import com.cheeke.surfy.model.TrendingMedia
@@ -91,97 +92,25 @@ class SettingNetworkDataSourceImpl @Inject constructor(
 class SearchRemoteDataSourceImpl @Inject constructor(
     private val apis: SearchApis
 ) : SearchRemoteDataSource {
-    override suspend fun searchMulti(
+    override suspend fun search(
+        type: SearchType,
         query: String,
-        includeAdult: Boolean,
         language: String,
+        isAdult: Boolean,
         page: Int
-    ): SearchData = when (
-        val response = apis.searchMulti(
-            query = query,
-            includeAdult = includeAdult,
-            language = language,
-            page = page
-        )
-    ) {
-        is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-        is ApiResponse.Success -> response.data.asExternalModel(mediaType = null)
-    }
-
-    override suspend fun searchMovies(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = when (
-        val response = apis.searchMovies(
-            query = query,
-            includeAdult = includeAdult,
-            language = language,
-            region = region,
-            page = page
-        )
-    ) {
-        is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-        is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.MOVIE)
-    }
-
-    override suspend fun searchTv(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = when (
-        val response = apis.searchTv(
-            query = query,
-            includeAdult = includeAdult,
-            language = language,
-            region = region,
-            page = page
-        )
-    ) {
-        is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-        is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.TV)
-    }
-
-    override suspend fun searchPeople(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = when (
-        val response = apis.searchPeople(
-            query = query,
-            includeAdult = includeAdult,
-            language = language,
-            region = region,
-            page = page
-        )
-    ) {
-        is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-        is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.PEOPLE)
-    }
-
-    override suspend fun searchSeries(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): SearchData = when (
-        val response = apis.searchMovieSeries(
-            query = query,
-            includeAdult = includeAdult,
-            language = language,
-            region = region,
-            page = page
-        )
-    ) {
-        is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-        is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.SERIES)
+    ): SearchData {
+        return when (val response = apis.search(type = type.path, includeAdult = isAdult, query = query, language = language, page = page)) {
+            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
+            is ApiResponse.Success -> response.data.asExternalModel(
+                mediaType = when (type) {
+                    SearchType.MULTI -> null
+                    SearchType.MOVIE -> MediaType.MOVIE
+                    SearchType.TV -> MediaType.TV
+                    SearchType.PEOPLE -> MediaType.PEOPLE
+                    SearchType.SERIES -> MediaType.SERIES
+                }
+            )
+        }
     }
 
     override suspend fun getSearchKeyword(query: String, page: Int): SearchKeywordData =
