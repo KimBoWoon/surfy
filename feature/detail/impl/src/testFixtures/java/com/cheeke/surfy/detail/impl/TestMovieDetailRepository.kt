@@ -1,6 +1,5 @@
 package com.cheeke.surfy.detail.impl
 
-import com.cheeke.surfy.detail.impl.movie.MovieDetailRepository
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.MovieWatchProvider

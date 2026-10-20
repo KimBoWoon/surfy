@@ -31,7 +31,6 @@ import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.peopleDetailTestData
 import com.cheeke.surfy.testing.model.regionTestData
 import com.cheeke.surfy.testing.repository.TestPeopleDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestPeopleDetailRepository
 import com.cheeke.surfy.testing.utils.TestSurfyAppData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -71,7 +70,7 @@ class PeopleScreenTest {
         testDatabaseRepository = TestPeopleDatabaseRepository()
         testDetailRepository = TestPeopleDetailRepository()
         getPeopleDetail = GetPeopleDetailUseCase(
-            detailRepository = testDetailRepository,
+            repository = testDetailRepository,
             peopleDataBaseRepository = testDatabaseRepository
         )
         viewModel = PeopleVM(

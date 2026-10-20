@@ -49,7 +49,7 @@ class MovieVMTest {
     private val getMovieDetailUseCase = GetMovieDetailUseCase(
         detailRepository = testDetailRepository,
         userDataRepository = testUserDataRepository,
-        movieDataBaseRepository = testDataBaseRepository
+        repository = testDataBaseRepository
     )
     private lateinit var viewModel: MovieVM
 

@@ -22,7 +22,6 @@ import com.cheeke.surfy.network.model.SurfyNetworkException
 import com.cheeke.surfy.testing.model.tvTestData
 import com.cheeke.surfy.testing.repository.TestPagingRepository
 import com.cheeke.surfy.testing.repository.TestTvDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestTvDetailRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -47,7 +46,7 @@ class TvScreenTest {
         pagingRepository = TestPagingRepository()
         userDataRepository = TestUserDataRepository()
         getTvDetailUseCase = GetTvDetailUseCase(
-            tvDataBaseRepository = databaseRepository,
+            repository = databaseRepository,
             detailRepository = detailRepository
         )
         viewModel = TvVM(

@@ -42,7 +42,7 @@ class PeopleVMTest {
         testMovieAppDataManager = TestSurfyAppData()
         testAnalyticsHelper = TestAnalyticsHelper()
         getPeopleDetailUseCase = GetPeopleDetailUseCase(
-            detailRepository = testDetailRepository,
+            repository = testDetailRepository,
             peopleDataBaseRepository = testDatabaseRepository
         )
         viewModel = PeopleVM(

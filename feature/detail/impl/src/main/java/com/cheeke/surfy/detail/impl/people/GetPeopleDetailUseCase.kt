@@ -7,15 +7,14 @@ import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class GetPeopleDetailUseCase @Inject constructor(
-    private val detailRepository: PeopleDetailRepository,
-    private val peopleDataBaseRepository: PeopleRepository
+    private val repository: PeopleRepository
 ) {
     operator fun invoke(personId: Int): Flow<People> =
         combine(
-            detailRepository.getData(id = personId),
-            detailRepository.getCombineCredits(personId = personId),
-            detailRepository.getExternalIds(personId = personId),
-            peopleDataBaseRepository.isFavorite(id = personId)
+            repository.getData(id = personId),
+            repository.getCombineCredits(personId = personId),
+            repository.getExternalIds(personId = personId),
+            repository.isFavorite(id = personId)
         ) { peopleDetail, combineCredits, externalIds, isFavorite ->
             peopleDetail.copy(
                 combineCredits = combineCredits,

@@ -38,7 +38,7 @@ class GetTvDataUseCaseTest {
         tvDataBaseRepository = TestTvDatabaseRepository()
         userDataRepository = TestUserDataRepository()
         getTvDetailUseCase = GetTvDetailUseCase(
-            tvDataBaseRepository = tvDataBaseRepository,
+            repository = tvDataBaseRepository,
             detailRepository = detailRepository
         )
     }

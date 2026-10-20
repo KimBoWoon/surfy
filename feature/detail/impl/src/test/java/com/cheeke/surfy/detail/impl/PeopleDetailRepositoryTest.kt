@@ -1,6 +1,5 @@
 package com.cheeke.surfy.detail.impl
 
-import com.cheeke.surfy.detail.impl.people.PeopleDetailRepositoryImpl
 import com.cheeke.surfy.network.api.TestPeopleRemoteDataSource
 import com.cheeke.surfy.testing.model.combineCreditsTestData
 import com.cheeke.surfy.testing.model.externalIdsTestData

@@ -34,7 +34,7 @@ class TvVMTest {
     private val testAnalyticsHelper = TestAnalyticsHelper()
     private val getTvDetailUseCase = GetTvDetailUseCase(
         detailRepository = testDetailRepository,
-        tvDataBaseRepository = testDataBaseRepository
+        repository = testDataBaseRepository
     )
     private lateinit var viewModel: TvVM
     private val tv = Tv(id = 0)

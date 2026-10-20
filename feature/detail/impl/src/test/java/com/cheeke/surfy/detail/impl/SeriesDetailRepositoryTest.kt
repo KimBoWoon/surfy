@@ -1,6 +1,6 @@
 package com.cheeke.surfy.detail.impl
 
-import com.cheeke.surfy.detail.impl.series.SeriesDetailRepositoryImpl
+import com.cheeke.surfy.detail.impl.series.SeriesRepositoryImpl
 import com.cheeke.surfy.network.api.TestSeriesRemoteDataSource
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.testImageList
@@ -18,13 +18,13 @@ class SeriesDetailRepositoryTest {
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var movieApis: TestSeriesRemoteDataSource
     private lateinit var userdata: TestUserDataRepository
-    private lateinit var repository: SeriesDetailRepositoryImpl
+    private lateinit var repository: SeriesRepositoryImpl
 
     @Before
     fun setup() {
         movieApis = TestSeriesRemoteDataSource()
         userdata = TestUserDataRepository()
-        repository = SeriesDetailRepositoryImpl(
+        repository = SeriesRepositoryImpl(
             apis = movieApis,
             requestOptionsProvider = DetailRequestOptionsProvider(userdataRepository = userdata),
         )

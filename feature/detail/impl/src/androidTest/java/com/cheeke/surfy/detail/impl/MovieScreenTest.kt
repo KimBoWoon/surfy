@@ -35,7 +35,6 @@ import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.regionTestData
 import com.cheeke.surfy.testing.model.unFavoriteMovieDetailTestData
 import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
-import com.cheeke.surfy.testing.repository.TestMovieDetailRepository
 import com.cheeke.surfy.testing.repository.TestPagingRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.TestSurfyAppData
@@ -85,7 +84,7 @@ class MovieScreenTest {
         testMovieAppDataManager = TestSurfyAppData()
         movieDetailUseCase = GetMovieDetailUseCase(
             userDataRepository = testUserDataRepository,
-            movieDataBaseRepository = testDatabaseRepository,
+            repository = testDatabaseRepository,
             detailRepository = testDetailRepository
         )
         viewModel = MovieVM(

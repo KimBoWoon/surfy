@@ -1,6 +1,6 @@
 package com.cheeke.surfy.detail.impl
 
-import com.cheeke.surfy.detail.impl.series.SeriesRepository
+import com.cheeke.surfy.detail.api.series.SeriesRepository
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Series
 import kotlinx.coroutines.channels.BufferOverflow

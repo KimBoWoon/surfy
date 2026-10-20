@@ -34,7 +34,7 @@ class SeriesVMTest {
         testDetailRepository = TestSeriesDetailRepository()
         testMovieAppDataManager = TestSurfyAppData()
         testAnalyticsHelper = TestAnalyticsHelper()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = testDetailRepository)
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(repository = testDetailRepository)
 
         seriesVM = SeriesVM(
             id = 0,

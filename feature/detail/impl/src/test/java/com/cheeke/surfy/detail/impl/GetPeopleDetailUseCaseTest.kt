@@ -30,7 +30,7 @@ class GetPeopleDetailUseCaseTest {
         peopleDataBaseRepository = TestPeopleDatabaseRepository()
         movieAppDataRepository = TestSurfyAppData()
         getPeopleDetailUseCase = GetPeopleDetailUseCase(
-            detailRepository = detailRepository,
+            repository = detailRepository,
             peopleDataBaseRepository = peopleDataBaseRepository
         )
 

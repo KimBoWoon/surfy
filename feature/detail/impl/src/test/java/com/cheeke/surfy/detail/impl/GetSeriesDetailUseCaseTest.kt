@@ -22,7 +22,7 @@ class GetSeriesDetailUseCaseTest {
     @Before
     fun setup() {
         detailRepository = TestSeriesDetailRepository()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = detailRepository)
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(repository = detailRepository)
     }
 
     @Test

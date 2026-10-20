@@ -1,6 +1,5 @@
 package com.cheeke.surfy.detail.impl
 
-import com.cheeke.surfy.detail.impl.tv.TvDetailRepository
 import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeasons
@@ -9,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.jetbrains.annotations.VisibleForTesting
 
-class TestTvDetailRepository : TvDetailRepository {
+class TestTvDetailRepository : TvRepository {
     private val tv = MutableSharedFlow<Tv>(replay = 1, onBufferOverflow = DROP_OLDEST)
     private val tvSeasons = MutableSharedFlow<TvSeasons>(replay = 1, onBufferOverflow = DROP_OLDEST)
     private val tvEpisode = MutableSharedFlow<TvEpisode>(replay = 1, onBufferOverflow = DROP_OLDEST)

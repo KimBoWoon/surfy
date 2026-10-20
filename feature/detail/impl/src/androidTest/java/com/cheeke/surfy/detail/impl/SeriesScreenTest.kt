@@ -65,7 +65,7 @@ class SeriesScreenTest {
     fun setup() {
         savedStateHandle = SavedStateHandle(initialState = mapOf("id" to 0))
         testDetailRepository = TestSeriesDetailRepository()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = testDetailRepository)
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(repository = testDetailRepository)
         viewModel = SeriesVM(
             id = 0,
             getSeriesDetailUseCase = getSeriesDetailUseCase,

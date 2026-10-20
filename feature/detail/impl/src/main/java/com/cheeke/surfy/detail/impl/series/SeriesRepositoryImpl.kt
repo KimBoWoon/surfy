@@ -1,5 +1,6 @@
 package com.cheeke.surfy.detail.impl.series
 
+import com.cheeke.surfy.detail.api.series.SeriesRepository
 import com.cheeke.surfy.detail.impl.DetailRequestOptionsProvider
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Series
@@ -8,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class SeriesDetailRepositoryImpl @Inject constructor(
+class SeriesRepositoryImpl @Inject constructor(
     private val apis: SeriesRemoteDataSource,
     private val requestOptionsProvider: DetailRequestOptionsProvider
 ) : SeriesRepository {

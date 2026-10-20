@@ -19,14 +19,13 @@ import javax.inject.Inject
 
 class GetMovieDetailUseCase @Inject constructor(
     private val userDataRepository: UserDataRepository,
-    private val movieDataBaseRepository: MovieRepository,
-    private val detailRepository: MovieDetailRepository
+    private val repository: MovieRepository,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(id: Int): Flow<Movie> =
         combine(
             getMovieWithCollection(id = id),
-            movieDataBaseRepository.isFavorite(id = id)
+            repository.isFavorite(id = id)
         ) { movie, isFavorite ->
             movie.copy(isFavorite = isFavorite)
         }
@@ -34,7 +33,7 @@ class GetMovieDetailUseCase @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getMovieWithCollection(id: Int): Flow<Movie> =
         combine(
-            detailRepository.getData(id = id),
+            repository.getData(id = id),
             userDataRepository.internalData
         ) { movie, internalData ->
             val country = movie.releases?.countries?.filter { country ->
@@ -52,7 +51,7 @@ class GetMovieDetailUseCase @Inject constructor(
         }
 
     private fun getCollection(collectionId: Int): Flow<Series> =
-        detailRepository.getMovieSeries(collectionId = collectionId)
+        repository.getMovieSeries(collectionId = collectionId)
             .map { series ->
                 series.copy(
                     parts = series.parts?.sortedWith(

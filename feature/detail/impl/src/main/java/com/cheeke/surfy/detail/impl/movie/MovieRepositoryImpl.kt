@@ -11,24 +11,32 @@ import com.cheeke.surfy.database.impl.model.NowPlayingMovieEntity
 import com.cheeke.surfy.database.impl.model.UpComingMovieEntity
 import com.cheeke.surfy.database.impl.model.asExternalModel
 import com.cheeke.surfy.detail.api.movie.MovieRepository
+import com.cheeke.surfy.detail.impl.DetailRequestOptionsProvider
 import com.cheeke.surfy.detail.impl.paging.MovieReviewPagingSource
 import com.cheeke.surfy.detail.impl.paging.SimilarMoviePagingSource
 import com.cheeke.surfy.feature.detail.impl.BuildConfig
+import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Movie
+import com.cheeke.surfy.model.MovieWatchProvider
 import com.cheeke.surfy.model.Review
+import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedia
 import com.cheeke.surfy.network.api.MovieRemoteDataSource
+import com.cheeke.surfy.network.api.SeriesRemoteDataSource
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.Instant
 
 class MovieRepositoryImpl @Inject constructor(
     private val movieDao: MovieDao,
-    private val movieApis: MovieRemoteDataSource
+    private val movieApis: MovieRemoteDataSource,
+    private val seriesApis: SeriesRemoteDataSource,
+    private val requestOptionsProvider: DetailRequestOptionsProvider
 ) : MovieRepository {
     init {
         if (BuildConfig.BENCHMARK) {
@@ -45,6 +53,28 @@ class MovieRepositoryImpl @Inject constructor(
                 )
             }
         }
+    }
+
+    override fun getData(id: Int): Flow<Movie> = flow {
+        val internalData = requestOptionsProvider.current()
+
+        emit(value = movieApis.getMovie(id = id, language = internalData.languageTag, region = internalData.region, includeImageLanguage = internalData.includeImageLanguage))
+    }
+
+    override fun getMovieSeries(collectionId: Int): Flow<Series> = flow {
+        val internalData = requestOptionsProvider.current()
+
+        emit(value = seriesApis.getMovieSeries(collectionId = collectionId, language = internalData.languageTag))
+    }
+
+    override fun getMovieSeriesImageList(collectionId: Int): Flow<ImageList> = flow {
+        val internalData = requestOptionsProvider.current()
+
+        emit(value = seriesApis.getSeriesImages(collectionId = collectionId, includeImageLanguage = "${internalData.languageTag},null", language = internalData.languageTag))
+    }
+
+    override fun getMovieWatchProviders(movieId: Int): Flow<MovieWatchProvider> = flow {
+        emit(value = movieApis.getMovieWatchProvider(movieId = movieId))
     }
 
     override fun getFavorite(): Flow<PagingData<Movie>> =

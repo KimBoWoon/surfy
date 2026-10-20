@@ -1,6 +1,5 @@
 package com.cheeke.surfy.detail.impl
 
-import com.cheeke.surfy.detail.impl.tv.TvDetailRepositoryImpl
 import com.cheeke.surfy.network.api.TestTvRemoteDataSource
 import com.cheeke.surfy.testing.model.tvEpisodeTestData
 import com.cheeke.surfy.testing.model.tvSeasonTestData

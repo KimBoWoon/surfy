@@ -42,7 +42,7 @@ class GetMovieDetailUseCaseTest {
         getMovieDetailUseCase = GetMovieDetailUseCase(
             userDataRepository = userDataRepository,
             detailRepository = detailRepository,
-            movieDataBaseRepository = movieDataBaseRepository
+            repository = movieDataBaseRepository
         )
         runBlocking {
             movieDataBaseRepository.insert(media = Movie(id = 23))

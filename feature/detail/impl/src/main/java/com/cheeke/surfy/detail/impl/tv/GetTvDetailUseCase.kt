@@ -17,8 +17,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class GetTvDetailUseCase @Inject constructor(
-    private val tvDataBaseRepository: TvRepository,
-    private val detailRepository: TvDetailRepository
+    private val repository: TvRepository
 ) {
     private val episodesCache = MutableStateFlow<Map<String, List<TvEpisode>>>(value = emptyMap())
 
@@ -42,8 +41,8 @@ class GetTvDetailUseCase @Inject constructor(
             }
 
         return combine(
-            detailRepository.getData(id = id),
-            tvDataBaseRepository.isFavorite(id = id),
+            repository.getData(id = id),
+            repository.isFavorite(id = id),
             episodesCache,
             seasonState
         ) { tv, isFavorite, episodesBySeason, currentSeasonState ->
@@ -56,7 +55,7 @@ class GetTvDetailUseCase @Inject constructor(
     }
 
     private fun getTvSeason(id: Int, season: TvSeason): Flow<TvSeasonLoadState> =
-        detailRepository.getTvSeasons(seriesId = id, seasonNumber = season.seasonNumber ?: -1)
+        repository.getTvSeasons(seriesId = id, seasonNumber = season.seasonNumber ?: -1)
             .asResult()
             .map { result ->
                 when (result) {

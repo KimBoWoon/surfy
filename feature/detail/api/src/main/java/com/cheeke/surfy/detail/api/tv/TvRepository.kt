@@ -1,12 +1,18 @@
 package com.cheeke.surfy.detail.api.tv
 
 import androidx.paging.PagingSource
-import com.cheeke.surfy.detail.api.DataBaseRepository
+import com.cheeke.surfy.detail.api.Repository
 import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.SimilarMedia
 import com.cheeke.surfy.model.Tv
+import com.cheeke.surfy.model.TvEpisode
+import com.cheeke.surfy.model.TvSeasons
+import kotlinx.coroutines.flow.Flow
 
-interface TvRepository : DataBaseRepository<Tv> {
+interface TvRepository : Repository<Tv> {
+    override fun getData(id: Int): Flow<Tv>
+    fun getTvSeasons(seriesId: Int, seasonNumber: Int): Flow<TvSeasons>
+    fun getTvEpisode(seriesId: Int, seasonNumber: Int, episodeNumber: Int): Flow<TvEpisode>
     suspend fun getNextWeekReleaseTvs(): List<Tv>
     fun getSimilarTvPagingSource(
         id: Int,
