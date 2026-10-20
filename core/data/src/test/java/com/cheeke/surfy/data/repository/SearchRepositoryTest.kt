@@ -40,7 +40,7 @@ class SearchRepositoryTest {
 
     @Test
     fun getKeywordsTest() = runTest {
-        val getKeyword = repository.getKeywords().load(
+        val getKeyword = repository.getRecentlyKeyword().load(
             params = PagingSource.LoadParams.Refresh(
                 key = 0,
                 loadSize = 20,
@@ -119,10 +119,10 @@ class SearchRepositoryTest {
     }
 
     private suspend fun loadSearchResult(searchType: SearchType, keyword: String): List<Media> =
-        repository.getSearchPagingSource(
+        repository.search(
             type = searchType,
             query = keyword,
-            language = "ko-KR",
+            language = "ko",
             region = "KR",
             isAdult = true
         ).asSnapshot()
@@ -171,7 +171,6 @@ class SearchRepositoryTest {
                 type = SearchType.MOVIE,
                 query = "미션",
                 language = "ko-KR",
-                region = "KR",
                 isAdult = true,
                 page = 1
             ),
@@ -190,14 +189,14 @@ class SearchRepositoryTest {
 
     @Test
     fun `추천 키워드는 remote 결과를 그대로 반환한다`() = runTest {
-        val loadedItems = repository.getRecommendKeywordPagingSource(query = "미션").asSnapshot()
+        val loadedItems = repository.getRecommendKeyword(query = "미션").asSnapshot()
 
         assertEquals(expected = testRecommendedKeyword, actual = loadedItems)
     }
 
     @Test
     fun `추천 키워드는 전달한 query와 page 1로 요청한다`() = runTest {
-        repository.getRecommendKeywordPagingSource(query = "미션").asSnapshot()
+        repository.getRecommendKeyword(query = "미션").asSnapshot()
 
         assertEquals(
             expected = TestSearchRemoteDataSource.KeywordRequest(query = "미션", page = 1),

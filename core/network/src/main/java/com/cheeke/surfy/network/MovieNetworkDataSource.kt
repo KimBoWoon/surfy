@@ -150,8 +150,7 @@ interface SearchRemoteDataSource {
     suspend fun search(
         type: SearchType,
         query: String,
-        language: String = defaultLanguageRegion,
-        region: String = defaultRegion,
+        language: String = defaultLanguage,
         isAdult: Boolean = false,
         page: Int = 1
     ): SearchData

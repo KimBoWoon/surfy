@@ -96,80 +96,20 @@ class SearchRemoteDataSourceImpl @Inject constructor(
         type: SearchType,
         query: String,
         language: String,
-        region: String,
         isAdult: Boolean,
         page: Int
     ): SearchData {
-        return when (type) {
-            SearchType.MULTI -> {
-                when (
-                    val response = apis.searchMulti(
-                        query = query,
-                        includeAdult = isAdult,
-                        language = language,
-                        page = page
-                    )
-                ) {
-                    is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-                    is ApiResponse.Success -> response.data.asExternalModel(mediaType = null)
+        return when (val response = apis.search(type = type.path, includeAdult = isAdult, query = query, language = language, page = page)) {
+            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
+            is ApiResponse.Success -> response.data.asExternalModel(
+                mediaType = when (type) {
+                    SearchType.MULTI -> null
+                    SearchType.MOVIE -> MediaType.MOVIE
+                    SearchType.TV -> MediaType.TV
+                    SearchType.PEOPLE -> MediaType.PEOPLE
+                    SearchType.SERIES -> MediaType.SERIES
                 }
-            }
-            SearchType.MOVIE -> {
-                when (
-                    val response = apis.searchMovies(
-                        query = query,
-                        includeAdult = isAdult,
-                        language = language,
-                        region = region,
-                        page = page
-                    )
-                ) {
-                    is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-                    is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.MOVIE)
-                }
-            }
-            SearchType.TV -> {
-                when (
-                    val response = apis.searchTv(
-                        query = query,
-                        includeAdult = isAdult,
-                        language = language,
-                        region = region,
-                        page = page
-                    )
-                ) {
-                    is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-                    is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.TV)
-                }
-            }
-            SearchType.PEOPLE -> {
-                when (
-                    val response = apis.searchPeople(
-                        query = query,
-                        includeAdult = isAdult,
-                        language = language,
-                        region = region,
-                        page = page
-                    )
-                ) {
-                    is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-                    is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.PEOPLE)
-                }
-            }
-            SearchType.SERIES -> {
-                when (
-                    val response = apis.searchMovieSeries(
-                        query = query,
-                        includeAdult = isAdult,
-                        language = language,
-                        region = region,
-                        page = page
-                    )
-                ) {
-                    is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-                    is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.SERIES)
-                }
-            }
+            )
         }
     }
 

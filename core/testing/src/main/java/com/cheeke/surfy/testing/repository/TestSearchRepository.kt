@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.flowOf
 class TestSearchRepository : SearchRepository {
     val keywordDatabase = MutableStateFlow<List<KeywordEntity>>(value = emptyList())
 
-    override fun getKeywords(): PagingSource<Int, KeywordEntity> =
+    override fun getRecentlyKeyword(): PagingSource<Int, KeywordEntity> =
         keywordList.asPagingSourceFactory().invoke()
 
     override suspend fun insert(keyword: String) {
@@ -38,7 +38,7 @@ class TestSearchRepository : SearchRepository {
     }
 
     @SuppressLint("VisibleForTests")
-    override fun getSearchPagingSource(
+    override fun search(
         type: SearchType,
         query: String,
         language: String,
@@ -59,6 +59,6 @@ class TestSearchRepository : SearchRepository {
     }
 
     @SuppressLint("VisibleForTests")
-    override fun getRecommendKeywordPagingSource(query: String): Flow<PagingData<SearchKeyword>> =
+    override fun getRecommendKeyword(query: String): Flow<PagingData<SearchKeyword>> =
         flowOf(value = PagingData.from(data = testRecommendedKeyword))
 }

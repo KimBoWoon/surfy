@@ -304,7 +304,6 @@ class TestSearchRemoteDataSource : SearchRemoteDataSource {
         val type: SearchType,
         val query: String,
         val language: String,
-        val region: String,
         val isAdult: Boolean,
         val page: Int
     )
@@ -323,7 +322,6 @@ class TestSearchRemoteDataSource : SearchRemoteDataSource {
         type: SearchType,
         query: String,
         language: String,
-        region: String,
         isAdult: Boolean,
         page: Int
     ): SearchData {
@@ -331,11 +329,10 @@ class TestSearchRemoteDataSource : SearchRemoteDataSource {
             type = type,
             query = query,
             language = language,
-            region = region,
             isAdult = isAdult,
             page = page
         )
-        return searchResponses.getValue(type)
+        return searchResponses.getValue(key = type)
     }
 
     override suspend fun getSearchKeyword(

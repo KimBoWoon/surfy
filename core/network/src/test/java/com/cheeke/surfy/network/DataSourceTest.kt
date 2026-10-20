@@ -277,35 +277,35 @@ class SearchRemoteDataTest {
 
     @Test
     fun searchMoviesTest() = runTest {
-        val result = datasource.search(type = SearchType.MOVIE, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
+        val result = datasource.search(type = SearchType.MOVIE, query = "미션", language = "ko-KR", isAdult = false, page = 1)
 
         assertEquals(result, movieSearchTestData)
     }
 
     @Test
     fun searchPeopleTest() = runTest {
-        val result = datasource.search(type = SearchType.PEOPLE, query = "톰 크루즈", language = "ko", region = "KR", isAdult = false, page = 1)
+        val result = datasource.search(type = SearchType.PEOPLE, query = "톰 크루즈", language = "ko-KR", isAdult = false, page = 1)
 
         assertEquals(result, peopleSearchTestData)
     }
 
     @Test
     fun searchTvTest() = runTest {
-        val result = datasource.search(type = SearchType.TV, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
+        val result = datasource.search(type = SearchType.TV, query = "미션", language = "ko-KR", isAdult = false, page = 1)
 
         assertEquals(result, tvSearchTestData)
     }
 
     @Test
     fun searchSeriesTest() = runTest {
-        val result = datasource.search(type = SearchType.SERIES, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
+        val result = datasource.search(type = SearchType.SERIES, query = "미션", language = "ko-KR", isAdult = false, page = 1)
 
         assertEquals(result, seriesSearchTestData)
     }
 
     @Test
     fun searchMultiTest() = runTest {
-        val result = datasource.search(type = SearchType.MULTI, query = "미션", language = "ko", region = "KR", isAdult = false, page = 1)
+        val result = datasource.search(type = SearchType.MULTI, query = "미션", language = "ko-KR", isAdult = false, page = 1)
 
         assertEquals(result, movieSearchTestData)
     }

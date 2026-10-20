@@ -27,7 +27,7 @@ class SearchRepositoryImpl @Inject constructor(
         val config = PagingConfig(pageSize = PAGE_SIZE, initialLoadSize = INITIAL_LOAD_SIZE, enablePlaceholders = ENABLE_PLACE_HOLDER)
     }
 
-    override fun getKeywords(): PagingSource<Int, KeywordEntity> = keywordDao.getKeywords()
+    override fun getRecentlyKeyword(): PagingSource<Int, KeywordEntity> = keywordDao.getKeywords()
     override suspend fun insert(keyword: String) {
         keywordDao.insertOrReplaceKeyword(
             entity = KeywordEntity(
@@ -45,7 +45,7 @@ class SearchRepositoryImpl @Inject constructor(
         keywordDao.delete(id = entity.id)
     }
 
-    override fun getSearchPagingSource(
+    override fun search(
         type: SearchType,
         query: String,
         language: String,
@@ -65,7 +65,7 @@ class SearchRepositoryImpl @Inject constructor(
         }
     ).flow
 
-    override fun getRecommendKeywordPagingSource(
+    override fun getRecommendKeyword(
         query: String
     ): Flow<PagingData<SearchKeyword>> = Pager(
         config = config,

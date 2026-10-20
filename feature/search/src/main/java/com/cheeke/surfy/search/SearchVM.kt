@@ -82,7 +82,7 @@ class SearchVM @AssistedInject constructor(
     val recentlyKeywordPaging = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
         initialKey = 1,
-        pagingSourceFactory = { searchRepository.getKeywords() }
+        pagingSourceFactory = { searchRepository.getRecentlyKeyword() }
     ).flow.cachedIn(scope = viewModelScope)
     val recommendKeywordPaging = query
         .map { textFieldValue: TextFieldValue -> textFieldValue.text }
@@ -92,7 +92,7 @@ class SearchVM @AssistedInject constructor(
             if (keyword.trim().isEmpty()) {
                 flowOf(value = PagingData.empty())
             } else {
-                searchRepository.getRecommendKeywordPagingSource(query = keyword)
+                searchRepository.getRecommendKeyword(query = keyword)
             }
         }.cachedIn(scope = viewModelScope)
     private val searchRequest = MutableStateFlow<SearchRequest?>(
@@ -102,44 +102,86 @@ class SearchVM @AssistedInject constructor(
             null
         }
     )
-    val searchResult: StateFlow<SearchUiState> = searchRequest
-        .flatMapLatest { request: SearchRequest? ->
-            if (request == null) {
-                flowOf(value = SearchUiState.SearchHint)
-            } else {
-                flow<SearchUiState> {
-                    emit(
-                        value = SearchUiState.Success(
-                            pagingData = combine(
-                                searchRepository.getSearchPagingSource(
-                                    type = request.searchType,
-                                    query = request.query,
-                                    language = surfyAppData.value.language.find { it.isSelected }?.code.orEmpty(),
-                                    region = surfyAppData.value.region.find { it.isSelected }?.code.orEmpty(),
-                                    isAdult = surfyAppData.value.isAdult
-                                ).cachedIn(scope = viewModelScope),
-                                selectedGenre
-                            ) { pagingData: PagingData<Media>, genre: Genre? ->
-                                if (genre != null) {
-                                    pagingData.filter { media: Media ->
-                                        genre.id in (media.genres?.map { it.id }.orEmpty())
-                                    }
-                                } else {
-                                    pagingData
+    val searchResult: StateFlow<SearchUiState> = combine(
+        flow = searchRequest,
+        flow2 = surfyAppData
+    ) { request, surfyAppData ->
+        request to surfyAppData
+    }.flatMapLatest { (request: SearchRequest?, option: SurfyAppData) ->
+        if (request == null) {
+            flowOf(value = SearchUiState.SearchHint)
+        } else {
+            flow<SearchUiState> {
+                emit(
+                    value = SearchUiState.Success(
+                        pagingData = combine(
+                            flow = searchRepository.search(
+                                type = request.searchType,
+                                query = request.query,
+                                language = option.selectedLanguage,
+                                region = option.selectedRegion,
+                                isAdult = option.isAdult
+                            ).cachedIn(scope = viewModelScope),
+                            flow2 = selectedGenre
+                        ) { pagingData: PagingData<Media>, genre: Genre? ->
+                            if (genre != null) {
+                                pagingData.filter { media: Media ->
+                                    genre.id in media.genres?.map { it.id }.orEmpty()
                                 }
+                            } else {
+                                pagingData
                             }
-                        )
+                        }
                     )
-                }.catch { throwable: Throwable ->
-                    val networkException = throwable as? SurfyNetworkException ?: throw throwable
-                    emit(value = SearchUiState.Error(throwable = networkException))
-                }
+                )
+            }.catch { throwable: Throwable ->
+                val networkException = throwable as? SurfyNetworkException ?: throw throwable
+                emit(value = SearchUiState.Error(throwable = networkException))
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = SearchUiState.SearchHint
-        )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = SearchUiState.SearchHint
+    )
+//    val searchResult: StateFlow<SearchUiState> = searchRequest
+//        .flatMapLatest { request: SearchRequest? ->
+//            if (request == null) {
+//                flowOf(value = SearchUiState.SearchHint)
+//            } else {
+//                flow<SearchUiState> {
+//                    emit(
+//                        value = SearchUiState.Success(
+//                            pagingData = combine(
+//                                flow = searchRepository.getSearchPagingSource(
+//                                    type = request.searchType,
+//                                    query = request.query,
+//                                    language = surfyAppData.value.language.find { it.isSelected }?.code.orEmpty(),
+//                                    region = surfyAppData.value.region.find { it.isSelected }?.code.orEmpty(),
+//                                    isAdult = surfyAppData.value.isAdult
+//                                ).cachedIn(scope = viewModelScope),
+//                                flow2 = selectedGenre
+//                            ) { pagingData: PagingData<Media>, genre: Genre? ->
+//                                if (genre != null) {
+//                                    pagingData.filter { media: Media ->
+//                                        genre.id in (media.genres?.map { it.id }.orEmpty())
+//                                    }
+//                                } else {
+//                                    pagingData
+//                                }
+//                            }
+//                        )
+//                    )
+//                }.catch { throwable: Throwable ->
+//                    val networkException = throwable as? SurfyNetworkException ?: throw throwable
+//                    emit(value = SearchUiState.Error(throwable = networkException))
+//                }
+//            }
+//        }.stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.Lazily,
+//            initialValue = SearchUiState.SearchHint
+//        )
 
     fun updateGenre(genre: Genre?) {
         savedStateHandle[GENRE] = if (genre == selectedGenre.value) null else genre

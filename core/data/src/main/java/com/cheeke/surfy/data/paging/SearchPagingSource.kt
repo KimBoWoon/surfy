@@ -17,7 +17,7 @@ class SearchPagingSource(
 ) : PagingSource<Int, Media>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Media> =
         runCatching {
-            val response = apis.search(type = type, query = query, isAdult = isAdult, language = language, page = params.key ?: 1)
+            val response = apis.search(type = type, query = query, isAdult = isAdult, language = "${language}-${region}", page = params.key ?: 1)
 
             LoadResult.Page(
                 data = response.results.orEmpty(),

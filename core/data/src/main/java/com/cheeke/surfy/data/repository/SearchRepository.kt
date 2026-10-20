@@ -9,10 +9,10 @@ import com.cheeke.surfy.model.SearchType
 import kotlinx.coroutines.flow.Flow
 
 interface SearchRepository {
-    fun getKeywords(): PagingSource<Int, KeywordEntity>
+    fun getRecentlyKeyword(): PagingSource<Int, KeywordEntity>
     suspend fun insert(keyword: String)
     suspend fun deleteAll()
     suspend fun delete(entity: KeywordEntity)
-    fun getSearchPagingSource(type: SearchType, query: String, language: String, region: String, isAdult: Boolean): Flow<PagingData<Media>>
-    fun getRecommendKeywordPagingSource(query: String): Flow<PagingData<SearchKeyword>>
+    fun search(type: SearchType, query: String, language: String, region: String, isAdult: Boolean): Flow<PagingData<Media>>
+    fun getRecommendKeyword(query: String): Flow<PagingData<SearchKeyword>>
 }
