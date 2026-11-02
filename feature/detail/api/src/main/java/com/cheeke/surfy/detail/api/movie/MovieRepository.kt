@@ -20,7 +20,7 @@ interface MovieRepository : Repository<Movie> {
     fun getNowPlayingMovies(): Flow<PagingData<Movie>>
     fun getPopularMovies(): Flow<List<Movie>>
     suspend fun getNextWeekReleaseMovies(): List<Movie>
-    fun getSimilarMoviePagingSource(
+    fun getSimilarMovies(
         id: Int,
         language: String,
         region: String

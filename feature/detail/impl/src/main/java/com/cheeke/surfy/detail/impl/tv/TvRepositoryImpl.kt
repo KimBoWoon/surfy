@@ -10,8 +10,6 @@ import com.cheeke.surfy.database.impl.model.TvEntity
 import com.cheeke.surfy.database.impl.model.asExternalModel
 import com.cheeke.surfy.detail.api.tv.TvRepository
 import com.cheeke.surfy.detail.impl.DetailRequestOptionsProvider
-import com.cheeke.surfy.detail.impl.paging.SimilarTvPagingSource
-import com.cheeke.surfy.detail.impl.paging.TvReviewPagingSource
 import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.SimilarMedia
 import com.cheeke.surfy.model.Tv
@@ -87,7 +85,7 @@ class TvRepositoryImpl @Inject constructor(
         tvDao.upsertTvs(entities = medias.map(transform = Tv::asExternalModel))
     }
 
-    override fun getSimilarTvPagingSource(
+    override fun getSimilarTvs(
         id: Int,
         language: String,
         region: String

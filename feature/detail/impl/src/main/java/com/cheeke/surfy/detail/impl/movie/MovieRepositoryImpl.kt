@@ -12,8 +12,6 @@ import com.cheeke.surfy.database.impl.model.UpComingMovieEntity
 import com.cheeke.surfy.database.impl.model.asExternalModel
 import com.cheeke.surfy.detail.api.movie.MovieRepository
 import com.cheeke.surfy.detail.impl.DetailRequestOptionsProvider
-import com.cheeke.surfy.detail.impl.paging.MovieReviewPagingSource
-import com.cheeke.surfy.detail.impl.paging.SimilarMoviePagingSource
 import com.cheeke.surfy.feature.detail.impl.BuildConfig
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Movie
@@ -124,7 +122,7 @@ class MovieRepositoryImpl @Inject constructor(
     override suspend fun getNextWeekReleaseMovies(): List<Movie> =
         movieDao.getNextWeekReleaseMovies().map { it.asExternalModel() }
 
-    override fun getSimilarMoviePagingSource(
+    override fun getSimilarMovies(
         id: Int,
         language: String,
         region: String

@@ -14,7 +14,7 @@ interface TvRepository : Repository<Tv> {
     fun getTvSeasons(seriesId: Int, seasonNumber: Int): Flow<TvSeasons>
     fun getTvEpisode(seriesId: Int, seasonNumber: Int, episodeNumber: Int): Flow<TvEpisode>
     suspend fun getNextWeekReleaseTvs(): List<Tv>
-    fun getSimilarTvPagingSource(
+    fun getSimilarTvs(
         id: Int,
         language: String,
         region: String

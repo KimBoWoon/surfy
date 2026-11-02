@@ -16,10 +16,10 @@ class SearchPagingSource(
     private val isAdult: Boolean
 ) : PagingSource<Int, Media>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Media> {
-        val currentPage = params.key ?: FIRST_PAGE
         return try {
+            val currentPage = params.key ?: 1
             val response = apis.search(type = type, query = query, isAdult = isAdult, language = language, page = currentPage)
-            val totalPages = response.totalPages ?: FIRST_PAGE
+            val totalPages = response.totalPages ?: 1
 
             LoadResult.Page(
                 data = response.results.orEmpty(),
@@ -29,17 +29,13 @@ class SearchPagingSource(
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (throwable: Throwable) {
-            Log.printStackTrace(throwable)
+            Log.printStackTrace(tr = throwable)
             LoadResult.Error(throwable)
         }
     }
 
     override fun getRefreshKey(state: PagingState<Int, Media>): Int? =
         state.anchorPosition?.let { anchorPosition ->
-            state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+            state.closestPageToPosition(anchorPosition)?.nextKey?.minus(other = 1)
         }
-
-    private companion object {
-        const val FIRST_PAGE = 1
-    }
 }

@@ -80,6 +80,7 @@ import com.cheeke.surfy.ui.utils.dp12
 import com.cheeke.surfy.ui.utils.dp120
 import com.cheeke.surfy.ui.utils.dp14
 import com.cheeke.surfy.ui.utils.dp16
+import com.cheeke.surfy.ui.utils.dp20
 import com.cheeke.surfy.ui.utils.dp4
 import com.cheeke.surfy.ui.utils.dp5
 import com.cheeke.surfy.ui.utils.dp62
@@ -228,8 +229,7 @@ fun MovieDetailComponent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(state = scrollState),
-        verticalArrangement = Arrangement.spacedBy(space = dp10)
+            .verticalScroll(state = scrollState)
     ) {
         TitleComponent(
             isFavorite = movie.isFavorite,
@@ -309,6 +309,7 @@ fun MovieDetailComponent(
                 goToDestination = goToMovie
             )
         }
+        Spacer(modifier = Modifier.height(height = dp20))
     }
 }
 

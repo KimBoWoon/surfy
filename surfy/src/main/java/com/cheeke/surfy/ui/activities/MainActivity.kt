@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         deepLinkManager.handleDeepLink(uri = intent?.data)
+        val isDeeplink = intent?.getBooleanExtra("isDeeplink", false) ?: false
 
         onBackPressedDispatcher.addCallback(
             onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
@@ -133,7 +134,7 @@ class MainActivity : ComponentActivity() {
                         deepLinkManager.consumeRootDeepLink()
                     }
 
-                    if (shouldShowNextWeekReleaseDialog) {
+                    if (shouldShowNextWeekReleaseDialog && !isDeeplink) {
                         ReleaseMoviesDialog(
                             releaseMovies = nextWeekReleaseDialogItems,
                             goToMovie = { id -> backstack.add(element = MovieNavKey(id = id)) },

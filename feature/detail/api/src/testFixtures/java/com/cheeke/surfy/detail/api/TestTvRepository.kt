@@ -68,7 +68,7 @@ class TestTvRepository : TvRepository {
         tvDatabase.tryEmit(value = list)
     }
 
-    override fun getSimilarTvPagingSource(
+    override fun getSimilarTvs(
         id: Int,
         language: String,
         region: String

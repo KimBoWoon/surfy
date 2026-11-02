@@ -81,7 +81,7 @@ class TestMovieRepository : MovieRepository {
         movieDatabase.emit(value = list)
     }
 
-    override fun getSimilarMoviePagingSource(
+    override fun getSimilarMovies(
         id: Int,
         language: String,
         region: String

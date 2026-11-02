@@ -10,10 +10,9 @@ import kotlinx.coroutines.CancellationException
 class TrendingPagingSource(
     private val fetchPage: suspend (page: Int) -> TrendingMedia
 ) : PagingSource<Int, TrendingMediaResult>() {
-
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TrendingMediaResult> {
-        val page = params.key ?: 1
         return try {
+            val page = params.key ?: 1
             val response = fetchPage(page)
             val totalPages = response.totalPages ?: 1
             LoadResult.Page(

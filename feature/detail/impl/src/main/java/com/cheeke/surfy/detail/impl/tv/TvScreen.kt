@@ -258,8 +258,7 @@ fun TvDetailComponent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(state = scrollState),
-        verticalArrangement = Arrangement.spacedBy(space = dp10)
+            .verticalScroll(state = scrollState)
     ) {
         TitleComponent(
             isFavorite = tv.tv.isFavorite,
@@ -336,6 +335,7 @@ fun TvDetailComponent(
                 goToDestination = goToTv
             )
         }
+        Spacer(modifier = Modifier.height(height = dp20))
     }
 }
 

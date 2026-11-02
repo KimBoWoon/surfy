@@ -61,7 +61,7 @@ class TvVM @AssistedInject constructor(
                 config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
                 initialKey = 1,
                 pagingSourceFactory = {
-                    tvRepository.getSimilarTvPagingSource(
+                    tvRepository.getSimilarTvs(
                         id = id,
                         language = it.first,
                         region = it.second

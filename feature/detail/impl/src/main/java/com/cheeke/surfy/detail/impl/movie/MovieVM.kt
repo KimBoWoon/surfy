@@ -85,7 +85,7 @@ class MovieVM @AssistedInject constructor(
                 config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
                 initialKey = 1,
                 pagingSourceFactory = {
-                    movieRepository.getSimilarMoviePagingSource(
+                    movieRepository.getSimilarMovies(
                         id = id,
                         language = it.first,
                         region = it.second

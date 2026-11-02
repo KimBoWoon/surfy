@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.model.SearchKeyword
 import com.cheeke.surfy.network.api.SearchRemoteDataSource
+import kotlin.coroutines.cancellation.CancellationException
 
 class RecommendKeywordPagingSource(
     private val apis: SearchRemoteDataSource,
@@ -13,7 +14,7 @@ class RecommendKeywordPagingSource(
     override fun getRefreshKey(state: PagingState<Int, SearchKeyword>): Int? = 1
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchKeyword> =
-        runCatching {
+        try {
             if (query.isNotEmpty()) {
                 val page = params.key ?: 1
                 val response = apis.getSearchKeyword(query = query, page = page)
@@ -24,14 +25,16 @@ class RecommendKeywordPagingSource(
                     nextKey = if (response.totalPages == page) null else page + 1
                 )
             } else {
-                LoadResult.Page<Int, SearchKeyword>(
+                LoadResult.Page(
                     data = emptyList(),
                     prevKey = null,
                     nextKey = null
                 )
             }
-        }.getOrElse { e ->
-            Log.printStackTrace(e)
-            LoadResult.Error(e)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (throwable: Throwable) {
+            Log.printStackTrace(tr = throwable)
+            LoadResult.Error(throwable)
         }
 }

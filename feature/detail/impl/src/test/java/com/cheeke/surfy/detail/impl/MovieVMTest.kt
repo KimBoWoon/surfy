@@ -7,10 +7,10 @@ import androidx.paging.testing.asSnapshot
 import com.cheeke.surfy.analytics.api.TestAnalyticsHelper
 import com.cheeke.surfy.detail.api.TestMovieRepository
 import com.cheeke.surfy.detail.impl.movie.GetMovieDetailUseCase
+import com.cheeke.surfy.detail.impl.movie.MovieReviewPagingSource
 import com.cheeke.surfy.detail.impl.movie.MovieState
 import com.cheeke.surfy.detail.impl.movie.MovieVM
-import com.cheeke.surfy.detail.impl.paging.MovieReviewPagingSource
-import com.cheeke.surfy.detail.impl.paging.SimilarMoviePagingSource
+import com.cheeke.surfy.detail.impl.movie.SimilarMoviePagingSource
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.SimilarMedia
@@ -72,7 +72,7 @@ class MovieVMTest {
 
         val testPager = TestPager(
             config = PagingConfig(pageSize = 0, initialLoadSize = 7, prefetchDistance = 5),
-            pagingSource = repository.getSimilarMoviePagingSource(id = 0, language = "ko", region = "KR")
+            pagingSource = repository.getSimilarMovies(id = 0, language = "ko", region = "KR")
         )
 
         assertEquals(viewModel.movie.value, MovieState.Loading)
@@ -110,7 +110,7 @@ class MovieVMTest {
 
         val testPager = TestPager(
             config = PagingConfig(pageSize = 0, initialLoadSize = 7, prefetchDistance = 5),
-            pagingSource = repository.getSimilarMoviePagingSource(id = 324, language = "ko", region = "KR")
+            pagingSource = repository.getSimilarMovies(id = 324, language = "ko", region = "KR")
         )
 
         assertEquals(viewModel.movie.value, MovieState.Loading)
