@@ -22,7 +22,7 @@ import com.cheeke.surfy.database.impl.model.UpComingMovieEntity
         UpComingMovieEntity::class,
         KeywordEntity::class
     ],
-    version = 1,
+    version = 2,
     autoMigrations = [],
     exportSchema = true
 )

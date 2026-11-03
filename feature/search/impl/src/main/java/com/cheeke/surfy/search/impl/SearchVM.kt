@@ -4,8 +4,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.filter
@@ -78,11 +76,7 @@ class SearchVM @AssistedInject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = SurfyAppData()
         )
-    val recentlyKeywordPaging = Pager(
-        config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
-        initialKey = 1,
-        pagingSourceFactory = { searchRepository.getRecentlyKeyword() }
-    ).flow.cachedIn(scope = viewModelScope)
+    val recentlyKeywordPaging = searchRepository.getRecentlyKeyword().cachedIn(scope = viewModelScope)
     val recommendKeywordPaging = query
         .map { textFieldValue: TextFieldValue -> textFieldValue.text }
         .debounce(timeoutMillis = 300)

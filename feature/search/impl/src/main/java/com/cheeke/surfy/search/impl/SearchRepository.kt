@@ -3,7 +3,6 @@ package com.cheeke.surfy.search.impl
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import com.cheeke.surfy.database.impl.dao.KeywordDao
 import com.cheeke.surfy.database.impl.model.KeywordEntity
 import com.cheeke.surfy.model.Media
@@ -28,7 +27,7 @@ interface SearchRepository {
         query: String
     ): Flow<PagingData<SearchKeyword>>
 
-    fun getRecentlyKeyword(): PagingSource<Int, KeywordEntity>
+    fun getRecentlyKeyword(): Flow<PagingData<KeywordEntity>>
     suspend fun insert(keyword: String)
     suspend fun deleteAll()
     suspend fun delete(entity: KeywordEntity)
@@ -75,7 +74,17 @@ class SearchRepositoryImpl @Inject constructor(
         }
     ).flow
 
-    override fun getRecentlyKeyword(): PagingSource<Int, KeywordEntity> = keywordDao.getKeywords()
+    override fun getRecentlyKeyword(): Flow<PagingData<KeywordEntity>> =
+        Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                keywordDao.getKeywords()
+            }
+        ).flow
+//    override fun getRecentlyKeyword(): PagingSource<Int, KeywordEntity> = keywordDao.getKeywords()
     override suspend fun insert(keyword: String) {
         keywordDao.insertOrReplaceKeyword(
             entity = KeywordEntity(
@@ -90,6 +99,6 @@ class SearchRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(entity: KeywordEntity) {
-        keywordDao.delete(id = entity.id)
+        keywordDao.delete(keyword = entity.keyword)
     }
 }

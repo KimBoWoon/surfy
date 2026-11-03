@@ -633,7 +633,7 @@ fun RecommendKeywordComponent(
             ) {
                 items(
                     count = recentlyKeyword.itemCount,
-                    key = { index -> recentlyKeyword.peek(index)?.id ?: -1 }
+                    key = { index -> recentlyKeyword.peek(index)?.keyword ?: -1 }
                 ) { index ->
                     Box(
                         modifier = Modifier

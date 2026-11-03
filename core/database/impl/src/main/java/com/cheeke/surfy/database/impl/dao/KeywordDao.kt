@@ -9,7 +9,7 @@ import com.cheeke.surfy.database.impl.model.KeywordEntity
 
 @Dao
 interface KeywordDao {
-    @Query(value = "SELECT * FROM recentlyKeyword ORDER BY timestamp DESC LIMIT 10")
+    @Query(value = "SELECT * FROM recentlyKeyword ORDER BY timestamp DESC")
     fun getKeywords(): PagingSource<Int, KeywordEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -18,6 +18,6 @@ interface KeywordDao {
     @Query(value = "DELETE FROM recentlyKeyword")
     suspend fun deleteAll()
 
-    @Query(value = "DELETE FROM recentlyKeyword WHERE id = :id")
-    suspend fun delete(id: Int)
+    @Query(value = "DELETE FROM recentlyKeyword WHERE keyword = :keyword")
+    suspend fun delete(keyword: String)
 }
