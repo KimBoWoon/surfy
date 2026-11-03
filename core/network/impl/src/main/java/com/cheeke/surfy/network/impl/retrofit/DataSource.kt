@@ -75,14 +75,8 @@ class SettingNetworkDataSourceImpl @Inject constructor(
             is ApiResponse.Success -> response.data.asExternalModel()
         }
 
-    override suspend fun getMovieGenres(language: String): Genres =
-        when (val response = apis.getMovieGenres(language = language)) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel()
-        }
-
-    override suspend fun getTvGenres(language: String): Genres =
-        when (val response = apis.getTvGenres(language = language)) {
+    override suspend fun getGenres(media: MediaType, language: String): Genres =
+        when (val response = apis.getGenres(media = media.label, language = language)) {
             is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
             is ApiResponse.Success -> response.data.asExternalModel()
         }

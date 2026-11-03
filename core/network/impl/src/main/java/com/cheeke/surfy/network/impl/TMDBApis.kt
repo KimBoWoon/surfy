@@ -42,13 +42,9 @@ interface SettingApis {
     @GET(value = "/3/watch/providers/regions")
     suspend fun getAvailableRegion(): ApiResponse<NetworkTMDBRegion>
 
-    @GET(value = "/3/genre/movie/list")
-    suspend fun getMovieGenres(
-        @Query(value = "language") language: String = defaultLanguageRegion
-    ): ApiResponse<NetworkTMDBMovieGenres>
-
-    @GET(value = "/3/genre/tv/list")
-    suspend fun getTvGenres(
+    @GET(value = "/3/genre/{media}/list")
+    suspend fun getGenres(
+        @Path(value = "media") media: String,
         @Query(value = "language") language: String = defaultLanguageRegion
     ): ApiResponse<NetworkTMDBMovieGenres>
 }
@@ -194,11 +190,11 @@ interface SyncApis {
 }
 
 interface TrendingApis {
-    @GET("/3/trending/{mediaType}/{timeWindow}")
+    @GET(value = "/3/trending/{mediaType}/{timeWindow}")
     suspend fun getTrending(
-        @Path("mediaType") mediaType: String,
-        @Path("timeWindow") timeWindow: String,
-        @Query("language") language: String,
-        @Query("page") page: Int = 1
+        @Path(value = "mediaType") mediaType: String,
+        @Path(value = "timeWindow") timeWindow: String,
+        @Query(value = "language") language: String,
+        @Query(value = "page") page: Int = 1
     ): ApiResponse<NetworkTMDBTrendingMedia>
 }

@@ -31,8 +31,7 @@ interface SettingRemoteDataSource {
     suspend fun getCertification(): CertificationData
     suspend fun getAvailableLanguage(): List<Language>
     suspend fun getAvailableRegion(): Regions
-    suspend fun getMovieGenres(language: String = defaultLanguageRegion): Genres
-    suspend fun getTvGenres(language: String = defaultLanguageRegion): Genres
+    suspend fun getGenres(media: MediaType, language: String = defaultLanguageRegion): Genres
 }
 
 interface MovieRemoteDataSource {

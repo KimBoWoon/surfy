@@ -12,6 +12,7 @@ import com.cheeke.surfy.model.Genre
 import com.cheeke.surfy.model.InternalData
 import com.cheeke.surfy.model.Language
 import com.cheeke.surfy.model.LocaleOption
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.PosterSize
 import com.cheeke.surfy.model.Regions
 import com.cheeke.surfy.model.SurfyAppData
@@ -80,8 +81,8 @@ class SurfyDataManager @Inject constructor(
                 loader = {
                     val language = "${locale.language}-${locale.region}"
                     coroutineScope {
-                        val movieDeferred = async { apis.getMovieGenres(language = language) }
-                        val tvDeferred = async { apis.getTvGenres(language = language) }
+                        val movieDeferred = async { apis.getGenres(media = MediaType.MOVIE, language = language) }
+                        val tvDeferred = async { apis.getGenres(media = MediaType.TV, language = language) }
                         GenreData(
                             movie = movieDeferred.await().genres.orEmpty(),
                             tv = tvDeferred.await().genres.orEmpty()
