@@ -10,30 +10,31 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import com.cheeke.surfy.R
 import com.cheeke.surfy.analytics.api.AnalyticsHelper
 import com.cheeke.surfy.analytics.api.LocalAnalyticsHelper
 import com.cheeke.surfy.common.AppDoubleBackToExit
 import com.cheeke.surfy.common.Log
-import com.cheeke.surfy.common.isSystemInDarkTheme
 import com.cheeke.surfy.deeplink.DeepLinkManager
 import com.cheeke.surfy.detail.api.movie.MovieNavKey
 import com.cheeke.surfy.detail.api.tv.TvNavKey
 import com.cheeke.surfy.firebase.api.LocalFirebaseLogHelper
-import com.cheeke.surfy.firebase.impl.SurfyFirebaseLogHelper
+import com.cheeke.surfy.firebase.api.LogHelper
 import com.cheeke.surfy.ui.SurfyApp
 import com.cheeke.surfy.ui.root.ReleaseMoviesDialog
 import com.cheeke.surfy.ui.root.navigation.RootNavKey
@@ -41,132 +42,195 @@ import com.cheeke.surfy.ui.setting.SettingScreen
 import com.cheeke.surfy.ui.setting.SettingVM
 import com.cheeke.surfy.ui.setting.SettingsAction
 import com.cheeke.surfy.ui.theme.SurfyTheme
-import com.cheeke.surfy.utils.isSystemInDarkTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val LOG_TAG = "MainActivity"
+private const val EXTRA_IS_DEEPLINK = "isDeeplink"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainVM by viewModels()
     private val settingVM: SettingVM by viewModels()
     @Inject
-    lateinit var surfyFirebase: SurfyFirebaseLogHelper
+    lateinit var surfyFirebase: LogHelper
     @Inject
     lateinit var analyticsHelper: AnalyticsHelper
-    private val doubleBackToExitHandler = AppDoubleBackToExit()
-//    @Inject
-//    lateinit var appDoubleBackToExitFactory: AppDoubleBackToExit.AppDoubleBackToExitFactory
-//    private val appDoubleBackToExit: AppDoubleBackToExit by lazy {
-//        appDoubleBackToExitFactory.create(
-//            context = this@MainActivity,
-//            exitText = getString(R.string.double_back_message)
-//        )
-//    }
     @Inject
     lateinit var deepLinkManager: DeepLinkManager
+    private val doubleBackToExitHandler = AppDoubleBackToExit()
+    // onNewIntent 로 들어온 딥링크도 반영되도록 State 로 보관
+    private var isDeeplink by mutableStateOf(value = false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        deepLinkManager.handleDeepLink(uri = intent?.data)
-        val isDeeplink = intent?.getBooleanExtra("isDeeplink", false) ?: false
+        surfyFirebase.sendLog(name = LOG_TAG, message = "create MainActivity")
 
-        onBackPressedDispatcher.addCallback(
-            onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
-                override fun handleOnBackPressed() {
-                    doubleBackToExitHandler.handleBackPressed(
-                        onFirstPress = { Toast.makeText(this@MainActivity, R.string.double_back_message, Toast.LENGTH_SHORT).show() },
-                        onExit = { finish() }
-                    )
-                }
-            }
+        setUpSplashScreen(splashScreen = splashScreen)
+        setUpDoubleBackToExit()
+        handleIncomingIntent(
+            incomingIntent = intent,
+            // 화면 회전/프로세스 복원 시 같은 딥링크를 다시 처리하지 않도록 최초 생성에서만 처리
+            shouldHandleDeepLink = savedInstanceState == null
         )
-
-        surfyFirebase.sendLog(javaClass.simpleName, "create MainActivity")
-
-        var darkTheme by mutableStateOf(value = resources.configuration.isSystemInDarkTheme)
-
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-                combine(
-                    isSystemInDarkTheme(),
-                    viewModel.surfyAppData
-                ) { systemDarkTheme, userdata ->
-                    userdata.shouldUseDarkTheme(isSystemDarkTheme = systemDarkTheme)
-                }.onEach { darkTheme = it }
-                    .distinctUntilChanged()
-                    .collect { darkTheme ->
-                        enableEdgeToEdge(
-                            statusBarStyle = SystemBarStyle.auto(
-                                lightScrim = Color.TRANSPARENT,
-                                darkScrim = Color.TRANSPARENT,
-                            ) { darkTheme },
-                            navigationBarStyle = SystemBarStyle.auto(
-                                lightScrim = lightScrim,
-                                darkScrim = darkScrim,
-                            ) { darkTheme },
-                        )
-                    }
-            }
-        }
-
-        // true -> 스플래쉬 화면 노출, false -> 스플래쉬 화면 미노출
-        splashScreen.setKeepOnScreenCondition { viewModel.surfyAppData.value.shouldKeepSplashScreen() }
 
         setContent {
             CompositionLocalProvider(
                 LocalFirebaseLogHelper provides surfyFirebase,
                 LocalAnalyticsHelper provides analyticsHelper
             ) {
-                LocalFirebaseLogHelper.current.sendLog(name = javaClass.simpleName, message = "compose start!")
-
-                val nextWeekReleaseDialogItems by viewModel.nextWeekReleaseMedias.collectAsStateWithLifecycle()
-                val shouldShowNextWeekReleaseDialog by viewModel.shouldShowNextWeekReleaseDialog.collectAsStateWithLifecycle()
-
-                SurfyTheme(darkTheme = darkTheme) {
-                    val backstack = rememberNavBackStack(RootNavKey)
-                    val snackbarHostState = remember { SnackbarHostState() }
-                    val rootDeeplink by deepLinkManager.rootDeeplink.collectAsStateWithLifecycle(initialValue = emptyList())
-
-                    LaunchedEffect(key1 = rootDeeplink) {
-                        if (rootDeeplink.isEmpty()) return@LaunchedEffect
-                        rootDeeplink.forEach { backstack.add(it) }
-                        deepLinkManager.consumeRootDeepLink()
-                    }
-
-                    if (shouldShowNextWeekReleaseDialog && !isDeeplink) {
-                        ReleaseMoviesDialog(
-                            releaseMovies = nextWeekReleaseDialogItems,
-                            goToMovie = { id -> backstack.add(element = MovieNavKey(id = id)) },
-                            goToTv = { id -> backstack.add(element = TvNavKey(id = id)) },
-                            updateShowNextReleaseMoviesDate = viewModel::dontShowNextWeekReleaseDialogToday,
-                            dismissNextWeekReleaseDialog = viewModel::dismissNextWeekReleaseDialog
-                        )
-                    }
-
-                    SurfyApp(
-                        backstack = backstack,
-                        snackbarHostState = snackbarHostState,
-                        showSettingDialog = { settingVM.onAction(action = SettingsAction.OpenMain) }
-                    )
-
-                    SettingScreen(viewModel = settingVM)
-                }
+                MainContent(
+                    mainViewModel = viewModel,
+                    settingViewModel = settingVM,
+                    deepLinkManager = deepLinkManager,
+                    isDeeplink = isDeeplink,
+                    onApplyEdgeToEdge = ::applyEdgeToEdge
+                )
             }
         }
     }
 
     override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent = intent)
+        super.onNewIntent(intent)
         Log.d("onNewIntent")
         setIntent(intent)
-        deepLinkManager.handleDeepLink(uri = intent.data)
+        handleIncomingIntent(incomingIntent = intent, shouldHandleDeepLink = true)
     }
+
+    private fun handleIncomingIntent(incomingIntent: Intent?, shouldHandleDeepLink: Boolean) {
+        isDeeplink = incomingIntent?.getBooleanExtra(EXTRA_IS_DEEPLINK, false) ?: false
+        if (shouldHandleDeepLink) {
+            deepLinkManager.handleDeepLink(uri = incomingIntent?.data)
+        }
+    }
+
+    /** true -> 스플래쉬 화면 노출, false -> 스플래쉬 화면 미노출 */
+    private fun setUpSplashScreen(splashScreen: SplashScreen) {
+        splashScreen.setKeepOnScreenCondition {
+            viewModel.surfyAppData.value.shouldKeepSplashScreen()
+        }
+    }
+
+    private fun setUpDoubleBackToExit() {
+        onBackPressedDispatcher.addCallback(
+            owner = this,
+            onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
+                override fun handleOnBackPressed() {
+                    doubleBackToExitHandler.handleBackPressed(
+                        onFirstPress = {
+                            Toast.makeText(
+                                this@MainActivity,
+                                R.string.double_back_message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        onExit = { finish() }
+                    )
+                }
+            }
+        )
+    }
+
+    private fun applyEdgeToEdge(darkTheme: Boolean) {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(
+                lightScrim = Color.TRANSPARENT,
+                darkScrim = Color.TRANSPARENT,
+                detectDarkMode = { darkTheme }
+            ),
+            navigationBarStyle = SystemBarStyle.auto(
+                lightScrim = lightScrim,
+                darkScrim = darkScrim,
+                detectDarkMode = { darkTheme }
+            )
+        )
+    }
+}
+
+@Composable
+private fun MainContent(
+    mainViewModel: MainVM,
+    settingViewModel: SettingVM,
+    deepLinkManager: DeepLinkManager,
+    isDeeplink: Boolean,
+    onApplyEdgeToEdge: (darkTheme: Boolean) -> Unit,
+) {
+    val firebaseLogHelper = LocalFirebaseLogHelper.current
+    LaunchedEffect(key1 = Unit) {
+        firebaseLogHelper.sendLog(name = LOG_TAG, message = "compose start!")
+    }
+
+    val appData by mainViewModel.surfyAppData.collectAsStateWithLifecycle()
+    val darkTheme = appData.shouldUseDarkTheme(isSystemDarkTheme = isSystemInDarkTheme())
+
+    DisposableEffect(key1 = darkTheme) {
+        onApplyEdgeToEdge(darkTheme)
+        onDispose { }
+    }
+
+    SurfyTheme(darkTheme = darkTheme) {
+        val backstack = rememberNavBackStack(RootNavKey)
+        val snackbarHostState = remember { SnackbarHostState() }
+        val navigateTo: (NavKey) -> Unit = { navKey -> backstack.add(element = navKey) }
+
+        RootDeepLinkEffect(
+            deepLinkManager = deepLinkManager,
+            onNavigate = navigateTo
+        )
+
+        if (!isDeeplink) {
+            NextWeekReleaseDialogHost(
+                mainViewModel = mainViewModel,
+                onNavigate = navigateTo
+            )
+        }
+
+        SurfyApp(
+            backstack = backstack,
+            snackbarHostState = snackbarHostState,
+            showSettingDialog = { settingViewModel.onAction(action = SettingsAction.OpenMain) }
+        )
+
+        SettingScreen(viewModel = settingViewModel)
+    }
+}
+
+/** 루트 딥링크가 들어오면 백스택에 쌓고 소비 처리 */
+@Composable
+private fun RootDeepLinkEffect(
+    deepLinkManager: DeepLinkManager,
+    onNavigate: (NavKey) -> Unit,
+) {
+    val rootDeeplink by deepLinkManager.rootDeeplink
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+    LaunchedEffect(key1 = rootDeeplink) {
+        if (rootDeeplink.isEmpty()) return@LaunchedEffect
+        rootDeeplink.forEach { deepLinkKey -> onNavigate(deepLinkKey) }
+        deepLinkManager.consumeRootDeepLink()
+    }
+}
+
+/** 다음 주 개봉작 다이얼로그 (노출 조건은 ViewModel 이 결정) */
+@Composable
+private fun NextWeekReleaseDialogHost(
+    mainViewModel: MainVM,
+    onNavigate: (NavKey) -> Unit,
+) {
+    val releaseMedias by mainViewModel.nextWeekReleaseMedias.collectAsStateWithLifecycle()
+    val shouldShowDialog by mainViewModel.shouldShowNextWeekReleaseDialog.collectAsStateWithLifecycle()
+
+    if (!shouldShowDialog) return
+
+    ReleaseMoviesDialog(
+        releaseMovies = releaseMedias,
+        goToMovie = { movieId -> onNavigate(MovieNavKey(id = movieId)) },
+        goToTv = { tvId -> onNavigate(TvNavKey(id = tvId)) },
+        updateShowNextReleaseMoviesDate = mainViewModel::dontShowNextWeekReleaseDialogToday,
+        dismissNextWeekReleaseDialog = mainViewModel::dismissNextWeekReleaseDialog
+    )
 }
 
 /**
