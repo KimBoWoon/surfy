@@ -26,10 +26,10 @@ import com.cheeke.surfy.network.model.SurfyNetworkException
 import com.cheeke.surfy.testing.model.combineCreditsTestData
 import com.cheeke.surfy.testing.model.configurationTestData
 import com.cheeke.surfy.testing.model.externalIdsTestData
-import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.peopleDetailTestData
 import com.cheeke.surfy.testing.model.regionTestData
+import com.cheeke.surfy.testing.model.testGenreData
 import com.cheeke.surfy.testing.repository.TestPeopleDatabaseRepository
 import com.cheeke.surfy.testing.utils.TestSurfyAppData
 import kotlinx.coroutines.flow.first
@@ -51,7 +51,7 @@ class PeopleScreenTest {
     private lateinit var testMovieAppDataManager: TestSurfyAppData
     private val surfyAppData = SurfyAppData(
         secureBaseUrl = configurationTestData.images?.secureBaseUrl.orEmpty(),
-        movieGenres = genreListTestData.genres.orEmpty(),
+        movieGenres = testGenreData.genres.orEmpty(),
         region = regionTestData.results?.map { region ->
             LocaleOption(code = region.iso31661 ?: "KR", label = region.nativeName ?: "KR", isSelected = region.iso31661 == "KR")
         }.orEmpty(),

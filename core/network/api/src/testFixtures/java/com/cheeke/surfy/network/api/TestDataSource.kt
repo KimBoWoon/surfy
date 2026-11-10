@@ -27,7 +27,6 @@ import com.cheeke.surfy.testing.model.combineCreditsTestData
 import com.cheeke.surfy.testing.model.configurationTestData
 import com.cheeke.surfy.testing.model.externalIdsTestData
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
-import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.nowPlayingMoviesTestData
@@ -36,6 +35,7 @@ import com.cheeke.surfy.testing.model.regionTestData
 import com.cheeke.surfy.testing.model.searchKeywordTest
 import com.cheeke.surfy.testing.model.similarMoviesTestData
 import com.cheeke.surfy.testing.model.similarTvTestData
+import com.cheeke.surfy.testing.model.testGenreData
 import com.cheeke.surfy.testing.model.testImageList
 import com.cheeke.surfy.testing.model.testMovieReview
 import com.cheeke.surfy.testing.model.testMovieReviews
@@ -54,8 +54,7 @@ class TestSettingRemoteDataSource : SettingRemoteDataSource {
     override suspend fun getCertification(): CertificationData = certificationTestData
     override suspend fun getAvailableLanguage(): List<Language> = languageListTestData
     override suspend fun getAvailableRegion(): Regions = regionTestData
-    override suspend fun getMovieGenres(language: String): Genres = genreListTestData
-    override suspend fun getTvGenres(language: String): Genres = genreListTestData
+    override suspend fun getGenres(media: MediaType, language: String): Genres = testGenreData
 }
 
 class TestMovieRemoteDataSource : MovieRemoteDataSource {

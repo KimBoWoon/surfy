@@ -9,9 +9,9 @@ import com.cheeke.surfy.model.LocaleOption
 import com.cheeke.surfy.model.PosterSize
 import com.cheeke.surfy.model.SurfyAppData
 import com.cheeke.surfy.testing.model.configurationTestData
-import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.regionTestData
+import com.cheeke.surfy.testing.model.testGenreData
 import com.cheeke.surfy.testing.utils.TestSurfyAppData
 import com.cheeke.surfy.ui.setting.SettingScreen
 import com.cheeke.surfy.ui.setting.SettingVM
@@ -29,7 +29,7 @@ class SettingScreenTest {
     private lateinit var testMovieAppDataManager: TestSurfyAppData
     private val surfyAppData = SurfyAppData(
         secureBaseUrl = configurationTestData.images?.secureBaseUrl ?: "",
-        movieGenres = genreListTestData.genres.orEmpty(),
+        movieGenres = testGenreData.genres.orEmpty(),
         region = regionTestData.results?.map {
             LocaleOption(
                 code = it.iso31661 ?: "",

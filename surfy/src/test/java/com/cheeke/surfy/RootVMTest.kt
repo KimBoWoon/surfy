@@ -68,8 +68,8 @@ class RootVMTest {
         }
         viewModel = RootVM(
             deepLinkManager = deepLinkManager,
-            movieDataBaseRepository = movieRepository,
-            tvDataBaseRepository = tvRepository,
+            movieRepository = movieRepository,
+            tvRepository = tvRepository,
             networkMonitor = networkMonitor,
             surfyDataManager = testMovieAppDataManager
         )

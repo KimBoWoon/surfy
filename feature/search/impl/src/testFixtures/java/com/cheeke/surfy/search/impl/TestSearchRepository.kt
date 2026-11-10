@@ -2,8 +2,6 @@ package com.cheeke.surfy.search.impl
 
 import android.annotation.SuppressLint
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import androidx.paging.testing.asPagingSourceFactory
 import com.cheeke.surfy.database.impl.model.KeywordEntity
 import com.cheeke.surfy.model.Media
 import com.cheeke.surfy.model.SearchKeyword
@@ -21,13 +19,12 @@ import kotlinx.coroutines.flow.flowOf
 class TestSearchRepository : SearchRepository {
     val keywordDatabase = MutableStateFlow<List<KeywordEntity>>(value = emptyList())
 
-    override fun getRecentlyKeyword(): PagingSource<Int, KeywordEntity> =
-        keywordList.asPagingSourceFactory().invoke()
+    override fun getRecentlyKeyword(): Flow<PagingData<KeywordEntity>> =
+        flowOf(value = PagingData.from(data = keywordList))
 
     override suspend fun insert(keyword: String) {
         keywordDatabase.emit(
             value = keywordDatabase.value + KeywordEntity(
-                id = 0,
                 keyword = keyword,
                 timestamp = 0
             )
@@ -39,7 +36,7 @@ class TestSearchRepository : SearchRepository {
     }
 
     override suspend fun delete(entity: KeywordEntity) {
-        keywordDatabase.emit(value = keywordDatabase.value.filterNot { it.id == entity.id })
+        keywordDatabase.emit(value = keywordDatabase.value.filterNot { it.keyword == entity.keyword })
     }
 
     @SuppressLint("VisibleForTests")

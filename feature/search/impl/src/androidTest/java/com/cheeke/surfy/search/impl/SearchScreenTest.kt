@@ -20,8 +20,8 @@ import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.model.Genre
 import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.model.SurfyAppData
-import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.keywordList
+import com.cheeke.surfy.testing.model.testGenreData
 import com.cheeke.surfy.testing.model.testRecommendedKeyword
 import com.cheeke.surfy.testing.repository.TestKeywordDataBaseRepository
 import com.cheeke.surfy.testing.repository.TestPagingRepository
@@ -44,7 +44,7 @@ class SearchScreenTest {
     private lateinit var testUserDataRepository: TestUserDataRepository
     private lateinit var testKeywordDataBaseRepository: TestKeywordDataBaseRepository
     private lateinit var movieAppDataRepository: TestSurfyAppData
-    private val genres = genreListTestData.genres.orEmpty()
+    private val genres = testGenreData.genres.orEmpty()
 
     @Before
     fun setup() {

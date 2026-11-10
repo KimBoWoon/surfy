@@ -2,6 +2,7 @@ package com.cheeke.surfy.ui.activities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.datamanager.api.DataManager
 import com.cheeke.surfy.datamanager.api.SurfyAppDataState
 import com.cheeke.surfy.detail.api.movie.MovieRepository
@@ -11,6 +12,10 @@ import com.cheeke.surfy.ui.image.imageUrl
 import com.cheeke.surfy.userdata.api.SyncManager
 import com.cheeke.surfy.userdata.api.UserDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,49 +26,60 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class MainVM @Inject constructor(
     dataManager: DataManager,
-    syncManager: SyncManager,
+    private val syncManager: SyncManager,
     private val userDataRepository: UserDataRepository,
-    private val movieDataBaseRepository: MovieRepository,
-    private val tvDataBaseRepository: TvRepository
+    private val movieRepository: MovieRepository,
+    private val tvRepository: TvRepository
 ) : ViewModel() {
     init {
         viewModelScope.launch {
-            supervisorScope {
-                val isFirstInstall = userDataRepository.getFirstInstall()
-
-                if (!isFirstInstall) {
-                    syncManager.requestSync()
-                    syncManager.syncMain()
-                    userDataRepository.updateFirstInstall(value = true)
+            runCatching { syncIfNeeded() }
+                .onFailure { throwable ->
+                    if (throwable is CancellationException) throw throwable
+                    Log.printStackTrace(tr = throwable)
                 }
-            }
 
-            supervisorScope {
-                val lastUpdateMainDate = userDataRepository.getMainDate()
-
-                if (lastUpdateMainDate.isEmpty()) {
-                    syncManager.requestSync()
-                } else {
-                    if (LocalDate.parse(lastUpdateMainDate).plusDays(1) < LocalDate.now()) {
-                        syncManager.requestSync()
-                    }
-                }
-            }
-
-            supervisorScope {
-                _nextWeekReleaseMedias.emit(
-                    value = (movieDataBaseRepository.getNextWeekReleaseMovies() + tvDataBaseRepository.getNextWeekReleaseTvs())
-                        .sortedBy { it.releaseDate }
-                )
-            }
+            loadNextWeekReleaseMedias()
         }
+    }
+
+    private suspend fun syncIfNeeded() {
+        val isInitialSyncDone = userDataRepository.getFirstInstall()
+
+        if (!isInitialSyncDone) {
+            syncManager.requestSync()
+            syncManager.syncMain()
+            userDataRepository.updateFirstInstall(value = true)
+            return
+        }
+
+        if (isMainDataStale(lastUpdateMainDate = userDataRepository.getMainDate())) {
+            syncManager.requestSync()
+        }
+    }
+
+    private fun isMainDataStale(lastUpdateMainDate: String): Boolean {
+        if (lastUpdateMainDate.isEmpty()) return true
+
+        val lastUpdateDate = LocalDate.parse(lastUpdateMainDate)
+        return lastUpdateDate.plusDays(1).isBefore(LocalDate.now())
+    }
+
+    private suspend fun loadNextWeekReleaseMedias() {
+        val nextWeekReleaseMedias = coroutineScope {
+            awaitAll(
+                async { movieRepository.getNextWeekReleaseMovies() },
+                async { tvRepository.getNextWeekReleaseTvs() }
+            ).flatten()
+        }
+
+        _nextWeekReleaseMedias.emit(value = nextWeekReleaseMedias.sortedBy { it.releaseDate })
     }
 
     private val _nextWeekReleaseMedias: MutableStateFlow<List<Media>> = MutableStateFlow(value = emptyList())

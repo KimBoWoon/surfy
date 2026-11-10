@@ -9,10 +9,10 @@ import com.cheeke.surfy.model.PosterSize
 import com.cheeke.surfy.model.SurfyAppData
 import com.cheeke.surfy.testing.model.configurationTestData
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
-import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.regionTestData
+import com.cheeke.surfy.testing.model.testGenreData
 import com.cheeke.surfy.testing.model.unFavoriteMovieDetailTestData
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.userdata.api.TestUserDataRepository
@@ -46,7 +46,7 @@ class GetMovieDetailUseCaseTest {
             movieAppDataRepository.setMovieAppData(
                 SurfyAppData(
                     secureBaseUrl = configurationTestData.images?.secureBaseUrl.orEmpty(),
-                    movieGenres = genreListTestData.genres.orEmpty(),
+                    movieGenres = testGenreData.genres.orEmpty(),
                     region = regionTestData.results?.map { LocaleOption(code = it.iso31661.orEmpty(), label = it.englishName.orEmpty()) }.orEmpty(),
                     language = languageListTestData.map { LocaleOption(code = it.iso6391.orEmpty(), label = it.englishName.orEmpty()) },
                     posterSize = configurationTestData.images?.posterSizes?.map {

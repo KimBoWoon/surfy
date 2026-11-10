@@ -15,7 +15,6 @@ import com.cheeke.surfy.testing.model.combineCreditsTestData
 import com.cheeke.surfy.testing.model.configurationTestData
 import com.cheeke.surfy.testing.model.externalIdsTestData
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
-import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.movieSearchTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
@@ -27,6 +26,7 @@ import com.cheeke.surfy.testing.model.searchKeywordTest
 import com.cheeke.surfy.testing.model.seriesSearchTestData
 import com.cheeke.surfy.testing.model.similarMoviesTestData
 import com.cheeke.surfy.testing.model.similarTvTestData
+import com.cheeke.surfy.testing.model.testGenreData
 import com.cheeke.surfy.testing.model.testImageList
 import com.cheeke.surfy.testing.model.testMovieReview
 import com.cheeke.surfy.testing.model.testMovieReviews
@@ -80,16 +80,16 @@ class SettingRemoteDataTest {
 
     @Test
     fun getMovieGenresTest() = runTest {
-        val result = datasource.getMovieGenres()
+        val result = datasource.getGenres(media = MediaType.MOVIE, language = "ko-KR")
 
-        assertEquals(result, genreListTestData)
+        assertEquals(result, testGenreData)
     }
 
     @Test
     fun getTvGenresTest() = runTest {
-        val result = datasource.getTvGenres(language = "ko-KR")
+        val result = datasource.getGenres(media = MediaType.TV, language = "ko-KR")
 
-        assertEquals(result, genreListTestData)
+        assertEquals(result, testGenreData)
     }
 }
 

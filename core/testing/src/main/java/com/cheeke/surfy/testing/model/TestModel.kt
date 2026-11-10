@@ -84,7 +84,7 @@ val regionTestData = Regions(
     )
 )
 
-val genreListTestData = Genres(
+val testGenreData = Genres(
     genres = listOf(
         Genre(id = 0, name = "name1"),
         Genre(id = 1, name = "name2"),
@@ -549,7 +549,6 @@ val popularMovieTest = (0 until 5).map {
 
 val keywordList = (0 until 10).map {
     KeywordEntity(
-        id = it,
         keyword = "keyword_$it",
         timestamp = it.toLong()
     )

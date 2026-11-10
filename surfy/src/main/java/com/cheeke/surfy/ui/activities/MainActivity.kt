@@ -3,6 +3,7 @@ package com.cheeke.surfy.ui.activities
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
@@ -56,14 +57,15 @@ class MainActivity : ComponentActivity() {
     lateinit var surfyFirebase: SurfyFirebaseLogHelper
     @Inject
     lateinit var analyticsHelper: AnalyticsHelper
-    @Inject
-    lateinit var appDoubleBackToExitFactory: AppDoubleBackToExit.AppDoubleBackToExitFactory
-    private val appDoubleBackToExit: AppDoubleBackToExit by lazy {
-        appDoubleBackToExitFactory.create(
-            context = this@MainActivity,
-            exitText = getString(R.string.double_back_message)
-        )
-    }
+    private val doubleBackToExitHandler = AppDoubleBackToExit()
+//    @Inject
+//    lateinit var appDoubleBackToExitFactory: AppDoubleBackToExit.AppDoubleBackToExitFactory
+//    private val appDoubleBackToExit: AppDoubleBackToExit by lazy {
+//        appDoubleBackToExitFactory.create(
+//            context = this@MainActivity,
+//            exitText = getString(R.string.double_back_message)
+//        )
+//    }
     @Inject
     lateinit var deepLinkManager: DeepLinkManager
 
@@ -77,7 +79,10 @@ class MainActivity : ComponentActivity() {
         onBackPressedDispatcher.addCallback(
             onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
                 override fun handleOnBackPressed() {
-                    appDoubleBackToExit.onBackPressed(callback = { finish() })
+                    doubleBackToExitHandler.handleBackPressed(
+                        onFirstPress = { Toast.makeText(this@MainActivity, R.string.double_back_message, Toast.LENGTH_SHORT).show() },
+                        onExit = { finish() }
+                    )
                 }
             }
         )

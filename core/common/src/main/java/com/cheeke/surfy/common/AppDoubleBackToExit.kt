@@ -1,41 +1,53 @@
 package com.cheeke.surfy.common
 
-import android.content.Context
-import android.widget.Toast
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import android.os.SystemClock
 
-class AppDoubleBackToExit @AssistedInject constructor(
-    @Assisted("context") private val context: Context,
-    @Assisted("exitText") private val exitText: String
+class AppDoubleBackToExit(
+    private val exitIntervalMillis: Long = 2_000L,
+    private val currentTimeProvider: () -> Long = SystemClock::elapsedRealtime
 ) {
-    private val delayMillis = 1500L
-    private var backPressedOnce = false
+    private var lastBackPressedTimeMillis: Long? = null
 
-    @AssistedFactory
-    interface AppDoubleBackToExitFactory {
-        fun create(
-            @Assisted("context") context: Context,
-            @Assisted("exitText") exitText: String
-        ): AppDoubleBackToExit
-    }
+    fun handleBackPressed(onFirstPress: () -> Unit, onExit: () -> Unit) {
+        val currentTimeMillis = currentTimeProvider()
+        val lastPressedTimeMillis = lastBackPressedTimeMillis
 
-    fun onBackPressed(callback: () -> Unit) {
-        when (backPressedOnce) {
-            true -> callback.invoke()
-            false -> {
-                Toast.makeText(context, exitText, Toast.LENGTH_SHORT).show()
-                backPressedOnce = true
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(delayMillis)
-                    backPressedOnce = false
-                }
-            }
+        if (lastPressedTimeMillis != null && currentTimeMillis - lastPressedTimeMillis <= exitIntervalMillis) {
+            lastBackPressedTimeMillis = null
+            onExit()
+        } else {
+            lastBackPressedTimeMillis = currentTimeMillis
+            onFirstPress()
         }
     }
 }
+
+//class AppDoubleBackToExit @AssistedInject constructor(
+//    @Assisted("context") private val context: Context,
+//    @Assisted("exitText") private val exitText: String
+//) {
+//    private val delayMillis = 1500L
+//    private var backPressedOnce = false
+//
+//    @AssistedFactory
+//    interface AppDoubleBackToExitFactory {
+//        fun create(
+//            @Assisted("context") context: Context,
+//            @Assisted("exitText") exitText: String
+//        ): AppDoubleBackToExit
+//    }
+//
+//    fun onBackPressed(callback: () -> Unit) {
+//        when (backPressedOnce) {
+//            true -> callback.invoke()
+//            false -> {
+//                Toast.makeText(context, exitText, Toast.LENGTH_SHORT).show()
+//                backPressedOnce = true
+//                CoroutineScope(Dispatchers.Main).launch {
+//                    delay(delayMillis)
+//                    backPressedOnce = false
+//                }
+//            }
+//        }
+//    }
+//}

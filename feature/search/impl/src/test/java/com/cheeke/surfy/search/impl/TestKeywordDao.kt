@@ -15,14 +15,14 @@ class TestKeywordDao : KeywordDao {
 
     override suspend fun insertOrReplaceKeyword(entity: KeywordEntity): Long {
         entitiesStateFlow.emit(value = entitiesStateFlow.value + entity)
-        return entity.id.toLong()
+        return entity.keyword.hashCode().toLong()
     }
 
     override suspend fun deleteAll() {
         entitiesStateFlow.emit(value = emptyList())
     }
 
-    override suspend fun delete(id: Int) {
-        entitiesStateFlow.emit(value = entitiesStateFlow.value.filterNot { it.id == id })
+    override suspend fun delete(keyword: String) {
+        entitiesStateFlow.emit(value = entitiesStateFlow.value.filterNot { it.keyword == keyword })
     }
 }

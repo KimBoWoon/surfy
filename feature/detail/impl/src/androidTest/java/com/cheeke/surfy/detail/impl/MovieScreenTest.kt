@@ -29,10 +29,10 @@ import com.cheeke.surfy.model.SurfyAppData
 import com.cheeke.surfy.network.model.SurfyNetworkException
 import com.cheeke.surfy.testing.model.configurationTestData
 import com.cheeke.surfy.testing.model.favoriteMovieDetailTestData
-import com.cheeke.surfy.testing.model.genreListTestData
 import com.cheeke.surfy.testing.model.languageListTestData
 import com.cheeke.surfy.testing.model.movieSeriesTestData
 import com.cheeke.surfy.testing.model.regionTestData
+import com.cheeke.surfy.testing.model.testGenreData
 import com.cheeke.surfy.testing.model.unFavoriteMovieDetailTestData
 import com.cheeke.surfy.testing.repository.TestMovieDatabaseRepository
 import com.cheeke.surfy.testing.repository.TestPagingRepository
@@ -59,7 +59,7 @@ class MovieScreenTest {
     private lateinit var testMovieAppDataManager: TestSurfyAppData
     private val surfyAppData = SurfyAppData(
         secureBaseUrl = configurationTestData.images?.secureBaseUrl.orEmpty(),
-        movieGenres = genreListTestData.genres.orEmpty(),
+        movieGenres = testGenreData.genres.orEmpty(),
         region = regionTestData.results?.map { region ->
             LocaleOption(code = region.iso31661 ?: "KR", label = region.nativeName ?: "KR", isSelected = region.iso31661 == "KR")
         }.orEmpty(),
