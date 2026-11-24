@@ -14,17 +14,11 @@ class SearchPagingSource(
     private val type: SearchType,
     private val query: String,
     private val language: String,
-    private val region: String,
     private val isAdult: Boolean
 ) : RxPagingSource<Int, Media>() {
-    override fun loadSingle(params: LoadParams<Int>): Single<LoadResult<Int, Media>> {
-        return when (type) {
-            SearchType.MULTI -> apis.searchMulti(query = query, includeAdult = isAdult, language = language, page = params.key ?: 1)
-            SearchType.MOVIE -> apis.searchMovies(query = query, includeAdult = isAdult, language = language, region = region, page = params.key ?: 1)
-            SearchType.TV -> apis.searchTv(query = query, includeAdult = isAdult, language = language, region = region, page = params.key ?: 1)
-            SearchType.PEOPLE -> apis.searchPeople(query = query, includeAdult = isAdult, language = language, region = region, page = params.key ?: 1)
-            SearchType.SERIES -> apis.searchSeries(query = query, includeAdult = isAdult, language = language, region = region, page = params.key ?: 1)
-        }.subscribeOn(Schedulers.io())
+    override fun loadSingle(params: LoadParams<Int>): Single<LoadResult<Int, Media>> =
+        apis.search(type = type, query = query, includeAdult = isAdult, language = language, page = params.key ?: 1)
+            .subscribeOn(Schedulers.io())
             .map<LoadResult<Int, Media>> { response ->
                 LoadResult.Page(
                     data = response.results.orEmpty(),
@@ -35,7 +29,6 @@ class SearchPagingSource(
                 Log.printStackTrace(e)
                 LoadResult.Error(e)
             }
-    }
 
     override fun getRefreshKey(state: PagingState<Int, Media>): Int? =
         state.anchorPosition?.let { anchorPosition ->

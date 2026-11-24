@@ -18,6 +18,7 @@ import com.cheeke.surfy.data.util.NetworkMonitor
 import com.cheeke.surfy.database.model.NowPlayingMovieEntity
 import com.cheeke.surfy.database.model.UpComingMovieEntity
 import com.cheeke.surfy.model.Media
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Movie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.core.BackpressureStrategy
@@ -66,18 +67,21 @@ class HomeVM @Inject constructor(
     }.cachedIn(scope = viewModelScope)
     val trendingMoviePaging =
         createTrendingPaging(
+            type = MediaType.MOVIE,
             timeWindowFlow = trendingMovieTimeWindow,
-            pagingSourceFactory = homeRepository::getTrendingMovie
+            pagingSourceFactory = homeRepository::getTrending
         ).asFlow()
     val trendingPeoplePaging =
         createTrendingPaging(
+            type = MediaType.PEOPLE,
             timeWindowFlow = trendingPeopleTimeWindow,
-            pagingSourceFactory = homeRepository::getTrendingPeople
+            pagingSourceFactory = homeRepository::getTrending
         ).asFlow()
     val trendingTvPaging =
         createTrendingPaging(
+            type = MediaType.TV,
             timeWindowFlow = trendingTvTimeWindow,
-            pagingSourceFactory = homeRepository::getTrendingTv
+            pagingSourceFactory = homeRepository::getTrending
         ).asFlow()
     val homeUiState: Observable<HomeState> = movieRepository.getPopularMovies()
         .map<HomeState> { HomeState.Success(HomeUiState(popularMovies = it)) }
@@ -100,25 +104,23 @@ class HomeVM @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun <T : Any> createTrendingPaging(
+        type: MediaType,
         timeWindowFlow: Observable<TimeWindow>,
-        pagingSourceFactory: (timeWindow: String, language: String) -> PagingSource<Int, T>
-    ): Flowable<PagingData<T>> {
-        return Flowable.combineLatest(
-            timeWindowFlow.toFlowable(BackpressureStrategy.LATEST),
-            dataManager.localeFlow,
-            onlineState
-        ) { timeWindow, language, _ ->
-            TrendingRequest(timeWindow = timeWindow.label, language = "${language.language}-${language.region}")
-        }.distinctUntilChanged()
-            .flatMap { request ->
-                Pager(
-                    config = pagingConfig,
-                    pagingSourceFactory = {
-                        pagingSourceFactory(request.timeWindow, request.language)
-                    }
-                ).flowable
-            }.cachedIn(scope = viewModelScope)
-    }
+        pagingSourceFactory: (type: MediaType, timeWindow: String, language: String) -> PagingSource<Int, T>
+    ): Flowable<PagingData<T>> = Flowable.combineLatest(
+        timeWindowFlow.toFlowable(BackpressureStrategy.LATEST),
+        dataManager.localeFlow,
+    ) { timeWindow, language ->
+        TrendingRequest(timeWindow = timeWindow.label, language = "${language.language}-${language.region}")
+    }.distinctUntilChanged()
+        .flatMap { request ->
+            Pager(
+                config = pagingConfig,
+                pagingSourceFactory = {
+                    pagingSourceFactory(type, request.timeWindow, request.language)
+                }
+            ).flowable
+        }.cachedIn(scope = viewModelScope)
 }
 
 sealed interface HomeState {

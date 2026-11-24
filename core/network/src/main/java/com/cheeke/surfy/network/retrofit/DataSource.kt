@@ -16,6 +16,7 @@ import com.cheeke.surfy.model.Regions
 import com.cheeke.surfy.model.Reviews
 import com.cheeke.surfy.model.SearchData
 import com.cheeke.surfy.model.SearchKeywordData
+import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedias
 import com.cheeke.surfy.model.TrendingMedia
@@ -88,7 +89,7 @@ class SettingNetworkDataSourceImpl @Inject constructor(
             }
 
     override fun getMovieGenres(language: String): Single<Genres> =
-        apis.getMovieGenres(language = language)
+        apis.getGenres(media = MediaType.MOVIE.label, language = language)
             .map {
                 when (it) {
                     is ApiResponse.Failure -> throw SurfyNetworkException(throwable = it.throwable, stringRes = it.stringRes)
@@ -97,7 +98,7 @@ class SettingNetworkDataSourceImpl @Inject constructor(
             }
 
     override fun getTvGenres(language: String): Single<Genres> =
-        apis.getTvGenres(language = language)
+        apis.getGenres(media = MediaType.TV.label, language = language)
             .map {
                 when (it) {
                     is ApiResponse.Failure -> throw SurfyNetworkException(throwable = it.throwable, stringRes = it.stringRes)
@@ -110,12 +111,14 @@ class SettingNetworkDataSourceImpl @Inject constructor(
 class SearchRemoteDataSourceImpl @Inject constructor(
     private val apis: SearchApis
 ) : SearchRemoteDataSource {
-    override fun searchMulti(
+    override fun search(
+        type: SearchType,
         query: String,
         includeAdult: Boolean,
         language: String,
         page: Int
-    ): Single<SearchData> = apis.searchMulti(
+    ): Single<SearchData> = apis.search(
+        type = type.type,
         query = query,
         includeAdult = includeAdult,
         language = language,
@@ -123,83 +126,15 @@ class SearchRemoteDataSourceImpl @Inject constructor(
     ).map { response ->
         when (response) {
             is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = null)
-        }
-    }
-
-    override fun searchMovies(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): Single<SearchData> = apis.searchMovies(
-        query = query,
-        includeAdult = includeAdult,
-        language = language,
-        region = region,
-        page = page
-    ).map { response ->
-        when (response) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.MOVIE)
-        }
-    }
-
-    override fun searchTv(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): Single<SearchData> = apis.searchTv(
-        query = query,
-        includeAdult = includeAdult,
-        language = language,
-        region = region,
-        page = page
-    ).map { response ->
-        when (response) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.TV)
-        }
-    }
-
-    override fun searchPeople(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): Single<SearchData> = apis.searchPeople(
-        query = query,
-        includeAdult = includeAdult,
-        language = language,
-        region = region,
-        page = page
-    ).map { response ->
-        when (response) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.PEOPLE)
-        }
-    }
-
-    override fun searchSeries(
-        query: String,
-        includeAdult: Boolean,
-        language: String,
-        region: String,
-        page: Int
-    ): Single<SearchData> = apis.searchMovieSeries(
-        query = query,
-        includeAdult = includeAdult,
-        language = language,
-        region = region,
-        page = page
-    ).map { response ->
-        when (response) {
-            is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-            is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.SERIES)
+            is ApiResponse.Success -> response.data.asExternalModel(
+                mediaType = when (type) {
+                    SearchType.MULTI -> null
+                    SearchType.MOVIE -> MediaType.MOVIE
+                    SearchType.TV -> MediaType.TV
+                    SearchType.PEOPLE -> MediaType.PEOPLE
+                    SearchType.SERIES -> MediaType.SERIES
+                }
+            )
         }
     }
 
@@ -481,27 +416,11 @@ class SyncRemoteDataSourceImpl @Inject constructor(
 class TrendingRemoteDataSourceImpl @Inject constructor(
     private val apis: TrendingApis
 ) : TrendingRemoteDataSource {
-    override fun getTrendingMovie(timeWindow: String, language: String, page: Int): Single<TrendingMedia> =
-        apis.getTrendingMovie(timeWindow = timeWindow, language = language, page = page).map { response ->
+    override fun getTrending(type: MediaType, timeWindow: String, language: String, page: Int): Single<TrendingMedia> =
+        apis.getTrending(type = type.label, timeWindow = timeWindow, language = language, page = page).map { response ->
             when (response) {
                 is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
                 is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.MOVIE)
-            }
-        }
-
-    override fun getTrendingPeople(timeWindow: String, language: String, page: Int): Single<TrendingMedia> =
-        apis.getTrendingPeople(timeWindow = timeWindow, language = language, page = page).map { response ->
-            when (response) {
-                is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-                is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.PEOPLE)
-            }
-        }
-
-    override fun getTrendingTv(timeWindow: String, language: String, page: Int): Single<TrendingMedia> =
-        apis.getTrendingTv(timeWindow = timeWindow, language = language, page = page).map { response ->
-            when (response) {
-                is ApiResponse.Failure -> throw SurfyNetworkException(throwable = response.throwable, stringRes = response.stringRes)
-                is ApiResponse.Success -> response.data.asExternalModel(mediaType = MediaType.TV)
             }
         }
 }

@@ -41,13 +41,9 @@ interface SettingApis {
     @GET(value = "/3/watch/providers/regions")
     fun getAvailableRegion(): Single<ApiResponse<NetworkTMDBRegion>>
 
-    @GET(value = "/3/genre/movie/list")
-    fun getMovieGenres(
-        @Query(value = "language") language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}"
-    ): Single<ApiResponse<NetworkTMDBMovieGenres>>
-
-    @GET(value = "/3/genre/tv/list")
-    fun getTvGenres(
+    @GET(value = "/3/genre/{media}/list")
+    fun getGenres(
+        @Path(value = "media") media: String,
         @Query(value = "language") language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}"
     ): Single<ApiResponse<NetworkTMDBMovieGenres>>
 }
@@ -160,48 +156,13 @@ interface SeriesApis {
 }
 
 interface SearchApis {
-    @GET(value = "/3/search/multi")
-    fun searchMulti(
+    @GET(value = "/3/search/{type}")
+    fun search(
+        @Path(value = "type") type: String,
         @Query(value = "query") query: String,
         @Query(value = "include_adult") includeAdult: Boolean = true,
         @Query(value = "language") language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
         @Query(value = "page") page: Int = 1
-    ): Single<ApiResponse<NetworkTMDBSearch>>
-
-    @GET(value = "/3/search/movie")
-    fun searchMovies(
-        @Query(value = "query") query: String,
-        @Query(value = "include_adult") includeAdult: Boolean = true,
-        @Query(value = "language") language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        @Query(value = "region") region: String = "${Locale.getDefault().country}",
-        @Query(value = "page") page: Int = 1
-    ): Single<ApiResponse<NetworkTMDBSearch>>
-
-    @GET(value = "/3/search/tv")
-    fun searchTv(
-        @Query(value = "query") query: String,
-        @Query(value = "include_adult") includeAdult: Boolean = true,
-        @Query(value = "language") language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        @Query(value = "region") region: String = "${Locale.getDefault().country}",
-        @Query(value = "page") page: Int = 1
-    ): Single<ApiResponse<NetworkTMDBSearch>>
-
-    @GET(value = "/3/search/person")
-    fun searchPeople(
-        @Query(value = "query") query: String,
-        @Query(value = "include_adult") includeAdult: Boolean = true,
-        @Query(value = "language") language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        @Query(value = "region") region: String = "${Locale.getDefault().country}",
-        @Query(value = "page") page: Int = 1
-    ): Single<ApiResponse<NetworkTMDBSearch>>
-
-    @GET(value = "/3/search/collection")
-    fun searchMovieSeries(
-        @Query(value = "query") query: String,
-        @Query(value = "include_adult") includeAdult: Boolean = true,
-        @Query(value = "page") page: Int = 1,
-        @Query(value = "language") language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        @Query(value = "region") region: String = "${Locale.getDefault().country}"
     ): Single<ApiResponse<NetworkTMDBSearch>>
 
     @GET(value = "/3/search/keyword")
@@ -228,22 +189,9 @@ interface SyncApis {
 }
 
 interface TrendingApis {
-    @GET(value = "/3/trending/movie/{time_window}")
-    fun getTrendingMovie(
-        @Path(value = "time_window") timeWindow: String,
-        @Query(value = "language") language: String,
-        @Query(value = "page") page: Int = 1
-    ): Single<ApiResponse<NetworkTMDBTrendingMedia>>
-
-    @GET(value = "/3/trending/person/{time_window}")
-    fun getTrendingPeople(
-        @Path(value = "time_window") timeWindow: String,
-        @Query(value = "language") language: String,
-        @Query(value = "page") page: Int = 1
-    ): Single<ApiResponse<NetworkTMDBTrendingMedia>>
-
-    @GET(value = "/3/trending/tv/{time_window}")
-    fun getTrendingTv(
+    @GET(value = "/3/trending/{type}/{time_window}")
+    fun getTrending(
+        @Path(value = "type") type: String,
         @Path(value = "time_window") timeWindow: String,
         @Query(value = "language") language: String,
         @Query(value = "page") page: Int = 1

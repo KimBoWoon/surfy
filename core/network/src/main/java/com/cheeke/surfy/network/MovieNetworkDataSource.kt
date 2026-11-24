@@ -7,6 +7,7 @@ import com.cheeke.surfy.model.ExternalIds
 import com.cheeke.surfy.model.Genres
 import com.cheeke.surfy.model.ImageList
 import com.cheeke.surfy.model.Language
+import com.cheeke.surfy.model.MediaType
 import com.cheeke.surfy.model.Movie
 import com.cheeke.surfy.model.MovieWatchProvider
 import com.cheeke.surfy.model.People
@@ -14,6 +15,7 @@ import com.cheeke.surfy.model.Regions
 import com.cheeke.surfy.model.Reviews
 import com.cheeke.surfy.model.SearchData
 import com.cheeke.surfy.model.SearchKeywordData
+import com.cheeke.surfy.model.SearchType
 import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SimilarMedias
 import com.cheeke.surfy.model.TrendingMedia
@@ -140,54 +142,20 @@ interface SyncRemoteDataSource {
 }
 
 interface TrendingRemoteDataSource {
-    fun getTrendingMovie(timeWindow: String, language: String, page: Int): Single<TrendingMedia>
-
-    fun getTrendingPeople(
+    fun getTrending(
+        type: MediaType,
         timeWindow: String,
         language: String,
-        page: Int = 1
+        page: Int
     ): Single<TrendingMedia>
-
-    fun getTrendingTv(timeWindow: String, language: String, page: Int): Single<TrendingMedia>
 }
 
 interface SearchRemoteDataSource {
-    fun searchMulti(
+    fun search(
+        type: SearchType,
         query: String,
         includeAdult: Boolean = true,
         language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        page: Int = 1
-    ): Single<SearchData>
-
-    fun searchMovies(
-        query: String,
-        includeAdult: Boolean = true,
-        language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        region: String = "${Locale.getDefault().country}",
-        page: Int = 1
-    ): Single<SearchData>
-
-    fun searchTv(
-        query: String,
-        includeAdult: Boolean = true,
-        language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        region: String = "${Locale.getDefault().country}",
-        page: Int = 1
-    ): Single<SearchData>
-
-    fun searchPeople(
-        query: String,
-        includeAdult: Boolean = true,
-        language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        region: String = "${Locale.getDefault().country}",
-        page: Int = 1
-    ): Single<SearchData>
-
-    fun searchSeries(
-        query: String,
-        includeAdult: Boolean = true,
-        language: String = "${Locale.getDefault().language}-${Locale.getDefault().country}",
-        region: String = "${Locale.getDefault().country}",
         page: Int = 1
     ): Single<SearchData>
 

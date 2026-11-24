@@ -50,7 +50,6 @@ class SearchRepositoryImpl @Inject constructor(
         type = type,
         query = query,
         language = language,
-        region = region,
         isAdult = isAdult,
     )
 
