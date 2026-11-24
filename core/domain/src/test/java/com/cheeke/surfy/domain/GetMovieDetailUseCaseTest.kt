@@ -44,7 +44,7 @@ class GetMovieDetailUseCaseTest {
         testPagingRepository = TestPagingRepository()
         getMovieDetailUseCase = GetMovieDetailUseCase(
             userDataRepository = userDataRepository,
-            detailRepository = detailRepository,
+            movieRepository = detailRepository,
             movieDataBaseRepository = movieDataBaseRepository
         )
         runBlocking {

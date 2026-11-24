@@ -2,7 +2,6 @@ package com.cheeke.surfy
 
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
-import app.cash.turbine.test
 import com.cheeke.surfy.deeplink.DeepLinkManager
 import com.cheeke.surfy.deeplink.parseDeeplink
 import com.cheeke.surfy.favorite.navigation.FavoriteNavKey
@@ -18,7 +17,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runCurrent
@@ -65,8 +63,8 @@ class RootVMTest {
         }
         viewModel = RootVM(
             deepLinkManager = deepLinkManager,
-            movieDataBaseRepository = movieRepository,
-            tvDataBaseRepository = tvRepository,
+            movieRepository = movieRepository,
+            tvRepository = tvRepository,
             networkMonitor = networkMonitor
         )
     }

@@ -3,8 +3,8 @@ package com.cheeke.surfy.ui.activities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheeke.surfy.common.Log
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
+import com.cheeke.surfy.data.repository.MovieRepository
+import com.cheeke.surfy.data.repository.TvRepository
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.data.util.DataManager
 import com.cheeke.surfy.data.util.SyncManager
@@ -26,9 +26,9 @@ import javax.inject.Inject
 class MainVM @Inject constructor(
     dataManager: DataManager,
     syncManager: SyncManager,
-    private val userDataRepository: UserDataRepository,
-    private val movieDataBaseRepository: MovieDataBaseRepository,
-    private val tvDataBaseRepository: TvDataBaseRepository
+    movieRepository: MovieRepository,
+    tvRepository: TvRepository,
+    private val userDataRepository: UserDataRepository
 ) : ViewModel() {
     val disposable = CompositeDisposable()
 
@@ -58,8 +58,8 @@ class MainVM @Inject constructor(
                 { Log.d(it.message.toString()) }
             ).addTo(disposable)
         Single.zip(
-            movieDataBaseRepository.getNextWeekReleaseMovies(),
-            tvDataBaseRepository.getNextWeekReleaseTvs()
+            movieRepository.getNextWeekReleaseMovies(),
+            tvRepository.getNextWeekReleaseTvs()
         ) { movies, tvs ->
             movies to tvs
         }.subscribeOn(Schedulers.io())
@@ -67,7 +67,7 @@ class MainVM @Inject constructor(
             .subscribe(
             {
                 viewModelScope.launch {
-                    _nextWeekReleaseMedias.onNext((it.first + it.second).sortedBy { it.releaseDate })
+                    _nextWeekReleaseMedias.onNext((it.first + it.second).sortedBy { media -> media.releaseDate })
                 }
             },
             { Log.d(it.message.toString()) }

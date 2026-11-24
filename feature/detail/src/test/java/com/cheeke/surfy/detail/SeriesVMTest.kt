@@ -9,7 +9,6 @@ import com.cheeke.surfy.testing.repository.TestSeriesDetailRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -35,7 +34,7 @@ class SeriesVMTest {
         testDetailRepository = TestSeriesDetailRepository()
         testMovieAppDataManager = TestMovieAppDataManager()
         testAnalyticsHelper = TestAnalyticsHelper()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = testDetailRepository)
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(seriesRepository = testDetailRepository)
 
         seriesVM = SeriesVM(
             id = 0,

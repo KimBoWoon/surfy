@@ -43,8 +43,8 @@ class HomeScreenTest {
         testNetworkMonitor = TestNetworkMonitor()
         viewModel = HomeVM(
             dataManager = dataManager,
-            movieDataBaseRepository = testDatabaseRepository,
-            pagingRepository = testPagingRepository,
+            movieRepository = testDatabaseRepository,
+            homeRepository = testPagingRepository,
             networkMonitor = testNetworkMonitor
         )
     }

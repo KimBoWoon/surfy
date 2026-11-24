@@ -7,7 +7,6 @@ import com.cheeke.surfy.testing.repository.TestTvDatabaseRepository
 import com.cheeke.surfy.testing.repository.TestTvDetailRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -39,7 +38,7 @@ class GetTvDataUseCaseTest {
         userDataRepository = TestUserDataRepository()
         getTvDetailUseCase = GetTvDetailUseCase(
             tvDataBaseRepository = tvDataBaseRepository,
-            detailRepository = detailRepository
+            tvRepository = detailRepository
         )
     }
 

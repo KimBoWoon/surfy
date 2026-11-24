@@ -12,7 +12,6 @@ import com.cheeke.surfy.testing.repository.TestPeopleDetailRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -44,12 +43,12 @@ class PeopleVMTest {
         testAnalyticsHelper = TestAnalyticsHelper()
         getPeopleDetailUseCase = GetPeopleDetailUseCase(
             detailRepository = testDetailRepository,
-            peopleDataBaseRepository = testDatabaseRepository
+            peopleRepository = testDatabaseRepository
         )
         viewModel = PeopleVM(
             id = 0,
             getPeopleDetail = getPeopleDetailUseCase,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testDatabaseRepository,
             analyticsHelper = testAnalyticsHelper
         )
         runBlocking {
@@ -87,7 +86,7 @@ class PeopleVMTest {
         viewModel = PeopleVM(
             id = 124,
             getPeopleDetail = getPeopleDetailUseCase,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testDatabaseRepository,
             analyticsHelper = testAnalyticsHelper
         )
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.people.collect() }
@@ -112,7 +111,7 @@ class PeopleVMTest {
         viewModel = PeopleVM(
             id = 124,
             getPeopleDetail = getPeopleDetailUseCase,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testDatabaseRepository,
             analyticsHelper = testAnalyticsHelper
         )
         backgroundScope.launch(UnconfinedTestDispatcher()) { viewModel.people.collect() }

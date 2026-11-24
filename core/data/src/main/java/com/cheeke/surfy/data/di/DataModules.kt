@@ -1,25 +1,19 @@
 package com.cheeke.surfy.data.di
 
-import com.cheeke.surfy.data.repository.KeywordDataBaseRepository
-import com.cheeke.surfy.data.repository.KeywordDataBaseRepositoryImpl
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.MovieDataBaseRepositoryImpl
-import com.cheeke.surfy.data.repository.MovieDetailRepository
-import com.cheeke.surfy.data.repository.MovieDetailRepositoryImpl
-import com.cheeke.surfy.data.repository.PagingRepository
-import com.cheeke.surfy.data.repository.PagingRepositoryImpl
-import com.cheeke.surfy.data.repository.PeopleDataBaseRepository
-import com.cheeke.surfy.data.repository.PeopleDataBaseRepositoryImpl
-import com.cheeke.surfy.data.repository.PeopleDetailRepository
-import com.cheeke.surfy.data.repository.PeopleDetailRepositoryImpl
-import com.cheeke.surfy.data.repository.SeriesDetailRepository
-import com.cheeke.surfy.data.repository.SeriesDetailRepositoryImpl
+import com.cheeke.surfy.data.repository.HomeRepository
+import com.cheeke.surfy.data.repository.HomeRepositoryImpl
+import com.cheeke.surfy.data.repository.MovieRepository
+import com.cheeke.surfy.data.repository.MovieRepositoryImpl
+import com.cheeke.surfy.data.repository.PeopleRepository
+import com.cheeke.surfy.data.repository.PeopleRepositoryImpl
+import com.cheeke.surfy.data.repository.SearchRepository
+import com.cheeke.surfy.data.repository.SearchRepositoryImpl
+import com.cheeke.surfy.data.repository.SeriesRepository
+import com.cheeke.surfy.data.repository.SeriesRepositoryImpl
 import com.cheeke.surfy.data.repository.SyncRepository
 import com.cheeke.surfy.data.repository.SyncRepositoryImpl
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
-import com.cheeke.surfy.data.repository.TvDataBaseRepositoryImpl
-import com.cheeke.surfy.data.repository.TvDetailRepository
-import com.cheeke.surfy.data.repository.TvDetailRepositoryImpl
+import com.cheeke.surfy.data.repository.TvRepository
+import com.cheeke.surfy.data.repository.TvRepositoryImpl
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.data.repository.UserDataRepositoryImpl
 import dagger.Binds
@@ -36,44 +30,29 @@ abstract class DataModules {
     ): UserDataRepository
 
     @Binds
-    abstract fun bindMovieDetailRepository(
-        movieDetailRepository: MovieDetailRepositoryImpl
-    ): MovieDetailRepository
+    abstract fun bindMovieRepository(
+        movieDetailRepository: MovieRepositoryImpl
+    ): MovieRepository
 
     @Binds
-    abstract fun bindPeopleDetailRepository(
-        peopleDetailRepository: PeopleDetailRepositoryImpl
-    ): PeopleDetailRepository
+    abstract fun bindPeopleRepository(
+        peopleDetailRepository: PeopleRepositoryImpl
+    ): PeopleRepository
 
     @Binds
-    abstract fun bindTvDetailRepository(
-        tvDetailRepository: TvDetailRepositoryImpl
-    ): TvDetailRepository
+    abstract fun bindTvRepository(
+        tvDetailRepository: TvRepositoryImpl
+    ): TvRepository
 
     @Binds
-    abstract fun bindSeriesDetailRepository(
-        seriesDetailRepository: SeriesDetailRepositoryImpl
-    ): SeriesDetailRepository
+    abstract fun bindSeriesRepository(
+        seriesDetailRepository: SeriesRepositoryImpl
+    ): SeriesRepository
 
     @Binds
-    abstract fun bindMovieDatabaseRepository(
-        databaseRepository: MovieDataBaseRepositoryImpl
-    ): MovieDataBaseRepository
-
-    @Binds
-    abstract fun bindPeopleDatabaseRepository(
-        databaseRepository: PeopleDataBaseRepositoryImpl
-    ): PeopleDataBaseRepository
-
-    @Binds
-    abstract fun bindTvDatabaseRepository(
-        databaseRepository: TvDataBaseRepositoryImpl
-    ): TvDataBaseRepository
-
-    @Binds
-    abstract fun bindKeywordDatabaseRepository(
-        databaseRepository: KeywordDataBaseRepositoryImpl
-    ): KeywordDataBaseRepository
+    abstract fun bindSearchRepository(
+        databaseRepository: SearchRepositoryImpl
+    ): SearchRepository
 
     @Binds
     abstract fun bindMainMenuRepository(
@@ -82,6 +61,6 @@ abstract class DataModules {
 
     @Binds
     abstract fun bindPagingRepository(
-        pagingRepository: PagingRepositoryImpl
-    ): PagingRepository
+        pagingRepository: HomeRepositoryImpl
+    ): HomeRepository
 }

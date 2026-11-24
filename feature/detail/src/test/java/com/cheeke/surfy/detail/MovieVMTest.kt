@@ -24,7 +24,6 @@ import com.cheeke.surfy.testing.repository.TestPagingRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -50,7 +49,7 @@ class MovieVMTest {
     private val testUserDataRepository = TestUserDataRepository()
     private val testAnalyticsHelper = TestAnalyticsHelper()
     private val getMovieDetailUseCase = GetMovieDetailUseCase(
-        detailRepository = testDetailRepository,
+        movieRepository = testDetailRepository,
         userDataRepository = testUserDataRepository,
         movieDataBaseRepository = testDataBaseRepository
     )
@@ -60,9 +59,9 @@ class MovieVMTest {
     fun setup() {
         viewModel = MovieVM(
             id = 0,
-            movieDataBaseRepository = testDataBaseRepository,
+            movieRepository = testDataBaseRepository,
             getMovieDetail = getMovieDetailUseCase,
-            pagingRepository = testPagingRepository,
+            homeRepository = testPagingRepository,
             analyticsHelper = testAnalyticsHelper,
             userDataRepository = testUserDataRepository
         )
@@ -108,8 +107,8 @@ class MovieVMTest {
         viewModel = MovieVM(
             id = 324,
             getMovieDetail = getMovieDetailUseCase,
-            movieDataBaseRepository = testDataBaseRepository,
-            pagingRepository = testPagingRepository,
+            movieRepository = testDataBaseRepository,
+            homeRepository = testPagingRepository,
             analyticsHelper = testAnalyticsHelper,
             userDataRepository = testUserDataRepository
         )
@@ -205,8 +204,8 @@ class MovieVMTest {
         viewModel = MovieVM(
             id = 23,
             getMovieDetail = getMovieDetailUseCase,
-            movieDataBaseRepository = testDataBaseRepository,
-            pagingRepository = testPagingRepository,
+            movieRepository = testDataBaseRepository,
+            homeRepository = testPagingRepository,
             analyticsHelper = testAnalyticsHelper,
             userDataRepository = testUserDataRepository
         )

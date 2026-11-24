@@ -86,13 +86,13 @@ class MovieScreenTest {
         movieDetailUseCase = GetMovieDetailUseCase(
             userDataRepository = testUserDataRepository,
             movieDataBaseRepository = testDatabaseRepository,
-            detailRepository = testDetailRepository
+            movieRepository = testDetailRepository
         )
         viewModel = MovieVM(
             id = 0,
             getMovieDetail = movieDetailUseCase,
-            movieDataBaseRepository = testDatabaseRepository,
-            pagingRepository = testPagingRepository,
+            movieRepository = testDatabaseRepository,
+            homeRepository = testPagingRepository,
             userDataRepository = testUserDataRepository,
             analyticsHelper = object : AnalyticsHelper {
                 override fun logEvent(event: AnalyticsEvent) {

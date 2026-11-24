@@ -12,8 +12,7 @@ import androidx.paging.rxjava3.cachedIn
 import androidx.paging.rxjava3.observable
 import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.analytics.logSearch
-import com.cheeke.surfy.data.repository.KeywordDataBaseRepository
-import com.cheeke.surfy.data.repository.PagingRepository
+import com.cheeke.surfy.data.repository.SearchRepository
 import com.cheeke.surfy.data.util.DataManager
 import com.cheeke.surfy.data.util.SurfyAppDataState
 import com.cheeke.surfy.database.model.KeywordEntity
@@ -42,8 +41,7 @@ class SearchVM @AssistedInject constructor(
     @Assisted initialSearchType: SearchType,
     dataManager: DataManager,
     private val savedStateHandle: SavedStateHandle,
-    private val pagingRepository: PagingRepository,
-    private val keywordDataBaseRepository: KeywordDataBaseRepository,
+    private val searchRepository: SearchRepository,
     private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
     companion object {
@@ -91,7 +89,7 @@ class SearchVM @AssistedInject constructor(
     val recentlyKeywordPaging: Observable<PagingData<KeywordEntity>> = Pager(
         config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
         initialKey = 1,
-        pagingSourceFactory = { keywordDataBaseRepository.getKeywords() }
+        pagingSourceFactory = { searchRepository.getKeywords() }
     ).observable.cachedIn(scope = viewModelScope)
 
     private val recommendKeywordSubject: BehaviorSubject<String> = BehaviorSubject.createDefault("")
@@ -106,7 +104,7 @@ class SearchVM @AssistedInject constructor(
                 Pager(
                     config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
                     initialKey = 1,
-                    pagingSourceFactory = { pagingRepository.getRecommendKeywordPagingSource(query = keyword) }
+                    pagingSourceFactory = { searchRepository.getRecommendKeywordPagingSource(query = keyword) }
                 ).observable
             }
         }.cachedIn(scope = viewModelScope)
@@ -132,7 +130,7 @@ class SearchVM @AssistedInject constructor(
                                 config = PagingConfig(pageSize = 20, initialLoadSize = 20, prefetchDistance = 5),
                                 initialKey = 1,
                                 pagingSourceFactory = {
-                                    pagingRepository.getSearchPagingSource(
+                                    searchRepository.getSearchPagingSource(
                                         type = requested.searchType,
                                         query = requested.query,
                                         language = appDataSnapshot?.getMovieAppData()?.language?.find { it.isSelected }?.code.orEmpty(),
@@ -215,21 +213,21 @@ class SearchVM @AssistedInject constructor(
     }
 
     fun saveKeyword(keyword: String) {
-        keywordDataBaseRepository.insert(keyword = keyword)
+        searchRepository.insert(keyword = keyword)
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { throwable: Throwable -> /* 로깅 처리 */ })
             .addTo(compositeDisposable)
     }
 
     fun deleteAllRecentlyKeyword() {
-        keywordDataBaseRepository.deleteAll()
+        searchRepository.deleteAll()
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { throwable: Throwable -> /* 로깅 처리 */ })
             .addTo(compositeDisposable)
     }
 
     fun deleteRecentlyKeyword(entity: KeywordEntity) {
-        keywordDataBaseRepository.delete(entity = entity)
+        searchRepository.delete(entity = entity)
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { throwable: Throwable -> /* 로깅 처리 */ })
             .addTo(compositeDisposable)

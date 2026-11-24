@@ -11,8 +11,8 @@ import androidx.paging.map
 import androidx.paging.rxjava3.cachedIn
 import androidx.paging.rxjava3.flowable
 import com.cheeke.surfy.data.model.asExternalModel
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.PagingRepository
+import com.cheeke.surfy.data.repository.HomeRepository
+import com.cheeke.surfy.data.repository.MovieRepository
 import com.cheeke.surfy.data.util.DataManager
 import com.cheeke.surfy.data.util.NetworkMonitor
 import com.cheeke.surfy.database.model.NowPlayingMovieEntity
@@ -32,8 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeVM @Inject constructor(
     private val dataManager: DataManager,
-    movieDataBaseRepository: MovieDataBaseRepository,
-    pagingRepository: PagingRepository,
+    movieRepository: MovieRepository,
+    homeRepository: HomeRepository,
     networkMonitor: NetworkMonitor
 ) : ViewModel() {
     companion object {
@@ -54,32 +54,32 @@ class HomeVM @Inject constructor(
         .filter { it }
     val nowPlayingMoviePaging = Pager(
         config = PagingConfig(pageSize = 20, prefetchDistance = 5),
-        pagingSourceFactory = { movieDataBaseRepository.getNowPlayingMovies() }
+        pagingSourceFactory = { movieRepository.getNowPlayingMovies() }
     ).flow.map { pagingData ->
         pagingData.map(transform = NowPlayingMovieEntity::asExternalModel)
     }.cachedIn(scope = viewModelScope)
     val upComingMoviePaging = Pager(
         config = PagingConfig(pageSize = 20, prefetchDistance = 5),
-        pagingSourceFactory = { movieDataBaseRepository.getUpComingMovies() }
+        pagingSourceFactory = { movieRepository.getUpComingMovies() }
     ).flow.map { pagingData ->
         pagingData.map(transform = UpComingMovieEntity::asExternalModel)
     }.cachedIn(scope = viewModelScope)
     val trendingMoviePaging =
         createTrendingPaging(
             timeWindowFlow = trendingMovieTimeWindow,
-            pagingSourceFactory = pagingRepository::getTrendingMovie
+            pagingSourceFactory = homeRepository::getTrendingMovie
         ).asFlow()
     val trendingPeoplePaging =
         createTrendingPaging(
             timeWindowFlow = trendingPeopleTimeWindow,
-            pagingSourceFactory = pagingRepository::getTrendingPeople
+            pagingSourceFactory = homeRepository::getTrendingPeople
         ).asFlow()
     val trendingTvPaging =
         createTrendingPaging(
             timeWindowFlow = trendingTvTimeWindow,
-            pagingSourceFactory = pagingRepository::getTrendingTv
+            pagingSourceFactory = homeRepository::getTrendingTv
         ).asFlow()
-    val homeUiState: Observable<HomeState> = movieDataBaseRepository.getPopularMovies()
+    val homeUiState: Observable<HomeState> = movieRepository.getPopularMovies()
         .map<HomeState> { HomeState.Success(HomeUiState(popularMovies = it)) }
         .startWithItem(HomeState.Loading)
         .onErrorReturn { HomeState.Error(it) }

@@ -48,12 +48,12 @@ class TvScreenTest {
         userDataRepository = TestUserDataRepository()
         getTvDetailUseCase = GetTvDetailUseCase(
             tvDataBaseRepository = databaseRepository,
-            detailRepository = detailRepository
+            tvRepository = detailRepository
         )
         viewModel = TvVM(
             id = 0,
             getTvDetailUseCase = getTvDetailUseCase,
-            tvDataBaseRepository = databaseRepository,
+            tvRepository = databaseRepository,
             pagingRepository = pagingRepository,
             userDataRepository = userDataRepository,
             analyticsHelper = object : AnalyticsHelper {

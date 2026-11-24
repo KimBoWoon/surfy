@@ -6,7 +6,7 @@ import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.analytics.logSelectContent
 import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.common.Result
-import com.cheeke.surfy.data.repository.PeopleDataBaseRepository
+import com.cheeke.surfy.data.repository.PeopleRepository
 import com.cheeke.surfy.domain.GetPeopleDetailUseCase
 import com.cheeke.surfy.model.People
 import com.cheeke.surfy.network.model.SurfyNetworkException
@@ -22,7 +22,7 @@ import io.reactivex.rxjava3.processors.BehaviorProcessor
 class PeopleVM @AssistedInject constructor(
     @Assisted val id: Int,
     getPeopleDetail: GetPeopleDetailUseCase,
-    private val peopleDataBaseRepository: PeopleDataBaseRepository,
+    private val peopleRepository: PeopleRepository,
     private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
     companion object {
@@ -71,11 +71,11 @@ class PeopleVM @AssistedInject constructor(
     }
 
     fun insertPeople(people: People) {
-        peopleDataBaseRepository.insert(media = people).subscribe().addTo(disposable)
+        peopleRepository.insert(media = people).subscribe().addTo(disposable)
     }
 
     fun deletePeople(people: People) {
-        peopleDataBaseRepository.delete(media = people).subscribe().addTo(disposable)
+        peopleRepository.delete(media = people).subscribe().addTo(disposable)
     }
 
     override fun onCleared() {

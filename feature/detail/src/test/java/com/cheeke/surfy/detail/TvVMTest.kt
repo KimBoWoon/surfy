@@ -15,7 +15,6 @@ import com.cheeke.surfy.testing.repository.TestTvDetailRepository
 import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -36,7 +35,7 @@ class TvVMTest {
     private val testUserDataRepository = TestUserDataRepository()
     private val testAnalyticsHelper = TestAnalyticsHelper()
     private val getTvDetailUseCase = GetTvDetailUseCase(
-        detailRepository = testDetailRepository,
+        tvRepository = testDetailRepository,
         tvDataBaseRepository = testDataBaseRepository
     )
     private lateinit var viewModel: TvVM
@@ -62,7 +61,7 @@ class TvVMTest {
     fun setup() {
         viewModel = TvVM(
             id = 0,
-            tvDataBaseRepository = testDataBaseRepository,
+            tvRepository = testDataBaseRepository,
             pagingRepository = testPagingRepository,
             getTvDetailUseCase = getTvDetailUseCase,
             analyticsHelper = testAnalyticsHelper,

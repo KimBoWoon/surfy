@@ -31,7 +31,7 @@ class GetPeopleDetailUseCaseTest {
         movieAppDataRepository = TestMovieAppDataManager()
         getPeopleDetailUseCase = GetPeopleDetailUseCase(
             detailRepository = detailRepository,
-            peopleDataBaseRepository = peopleDataBaseRepository
+            peopleRepository = peopleDataBaseRepository
         )
 
         runBlocking { peopleDataBaseRepository.insert(media = People(id = 489)) }

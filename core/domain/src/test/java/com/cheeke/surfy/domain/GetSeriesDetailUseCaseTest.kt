@@ -5,7 +5,6 @@ import com.cheeke.surfy.model.Series
 import com.cheeke.surfy.model.SeriesPart
 import com.cheeke.surfy.testing.repository.TestSeriesDetailRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -22,7 +21,7 @@ class GetSeriesDetailUseCaseTest {
     @Before
     fun setup() {
         detailRepository = TestSeriesDetailRepository()
-        getSeriesDetailUseCase = GetSeriesDetailUseCase(detailRepository = detailRepository)
+        getSeriesDetailUseCase = GetSeriesDetailUseCase(seriesRepository = detailRepository)
     }
 
     @Test

@@ -60,7 +60,7 @@ class SearchScreenTest {
             savedStateHandle = savedStateHandle,
             dataManager = movieAppDataRepository,
             pagingRepository = testPagingRepository,
-            keywordDataBaseRepository = testKeywordDataBaseRepository,
+            searchRepository = testKeywordDataBaseRepository,
             analyticsHelper = object : AnalyticsHelper {
                 override fun logEvent(event: AnalyticsEvent) {
                     println("event: $event")

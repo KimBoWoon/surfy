@@ -1,7 +1,6 @@
 package com.cheeke.surfy.domain
 
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
-import com.cheeke.surfy.data.repository.TvDetailRepository
+import com.cheeke.surfy.data.repository.TvRepository
 import com.cheeke.surfy.model.Tv
 import com.cheeke.surfy.model.TvEpisode
 import com.cheeke.surfy.model.TvSeason
@@ -11,8 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class GetTvDetailUseCase @Inject constructor(
-    private val tvDataBaseRepository: TvDataBaseRepository,
-    private val detailRepository: TvDetailRepository
+    private val tvRepository: TvRepository
 ) {
     // 시즌 이름 -> 에피소드 스트림. replay+autoConnect로 "한 번 구독되면 끝까지 캐시" 형태의 메모이제이션.
     private val seasonEpisodesCache = ConcurrentHashMap<String, Flowable<List<TvEpisode>>>()
@@ -22,7 +20,7 @@ class GetTvDetailUseCase @Inject constructor(
         selectedSeason: Flowable<SeasonSelection> = Flowable.just(SeasonSelection.None)
     ): Flowable<TvScreenData> {
         val detail =
-            detailRepository
+            tvRepository
                 .getData(tvId)
                 .toFlowable()
                 .replay(1)
@@ -53,7 +51,7 @@ class GetTvDetailUseCase @Inject constructor(
 
         return Flowable.combineLatest(
             detail,
-            tvDataBaseRepository.isFavorite(tvId).toFlowable(BackpressureStrategy.LATEST),
+            tvRepository.isFavorite(tvId).toFlowable(BackpressureStrategy.LATEST),
             episodesBySeason,
             loadState
         ) { tv, favorite, cache, state ->
@@ -89,7 +87,7 @@ class GetTvDetailUseCase @Inject constructor(
         val seasonName = season.name.orEmpty()
 
         val episodes = seasonEpisodesCache.getOrPut(seasonName) {
-            detailRepository
+            tvRepository
                 .getTvSeasons(tvId, season.seasonNumber ?: -1)
                 .map { seasonDetail -> seasonDetail.episodes.orEmpty() }
                 .toFlowable()

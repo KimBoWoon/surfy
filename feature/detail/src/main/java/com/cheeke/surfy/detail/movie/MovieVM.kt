@@ -11,8 +11,7 @@ import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.analytics.logSelectContent
 import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.common.Result
-import com.cheeke.surfy.data.repository.MovieDataBaseRepository
-import com.cheeke.surfy.data.repository.PagingRepository
+import com.cheeke.surfy.data.repository.MovieRepository
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.domain.GetMovieDetailUseCase
 import com.cheeke.surfy.model.Movie
@@ -30,10 +29,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @HiltViewModel(assistedFactory = MovieVM.Factory::class)
 class MovieVM @AssistedInject constructor(
     @Assisted(value = "id") val id: Int,
+    userDataRepository: UserDataRepository,
     private val getMovieDetail: GetMovieDetailUseCase,
-    private val movieDataBaseRepository: MovieDataBaseRepository,
-    private val pagingRepository: PagingRepository,
-    private val userDataRepository: UserDataRepository,
+    private val movieRepository: MovieRepository,
     private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
     companion object {
@@ -85,7 +83,7 @@ class MovieVM @AssistedInject constructor(
                 config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
                 initialKey = 1,
                 pagingSourceFactory = {
-                    pagingRepository.getSimilarMoviePagingSource(
+                    movieRepository.getSimilarMoviePagingSource(
                         id = id,
                         language = it.first,
                         region = it.second
@@ -103,7 +101,7 @@ class MovieVM @AssistedInject constructor(
                 config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
                 initialKey = 1,
                 pagingSourceFactory = {
-                    pagingRepository.getMovieReviews(
+                    movieRepository.getMovieReviews(
                         movieId = id,
                         language = it.first,
                         region = it.second
@@ -121,11 +119,11 @@ class MovieVM @AssistedInject constructor(
     }
 
     fun insertMovie(movie: Movie) {
-        movieDataBaseRepository.insert(media = movie).subscribe().addTo(disposable)
+        movieRepository.insert(media = movie).subscribe().addTo(disposable)
     }
 
     fun deleteMovie(movie: Movie) {
-        movieDataBaseRepository.delete(media = movie).subscribe().addTo(disposable)
+        movieRepository.delete(media = movie).subscribe().addTo(disposable)
     }
 
     override fun onCleared() {

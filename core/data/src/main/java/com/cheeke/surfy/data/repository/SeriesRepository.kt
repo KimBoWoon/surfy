@@ -6,15 +6,15 @@ import com.cheeke.surfy.network.SeriesRemoteDataSource
 import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
-interface SeriesDetailRepository : DetailRepository<Series> {
+interface SeriesRepository : DetailRepository<Series> {
     override fun getData(id: Int): Single<Series>
     fun getMovieSeriesImageList(collectionId: Int): Single<ImageList>
 }
 
-class SeriesDetailRepositoryImpl @Inject constructor(
+class SeriesRepositoryImpl @Inject constructor(
     private val apis: SeriesRemoteDataSource,
     private val requestOptionsProvider: DetailRequestOptionsProvider
-) : SeriesDetailRepository {
+) : SeriesRepository {
     override fun getData(id: Int): Single<Series> = requestOptionsProvider.current()
         .flatMap {
             apis.getMovieSeries(

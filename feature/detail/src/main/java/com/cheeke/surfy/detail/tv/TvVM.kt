@@ -11,8 +11,7 @@ import com.cheeke.surfy.analytics.AnalyticsHelper
 import com.cheeke.surfy.analytics.logSelectContent
 import com.cheeke.surfy.common.Log
 import com.cheeke.surfy.common.Result
-import com.cheeke.surfy.data.repository.PagingRepository
-import com.cheeke.surfy.data.repository.TvDataBaseRepository
+import com.cheeke.surfy.data.repository.TvRepository
 import com.cheeke.surfy.data.repository.UserDataRepository
 import com.cheeke.surfy.domain.GetTvDetailUseCase
 import com.cheeke.surfy.domain.SeasonSelection
@@ -37,8 +36,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 class TvVM @AssistedInject constructor(
     @Assisted(value = "id") val id: Int,
     private val getTvDetailUseCase: GetTvDetailUseCase,
-    private val tvDataBaseRepository: TvDataBaseRepository,
-    private val pagingRepository: PagingRepository,
+    private val tvRepository: TvRepository,
     private val analyticsHelper: AnalyticsHelper,
     private val userDataRepository: UserDataRepository
 ) : ViewModel() {
@@ -62,7 +60,7 @@ class TvVM @AssistedInject constructor(
                 config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
                 initialKey = 1,
                 pagingSourceFactory = {
-                    pagingRepository.getSimilarTvPagingSource(
+                    tvRepository.getSimilarTvPagingSource(
                         id = id,
                         language = it.first,
                         region = it.second
@@ -125,7 +123,7 @@ class TvVM @AssistedInject constructor(
                 config = PagingConfig(pageSize = 1, initialLoadSize = 1, prefetchDistance = 5),
                 initialKey = 1,
                 pagingSourceFactory = {
-                    pagingRepository.getTvReviews(
+                    tvRepository.getTvReviews(
                         seriesId = id,
                         language = it.first,
                         region = it.second
@@ -147,11 +145,11 @@ class TvVM @AssistedInject constructor(
     }
 
     fun insertTv(tv: Tv) {
-        tvDataBaseRepository.insert(media = tv).subscribe().addTo(disposables)
+        tvRepository.insert(media = tv).subscribe().addTo(disposables)
     }
 
     fun deleteTv(tv: Tv) {
-        tvDataBaseRepository.delete(media = tv).subscribe().addTo(disposables)
+        tvRepository.delete(media = tv).subscribe().addTo(disposables)
     }
 
     fun showEpisodeDetail(episode: TvEpisode) {

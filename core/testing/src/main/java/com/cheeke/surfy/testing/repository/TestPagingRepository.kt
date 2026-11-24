@@ -3,7 +3,7 @@ package com.cheeke.surfy.testing.repository
 import android.annotation.SuppressLint
 import androidx.paging.PagingSource
 import androidx.paging.testing.asPagingSourceFactory
-import com.cheeke.surfy.data.repository.PagingRepository
+import com.cheeke.surfy.data.repository.HomeRepository
 import com.cheeke.surfy.model.Media
 import com.cheeke.surfy.model.Review
 import com.cheeke.surfy.model.SearchKeyword
@@ -21,7 +21,7 @@ import com.cheeke.surfy.testing.model.testTrendingTv
 import com.cheeke.surfy.testing.model.testTvReviews
 import com.cheeke.surfy.testing.model.tvSearchTestData
 
-class TestPagingRepository : PagingRepository {
+class TestPagingRepository : HomeRepository {
     @SuppressLint("VisibleForTests")
     private val testPagingSource = (0..100).map {
         SimilarMedia(

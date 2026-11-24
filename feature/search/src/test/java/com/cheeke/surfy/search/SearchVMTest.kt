@@ -17,7 +17,6 @@ import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestAnalyticsHelper
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -54,7 +53,7 @@ class SearchVMTest {
             savedStateHandle = savedStateHandle,
             dataManager = testMovieAppDataManager,
             pagingRepository = testPagingRepository,
-            keywordDataBaseRepository = testKeywordDataBaseRepository,
+            searchRepository = testKeywordDataBaseRepository,
             analyticsHelper = testAnalyticsHelper
         )
     }

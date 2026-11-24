@@ -72,12 +72,12 @@ class PeopleScreenTest {
         testDetailRepository = TestPeopleDetailRepository()
         getPeopleDetail = GetPeopleDetailUseCase(
             detailRepository = testDetailRepository,
-            peopleDataBaseRepository = testDatabaseRepository
+            peopleRepository = testDatabaseRepository
         )
         viewModel = PeopleVM(
             id = 0,
             getPeopleDetail = getPeopleDetail,
-            peopleDataBaseRepository = testDatabaseRepository,
+            peopleRepository = testDatabaseRepository,
             analyticsHelper = object : AnalyticsHelper {
                 override fun logEvent(event: AnalyticsEvent) {
                     println("event: $event")

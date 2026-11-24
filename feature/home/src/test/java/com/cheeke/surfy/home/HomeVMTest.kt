@@ -10,7 +10,6 @@ import com.cheeke.surfy.testing.repository.TestUserDataRepository
 import com.cheeke.surfy.testing.utils.MainDispatcherRule
 import com.cheeke.surfy.testing.utils.TestMovieAppDataManager
 import com.cheeke.surfy.testing.utils.TestNetworkMonitor
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -37,8 +36,8 @@ class HomeVMTest {
         testUserRepository = TestUserDataRepository()
         testMovieAppDataManager = TestMovieAppDataManager()
         viewModel = HomeVM(
-            movieDataBaseRepository = testDatabaseRepository,
-            pagingRepository = testPagingRepository,
+            movieRepository = testDatabaseRepository,
+            homeRepository = testPagingRepository,
             networkMonitor = testNetworkMonitor,
             dataManager = testMovieAppDataManager
         )
